@@ -1,0 +1,51 @@
+services:
+  app:
+    build: ./docker/php
+    volumes: ['.:/var/www/html']
+    depends_on: [mysql, redis]
+    environment:
+      DB_HOST: mysql
+      REDIS_HOST: redis
+
+  nginx:
+    image: nginx:alpine
+    ports: ['8000:80']
+    volumes:
+      - '.:/var/www/html'
+      - './docker/nginx/default.conf:/etc/nginx/conf.d/default.conf'
+    depends_on: [app]
+
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_DATABASE: reshen
+      MYSQL_ROOT_PASSWORD: secret
+    volumes: ['mysql:/var/lib/mysql']
+    ports: ['3306:3306']
+
+  redis:
+    image: redis:alpine
+    ports: ['6379:6379']
+
+  # worker صف — بدون این، پیامک‌ها و محاسبهٔ مجدد ETA اجرا نمی‌شوند
+  worker:
+    build: ./docker/php
+    command: php artisan queue:work --tries=3 --timeout=60
+    volumes: ['.:/var/www/html']
+    depends_on: [mysql, redis]
+    environment:
+      DB_HOST: mysql
+      REDIS_HOST: redis
+
+  # زمان‌بند — موتور ETA هر ۹۰ ثانیه صف را بازمحاسبه می‌کند
+  scheduler:
+    build: ./docker/php
+    command: php artisan schedule:work
+    volumes: ['.:/var/www/html']
+    depends_on: [mysql, redis]
+    environment:
+      DB_HOST: mysql
+      REDIS_HOST: redis
+
+volumes:
+  mysql:
