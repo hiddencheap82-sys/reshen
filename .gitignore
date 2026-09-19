@@ -22,3 +22,8 @@ yarn-error.log
 /.idea
 /.vscode
 .DS_Store
+
+# خروجی‌های موقت سازندهٔ Word
+tools/docx/node_modules/
+tools/docx/*.pdf
+tools/docx/package*.json
