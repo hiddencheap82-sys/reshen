@@ -1,0 +1,14 @@
+@font-face{font-family:'Vazirmatn';font-style:normal;font-weight:400;font-display:swap;
+  src:url('../fonts/Vazirmatn-Regular.woff2') format('woff2');}
+@font-face{font-family:'Vazirmatn';font-style:normal;font-weight:700;font-display:swap;
+  src:url('../fonts/Vazirmatn-Bold.woff2') format('woff2');}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ——— چیزهایی که تیلویند پوشش نمی‌دهد ——— */
+body{font-family:'Vazirmatn','Tahoma',sans-serif;}
+.nav-active{background:#eff6ff;color:#1d4ed8;font-weight:700;}
+/* اعداد فارسی در ورودی‌ها چپ‌به‌راست بمانند */
+input[type="tel"],input[type="number"],.ltr{direction:ltr;unicode-bidi:plaintext;}

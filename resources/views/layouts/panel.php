@@ -35,13 +35,7 @@ $icon = function (string $name, string $class = 'w-5 h-5') {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title><?= e($title ?? 'رشن') ?></title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = { theme: { extend: {
-    fontFamily: { sans: ['Vazirmatn','Tahoma','sans-serif'] },
-    colors: { brand: { 50:'#eff6ff',100:'#dbeafe',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',900:'#1e3a8a' } }
-  } } }
-</script>
+<link rel="stylesheet" href="<?= asset('css/app.css') ?>">
 <link rel="manifest" href="<?= url('manifest.webmanifest') ?>">
 <link rel="icon" href="<?= asset('icons/icon.svg') ?>" type="image/svg+xml">
 <link rel="apple-touch-icon" href="<?= asset('icons/icon.svg') ?>">

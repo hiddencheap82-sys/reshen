@@ -27,3 +27,13 @@ yarn-error.log
 tools/docx/node_modules/
 tools/docx/*.pdf
 tools/docx/package*.json
+
+# وابستگی‌های Composer — کامیت نمی‌شوند (تصمیم ت-۰۲ بازنگری‌شده).
+# بستهٔ انتشار با tools/build-release.sh ساخته می‌شود و vendor --no-dev داخلش هست.
+/vendor/
+/.env
+/node_modules/
+/tools/assets/node_modules/
+/tools/assets/package*.json
+/dist/
+.phpunit.cache/

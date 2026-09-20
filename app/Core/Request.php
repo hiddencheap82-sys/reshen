@@ -22,9 +22,38 @@ final class Request
         $this->path = '/' . trim($uri, '/');
     }
 
+    /**
+     * پیشوند آدرس پروژه — خالی اگر روی ریشهٔ دامنه نصب شده باشد،
+     * وگرنه چیزی مثل «/reshen».
+     *
+     * دو حالت نصب را پوشش می‌دهد (راهنمای استقرار، بخش cPanel):
+     *
+     *   الف) document root روی public/ است
+     *        SCRIPT_NAME = /index.php            → ''
+     *        SCRIPT_NAME = /reshen/index.php     → '/reshen'
+     *
+     *   ب) کل پروژه در public_html است و .htaccess ریشه درخواست‌ها را
+     *      به public/ می‌فرستد. آپاچی «/public» را در SCRIPT_NAME
+     *      نگه می‌دارد، ولی کاربر آن را در آدرس نمی‌بیند — پس باید حذف شود،
+     *      وگرنه همهٔ لینک‌ها یک «/public» اضافه می‌گیرند و ۴۰۴ می‌شوند.
+     *        SCRIPT_NAME = /public/index.php        → ''
+     *        SCRIPT_NAME = /reshen/public/index.php → '/reshen'
+     */
     public static function basePath(): string
     {
         $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
+        $scriptDir = rtrim($scriptDir, '/');
+
+        // حالت (ب): «/public» انتهایی را بردار.
+        // فقط وقتی که درخواستِ واقعی کاربر شامل «/public» نبوده باشد —
+        // اگر کسی عمداً example.com/public/... را باز کند، دست نمی‌زنیم.
+        if (str_ends_with($scriptDir, '/public') || $scriptDir === '/public') {
+            $requestUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+            if (!str_starts_with(ltrim($requestUri, '/'), 'public/')
+                && ltrim($requestUri, '/') !== 'public') {
+                $scriptDir = substr($scriptDir, 0, -strlen('/public'));
+            }
+        }
 
         return rtrim($scriptDir, '/');
     }
