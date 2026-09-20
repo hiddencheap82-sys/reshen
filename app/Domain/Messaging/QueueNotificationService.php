@@ -9,6 +9,8 @@ use App\Core\DB;
 use App\Domain\Queue\AppointmentRepository;
 use App\Domain\Queue\EtaEngine;
 use App\Domain\Queue\QueueOrderingService;
+use App\Support\Clock;
+use App\Support\Jalali;
 use DateTimeImmutable;
 
 /** Builds the actual SMS bodies and decides when to fire them (doc 8.6 "پیامک‌های صف"). */
@@ -66,8 +68,10 @@ final class QueueNotificationService
             if ($appt['estimated_start_at'] !== null) {
                 $previousMinutes = (int) round((strtotime($appt['estimated_start_at']) - $now->getTimestamp()) / 60);
                 if ($minutesUntil - $previousMinutes >= $delayThreshold) {
-                    $body = "شرمنده {$this->firstName($appt)} جان، امروز شلوغ شد و کمی عقبیم.\nنوبتت حدود {$e['start_p50']->format('H:i')} می‌شه.";
-                    $this->notifier->notify($salonId, $appt, 'queue_delayed', $body, false);
+                    $this->notifier->notify($salonId, $appt, 'queue_delayed', [
+                        'name' => $this->firstName($appt),
+                        'time' => Clock::hm($e['start_p50']->format('H:i')),
+                    ]);
                 }
             }
 
@@ -79,8 +83,10 @@ final class QueueNotificationService
 
             // "صندلی آماده‌ست" — became next in line (right after whoever's in the chair).
             if ($rank === 0 && !$this->notifier->alreadySent((int) $appt['id'], 'queue_chair_ready')) {
-                $body = "{$this->firstName($appt)} جان، نوبت بعدی توئه! بیا سمت {$staff['name']} تا معطل نشی.";
-                $this->notifier->notify($salonId, $appt, 'queue_chair_ready', $body, true);
+                $this->notifier->notify($salonId, $appt, 'queue_chair_ready', [
+                    'name' => $this->firstName($appt),
+                    'staff' => $staff['name'],
+                ]);
 
                 continue;
             }
@@ -88,11 +94,17 @@ final class QueueNotificationService
             // "نوبتت نزدیکه" — ETA fell inside the imminent window.
             if ($minutesUntil >= $imminentLow && $minutesUntil <= $imminentHigh
                 && !$this->notifier->alreadySent((int) $appt['id'], 'queue_nearly_up')) {
-                $ahead = $rank;
-                $link = rtrim((string) Config::get('app.url'), '/') . '/q/' . $appt['public_token'];
-                $body = "{$this->firstName($appt)} جان، {$ahead} نفر جلوتری، حدود {$minutesUntil} دقیقهٔ دیگه نوبتته.\n"
-                    . "راه بیفتی خوبه.\nجای صف: {$link}";
-                $this->notifier->notify($salonId, $appt, 'queue_nearly_up', $body, false);
+                /*
+                 * لینک صف از متن پیامک حذف شد: الگوی ثبت‌شده نمی‌تواند
+                 * لینک متغیر داشته باشد (اپراتور لینک را در متنِ تأییدشده
+                 * می‌خواهد، نه به‌عنوان متغیر). مشتری لینک را از پیامک
+                 * تأیید رزرو دارد.
+                 */
+                $this->notifier->notify($salonId, $appt, 'queue_nearly_up', [
+                    'name' => $this->firstName($appt),
+                    'ahead' => Jalali::toPersianDigits((string) $rank),
+                    'minutes' => Jalali::toPersianDigits((string) $minutesUntil),
+                ]);
             }
         }
     }
@@ -129,9 +141,12 @@ final class QueueNotificationService
                 if ($this->notifier->alreadySent((int) $appt['id'], $templateCode)) {
                     continue;
                 }
-                $when = \App\Support\Jalali::format(new DateTimeImmutable($appt['scheduled_at']), 'H:i');
-                $body = "{$this->firstName($appt)} جان، یادآوری: نوبتت ساعت {$when} در {$appt['salon_name']} است.";
-                if ($this->notifier->notify((int) $appt['salon_id'], $appt, $templateCode, $body, false)) {
+                $when = Clock::hm((new DateTimeImmutable($appt['scheduled_at']))->format('H:i'));
+                if ($this->notifier->notify((int) $appt['salon_id'], $appt, $templateCode, [
+                    'name' => $this->firstName($appt),
+                    'salon' => $appt['salon_name'],
+                    'time' => $when,
+                ])) {
                     $sentCount++;
                 }
             }

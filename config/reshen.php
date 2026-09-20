@@ -58,6 +58,25 @@ return [
         'far_threshold_minutes' => 60,
     ],
 
+    /*
+     * پرداخت آنلاین.
+     *
+     * پیش‌فرض خاموش است چون پلتفرم فعلاً رایگان است (ت-۳۱). کد زرین‌پال
+     * ساخته و آزموده شده تا روشن کردنش یک تغییر تنظیمات باشد نه یک
+     * پروژه: PAYMENT_DRIVER=zarinpal به‌علاوهٔ شناسهٔ پذیرنده.
+     *
+     * واقعیتی که در سند معماری هم آمده: اکثر پول در آرایشگاه نقدی و
+     * کارت‌به‌کارت است. درگاه آنلاین در این صنف حاشیه است، نه مرکز.
+     */
+    'payment' => [
+        'driver' => Env::get('PAYMENT_DRIVER', 'disabled'),
+
+        'zarinpal' => [
+            'merchant_id' => Env::get('ZARINPAL_MERCHANT_ID', ''),
+            'sandbox' => Env::get('ZARINPAL_SANDBOX', 'false') === 'true',
+        ],
+    ],
+
     'sms' => [
         'driver' => Env::get('SMS_DRIVER', 'log'),
 
@@ -68,14 +87,46 @@ return [
          * is why doc 8.7 says to start the approval paperwork in week zero,
          * not the last week. Leave empty in dev: the `log` driver ignores it.
          */
+        /*
+         * کلیدِ هر الگو با کدِ همان الگو در SmsTemplates یکی است. اگر
+         * خالی بماند، آن پیامک فرستاده نمی‌شود — مگر سالن خط اختصاصی
+         * داشته باشد (SMS_DEDICATED_LINE=true).
+         *
+         * فهرست کامل با متنی که باید در پنل اپراتور ثبت شود، در
+         * /panel/sms هست.
+         */
         'patterns' => [
             'melipayamak' => [
                 'otp' => Env::get('SMS_PATTERN_MELIPAYAMAK_OTP', ''),
+                'booking_confirmed' => Env::get('SMS_PATTERN_MELIPAYAMAK_BOOKING_CONFIRMED', ''),
+                'booking_cancelled' => Env::get('SMS_PATTERN_MELIPAYAMAK_BOOKING_CANCELLED', ''),
+                'reminder_24h' => Env::get('SMS_PATTERN_MELIPAYAMAK_REMINDER_24H', ''),
+                'reminder_2h' => Env::get('SMS_PATTERN_MELIPAYAMAK_REMINDER_2H', ''),
+                'queue_chair_ready' => Env::get('SMS_PATTERN_MELIPAYAMAK_QUEUE_CHAIR_READY', ''),
+                'queue_nearly_up' => Env::get('SMS_PATTERN_MELIPAYAMAK_QUEUE_NEARLY_UP', ''),
+                'queue_delayed' => Env::get('SMS_PATTERN_MELIPAYAMAK_QUEUE_DELAYED', ''),
             ],
             'kavenegar' => [
                 'otp' => Env::get('SMS_PATTERN_KAVENEGAR_OTP', ''),
+                'booking_confirmed' => Env::get('SMS_PATTERN_KAVENEGAR_BOOKING_CONFIRMED', ''),
+                'booking_cancelled' => Env::get('SMS_PATTERN_KAVENEGAR_BOOKING_CANCELLED', ''),
+                'reminder_24h' => Env::get('SMS_PATTERN_KAVENEGAR_REMINDER_24H', ''),
+                'reminder_2h' => Env::get('SMS_PATTERN_KAVENEGAR_REMINDER_2H', ''),
+                'queue_chair_ready' => Env::get('SMS_PATTERN_KAVENEGAR_QUEUE_CHAIR_READY', ''),
+                'queue_nearly_up' => Env::get('SMS_PATTERN_KAVENEGAR_QUEUE_NEARLY_UP', ''),
+                'queue_delayed' => Env::get('SMS_PATTERN_KAVENEGAR_QUEUE_DELAYED', ''),
             ],
         ],
+
+        /*
+         * خط اختصاصی، متنِ آزاد را تحویل می‌دهد؛ خط خدماتی (۳۰۰۰، ۲۰۰۰،
+         * ۹۸۲۱) نه. پیش‌فرض false است چون اشتباهِ true، پیامک‌ها را
+         * بی‌صدا از بین می‌برد.
+         */
+        'dedicated_line' => Env::get('SMS_DEDICATED_LINE', 'false') === 'true',
+
+        // کیف پیامک فعلاً اعمال نمی‌شود — پلتفرم رایگان است (ت-۲۶).
+        'enforce_credit' => Env::get('SMS_ENFORCE_CREDIT', 'false') === 'true',
 
         // OTP abuse limits. A per-phone cooldown alone is not enough: one
         // attacker cycling many numbers from a single IP never trips it.

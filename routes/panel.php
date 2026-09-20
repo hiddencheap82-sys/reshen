@@ -10,6 +10,7 @@ use App\Http\Controllers\QrController;
 use App\Http\Controllers\QueueController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\SmsPatternController;
 use App\Http\Controllers\SalonSettingsController;
 use App\Http\Controllers\StaffController;
 use App\Http\Middleware\AuthRequired;
@@ -23,6 +24,7 @@ $router->group(['middleware' => [AuthRequired::class, TenantRequired::class]], f
     $router->get('/panel', [QueueController::class, 'index']);
     $router->get('/panel/queue/poll', [QueueController::class, 'poll']);
     $router->get('/panel/bookings', [BookingsController::class, 'index']);
+    $router->get('/panel/bookings/new', [BookingsController::class, 'create']);
 
     // برگهٔ QR — هر کسی که به پنل سالن دسترسی دارد می‌تواند چاپش کند.
     $router->get('/panel/qr', [QrController::class, 'show']);
@@ -38,6 +40,7 @@ $router->group(['middleware' => [AuthRequired::class, TenantRequired::class]], f
 
     $router->group(['middleware' => [VerifyCsrf::class]], function ($router) {
         $router->post('/panel/customers/{id}', [CustomerController::class, 'update']);
+        $router->post('/panel/bookings', [BookingsController::class, 'store']);
         $router->post('/panel/queue/walkin', [QueueController::class, 'addWalkin']);
         $router->post('/panel/queue/{id}/start', [QueueController::class, 'start']);
         $router->post('/panel/queue/{id}/complete', [QueueController::class, 'complete']);
@@ -75,6 +78,7 @@ $router->group(['middleware' => [AuthRequired::class, TenantRequired::class]], f
         $router->get('/panel/reports/monthly', [ReportController::class, 'monthly']);
 
         // --- Salon settings ----------------------------------------------
+        $router->get('/panel/sms', [SmsPatternController::class, 'index']);
         $router->get('/panel/settings', [SalonSettingsController::class, 'show']);
         $router->group(['middleware' => [VerifyCsrf::class]], function ($router) {
             $router->post('/panel/settings/profile', [SalonSettingsController::class, 'updateProfile']);

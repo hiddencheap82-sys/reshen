@@ -56,7 +56,16 @@ final class EtaEngine
                 : ['p50' => (float) Config::get('reshen.estimation.fallback_minutes', 30), 'p80' => (float) Config::get('reshen.estimation.fallback_minutes', 30) * 1.3];
 
             if ($appt['status'] === 'in_chair' && $appt['actual_start_at'] !== null) {
-                $elapsedMinutes = (time() - strtotime($appt['actual_start_at'])) / 60;
+                /*
+                 * از $now خوانده می‌شود نه time().
+                 *
+                 * متد $now می‌گیرد تا قابل آزمودن باشد، ولی اینجا ساعت
+                 * واقعی سیستم را می‌خواند — یعنی در شبیه‌سازی یک روز
+                 * کاری، «گذشته از شروع» عددی نجومی می‌شد و تخمین کل صف
+                 * به هم می‌ریخت. در تولید هم اگر $now کمی عقب‌تر از
+                 * الان پاس داده شود، دو مبنای زمانی با هم می‌جنگند.
+                 */
+                $elapsedMinutes = ($now->getTimestamp() - strtotime($appt['actual_start_at'])) / 60;
                 $remainingP50 = max($minRemaining, $expected['p50'] - $elapsedMinutes);
                 $remainingP80 = max($minRemaining, $expected['p80'] - $elapsedMinutes);
 

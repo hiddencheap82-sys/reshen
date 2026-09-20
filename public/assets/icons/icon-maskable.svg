@@ -1,3 +1,8 @@
+<!--
+  نسخهٔ maskable — اندروید آیکون را در قالب‌های مختلف (دایره، سنجاقک،
+  مربع گرد) می‌بُرد. هر چیزی بیرون از دایرهٔ ۸۰٪ وسط ممکن است بریده شود،
+  پس حرف کوچک‌تر و پس‌زمینه تا لبه پر است.
+-->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="رشن">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
@@ -11,8 +16,7 @@
       <stop offset="100%" stop-color="#A16207"/>
     </linearGradient>
   </defs>
-  <rect width="192" height="192" rx="44" fill="url(#bg)"/>
-  <rect x="1.5" y="1.5" width="189" height="189" rx="42.5" fill="none" stroke="#FFFFFF" stroke-opacity=".12" stroke-width="3"/>
-  <text x="96" y="136" font-family="Tahoma, Arial, sans-serif" font-size="112" font-weight="bold"
+  <rect width="192" height="192" fill="url(#bg)"/>
+  <text x="96" y="126" font-family="Tahoma, Arial, sans-serif" font-size="84" font-weight="bold"
         fill="url(#gold)" text-anchor="middle">ر</text>
 </svg>

@@ -39,6 +39,11 @@ $totalRows = array_sum(array_map(static fn ($d) => count($d['rows']), $days));
     </p>
   </div>
 
+  <a href="<?= e(url('panel/bookings/new')) ?>" class="btn-accent metal h-11 text-[13px] px-4 order-last sm:order-none">
+    <?= icon('plus', 'w-4 h-4') ?>
+    رزرو جدید
+  </a>
+
   <nav class="flex items-center gap-1.5" aria-label="جابه‌جایی بازه">
     <a href="<?= e(url('panel/bookings?from=' . $prev)) ?>"
        class="glass w-11 h-11 grid place-items-center rounded-xl text-ink-600 tap"
@@ -77,6 +82,10 @@ $totalRows = array_sum(array_map(static fn ($d) => count($d['rows']), $days));
       لینک صفحهٔ سالن را برای مشتری‌ها بفرست تا بتوانند خودشان سانس بگیرند.<br>
       ساعت کاری و طول سانس را در <a class="text-accent font-semibold" href="<?= e(url('panel/settings')) ?>">تنظیمات</a> مشخص کن.
     </p>
+    <a href="<?= e(url('panel/bookings/new')) ?>" class="btn-ink mt-4 inline-flex">
+      <?= icon('plus', 'w-4 h-4') ?>
+      رزرو دستی ثبت کن
+    </a>
   </div>
 <?php else: ?>
   <div class="space-y-4">

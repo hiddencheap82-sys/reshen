@@ -7,10 +7,14 @@ namespace App\Http\Controllers;
 use App\Core\Auth;
 use App\Core\Request;
 use App\Core\Response;
+use App\Domain\Booking\BookingService;
+use App\Domain\Catalog\ServiceRepository;
 use App\Domain\Queue\AppointmentRepository;
 use App\Domain\Staff\StaffRepository;
+use App\Support\Clock;
 use App\Support\JalaliCalendar;
 use DateTimeImmutable;
+use RuntimeException;
 
 /**
  * رزروهای زمان‌دار (سانس‌های گرفته‌شده).
@@ -62,6 +66,139 @@ final class BookingsController extends Controller
             'onlyMine' => $onlyMine,
             'staffList' => (new StaffRepository())->all($salonId, true),
         ]);
+    }
+
+    /**
+     * فرم رزرو دستی — اول تاریخ، بعد سانس.
+     *
+     * چرا در پنل لازم است: مشتری‌ای که زنگ می‌زند یا سر پیشخوان
+     * می‌ایستد، نمی‌تواند از جریان رزرو آنلاین استفاده کند. تا الان
+     * پذیرش فقط می‌توانست «مراجعهٔ حضوری» به صف اضافه کند — یعنی همین
+     * الان — و هیچ راهی برای «چهارشنبه ساعت ۵» نداشت.
+     *
+     * یک فرم است نه ویزارد: پذیرش مشتری را پشت تلفن دارد و نباید چهار
+     * صفحه جلو و عقب برود. تاریخ و آرایشگر و خدمت که عوض شود، سانس‌ها
+     * دوباره حساب می‌شوند (با GET، پس بدون جاوااسکریپت هم کار می‌کند).
+     */
+    public function create(Request $request): Response
+    {
+        $salonId = Auth::salonId();
+
+        $date = $this->parseDate(
+            (string) ($this->jalaliQueryDate($request) ?? ''),
+            new DateTimeImmutable('today')
+        );
+
+        $staffRaw = $request->query('staff_id', '');
+        $staffId = $staffRaw !== '' && $staffRaw !== null ? (int) $staffRaw : null;
+
+        $serviceIds = array_values(array_filter(array_map(
+            'intval',
+            (array) $request->query('service_ids', [])
+        )));
+
+        $services = (new ServiceRepository())->all($salonId, true);
+
+        // تا خدمتی انتخاب نشده، مدت را از کوتاه‌ترین خدمت می‌گیریم تا
+        // فهرست سانس‌ها خالی نماند و پذیرش بفهمد آن روز اصلاً باز است.
+        $duration = $this->durationFor($salonId, $serviceIds, $services);
+
+        $free = $serviceIds === [] && $services === []
+            ? []
+            : (new BookingService())->freeSlots($salonId, $staffId, $date, $duration);
+
+        return $this->page('layouts.panel', 'panel.bookings.create', [
+            'title' => 'رزرو جدید',
+            'date' => $date,
+            'staffId' => $staffId,
+            'serviceIds' => $serviceIds,
+            'services' => $services,
+            'staffList' => (new StaffRepository())->all($salonId, true),
+            'slots' => $free,
+            'duration' => $duration,
+            'isClosed' => $free === [] && $services !== [],
+        ]);
+    }
+
+    /** ثبت نهایی. */
+    public function store(Request $request): Response
+    {
+        $salonId = Auth::salonId();
+
+        $date = $this->parseDate((string) (jalali_date_from_request($request, 'date') ?? ''), new DateTimeImmutable('today'));
+        $time = (string) $request->input('time', '');
+        $phone = trim((string) $request->input('phone', ''));
+        $name = trim((string) $request->input('name', ''));
+        $staffRaw = $request->input('staff_id', '');
+        $staffId = $staffRaw !== '' && $staffRaw !== null ? (int) $staffRaw : null;
+        $serviceIds = array_values(array_filter(array_map('intval', (array) $request->input('service_ids', []))));
+
+        if ($time === '') {
+            return $this->withError('یک سانس انتخاب کنید.', '/panel/bookings/new');
+        }
+        if ($phone === '') {
+            return $this->withError('شمارهٔ موبایل مشتری لازم است.', '/panel/bookings/new');
+        }
+
+        try {
+            $appointment = (new BookingService())->createBooking(
+                $salonId,
+                $staffId,
+                $serviceIds,
+                $date,
+                $time,
+                $phone,
+                $name !== '' ? $name : null,
+            );
+        } catch (RuntimeException $e) {
+            return $this->withError($e->getMessage(), '/panel/bookings/new');
+        }
+
+        $label = JalaliCalendar::humanDate(new DateTimeImmutable($appointment['scheduled_at']));
+
+        return $this->withSuccess(
+            'نوبت ثبت شد: ' . $label . ' ساعت ' . Clock::hm($time),
+            '/panel/bookings?from=' . $date->format('Y-m-d')
+        );
+    }
+
+    /**
+     * مدت کل خدمت‌های انتخاب‌شده.
+     *
+     * اگر چیزی انتخاب نشده، کوتاه‌ترین خدمت ملاک است — نه صفر. با صفر،
+     * حلقهٔ تولید سانس هر بازه‌ای را آزاد می‌بیند و فهرستی نشان می‌دهد
+     * که با انتخاب خدمت کوچک‌تر می‌شود؛ گمراه‌کننده است.
+     *
+     * @param int[] $serviceIds
+     * @param array<int,array> $services
+     */
+    private function durationFor(int $salonId, array $serviceIds, array $services): int
+    {
+        if ($services === []) {
+            return 30;
+        }
+
+        if ($serviceIds === []) {
+            return max(5, min(array_map(static fn ($s) => (int) $s['duration_minutes'], $services)));
+        }
+
+        $byId = [];
+        foreach ($services as $s) {
+            $byId[(int) $s['id']] = (int) $s['duration_minutes'];
+        }
+
+        $total = 0;
+        foreach ($serviceIds as $id) {
+            $total += $byId[$id] ?? 0;
+        }
+
+        return max(5, $total);
+    }
+
+    /** تاریخ از کوئری، اگر انتخابگر شمسی فرستاده باشد. */
+    private function jalaliQueryDate(Request $request): ?string
+    {
+        return jalali_date_from_request($request, 'date');
     }
 
     /**

@@ -16,8 +16,11 @@ $step = $step ?? null;
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title><?= e($title ?? 'رشن') ?></title>
 <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
-<link rel="manifest" href="<?= e(url('manifest.webmanifest')) ?>">
-<link rel="icon" href="<?= e(asset('icons/icon.svg')) ?>" type="image/svg+xml">
+<?php
+  $pwaSalonSlug = $salon['slug'] ?? null;
+  $pwaAppTitle = $salon['name'] ?? 'رشن';
+  include BASE_PATH . '/resources/views/components/pwa-head.php';
+?>
 <meta name="theme-color" content="#1C1917" id="theme-color">
 <meta name="color-scheme" content="light dark">
 <?php include BASE_PATH . '/resources/views/components/theme-boot.php'; ?>
@@ -123,6 +126,8 @@ $step = $step ?? null;
     <span class="text-[11px] text-ink-300">رشن — زمانِ راست می‌گوید</span>
   </footer>
 </div>
+
+<?php include BASE_PATH . '/resources/views/components/install-prompt.php'; ?>
 
 </body>
 </html>

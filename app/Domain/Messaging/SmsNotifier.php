@@ -9,15 +9,32 @@ use App\Core\DB;
 use DateTimeImmutable;
 
 /**
- * The anti-annoyance rules from doc 8.6 wrapped around SmsManager: at most
- * 4 SMS per appointment, nothing between 23:00-08:00 except "chair ready",
- * and "we're running late" is sent at most once — a second one is worse
- * than silence.
+ * قاعده‌های ضدِ مزاحمت (سند ۸.۶) دور SmsManager: حداکثر ۴ پیامک برای هر
+ * نوبت، هیچ چیز بین ۲۳ تا ۸ صبح جز «صندلی آماده است»، و «عقب افتادیم»
+ * فقط یک بار — دومی‌اش بدتر از سکوت است.
+ *
+ * **همه‌چیز از راه الگو می‌رود، نه متن آزاد.** روی خط خدماتی، پیامکِ
+ * متنِ آزاد تحویل داده نمی‌شود ولی در پنل «ارسال شد» می‌خورد. متن
+ * جایگزین فقط وقتی استفاده می‌شود که سالن خط اختصاصی دارد
+ * (`SMS_DEDICATED_LINE=true`) یا در حالت توسعه با درایور log.
  */
 final class SmsNotifier
 {
-    public function notify(int $salonId, array $appointment, string $templateCode, string $body, bool $critical): bool
+    /**
+     * @param array<string,string|int> $vars متغیرهای الگو، با نام
+     * @param bool|null $critical اگر null باشد از خود الگو خوانده می‌شود
+     */
+    public function notify(int $salonId, array $appointment, string $templateCode, array $vars, ?bool $critical = null): bool
     {
+        if (!SmsTemplates::exists($templateCode)) {
+            return false;
+        }
+
+        $critical ??= SmsTemplates::isCritical($templateCode);
+        // متن رندرشده هم لازم است: هم برای خط اختصاصی، هم برای اینکه در
+        // جدول پیامک‌ها بماند و بعداً بشود فهمید چه چیزی برای مشتری رفت.
+        $body = SmsTemplates::render($templateCode, $vars);
+
         $toPhone = DB::selectOne('SELECT phone FROM customers WHERE id = ?', [$appointment['customer_id']])['phone'] ?? null;
         if ($toPhone === null) {
             return false;
@@ -53,20 +70,33 @@ final class SmsNotifier
             }
         }
 
+        /*
+         * کیف پیامک فعلاً اعمال نمی‌شود چون پلتفرم رایگان است (تصمیم
+         * ت-۲۶). ستون‌ها و شمارش سر جایشان مانده‌اند تا وقتی شارژ
+         * برگشت، فقط این پرچم روشن شود — نه اینکه منطق از نو نوشته شود.
+         */
         $salon = DB::selectOne('SELECT sms_credit FROM salons WHERE id = ?', [$salonId]);
-        if (!$critical && (int) ($salon['sms_credit'] ?? 0) <= 0) {
-            $this->log($salonId, $appointment, $toPhone, $templateCode, $body, $critical, 'skipped_no_credit');
 
-            return false;
+        if (Config::get('reshen.sms.enforce_credit', false)) {
+            if (!$critical && (int) ($salon['sms_credit'] ?? 0) <= 0) {
+                $this->log($salonId, $appointment, $toPhone, $templateCode, $body, $critical, 'skipped_no_credit');
+
+                return false;
+            }
+            $emergencyFloor = -1 * (int) Config::get('reshen.sms.emergency_credit', 100);
+            if ($critical && (int) ($salon['sms_credit'] ?? 0) <= $emergencyFloor) {
+                $this->log($salonId, $appointment, $toPhone, $templateCode, $body, $critical, 'skipped_no_credit');
+
+                return false;
+            }
         }
-        $emergencyFloor = -1 * (int) Config::get('reshen.sms.emergency_credit', 100);
-        if ($critical && (int) ($salon['sms_credit'] ?? 0) <= $emergencyFloor) {
-            $this->log($salonId, $appointment, $toPhone, $templateCode, $body, $critical, 'skipped_no_credit');
 
-            return false;
-        }
-
-        $result = SmsManager::send($toPhone, $body);
+        $result = SmsManager::sendPattern(
+            $toPhone,
+            $templateCode,
+            SmsTemplates::orderedArgs($templateCode, $vars),
+            self::plainTextAllowed() ? $body : ''
+        );
         $this->log($salonId, $appointment, $toPhone, $templateCode, $body, $critical, $result['ok'] ? 'sent' : 'failed', $result);
 
         if ($result['ok']) {
@@ -82,6 +112,28 @@ final class SmsNotifier
             "SELECT id FROM sms_messages WHERE appointment_id = ? AND template_code = ? AND status = 'sent'",
             [$appointmentId, $templateCode]
         ) !== null;
+    }
+
+    /**
+     * آیا متنِ آزاد مجاز است؟
+     *
+     * دو حالت، و هر دو واقعی‌اند:
+     *
+     *   خط اختصاصی — اپراتور متنِ آزاد را تحویل می‌دهد. خط خدماتی
+     *   (۳۰۰۰، ۲۰۰۰، ۹۸۲۱) نمی‌دهد. پیش‌فرض false است یعنی سخت‌گیرانه؛
+     *   اگر اشتباه true باشد، پیامک‌ها بی‌صدا به مقصد نمی‌رسند.
+     *
+     *   درایور log — حالت توسعه. اینجا اصلاً پیامکی در کار نیست و
+     *   الگو معنا ندارد؛ بدون این، کل جریان رزرو در محیط توسعه با
+     *   «الگو تنظیم نشده» می‌خورد زمین و آزمودنش ممکن نیست.
+     */
+    private static function plainTextAllowed(): bool
+    {
+        if (Config::get('reshen.sms.driver', 'log') === 'log') {
+            return true;
+        }
+
+        return (bool) Config::get('reshen.sms.dedicated_line', false);
     }
 
     private function inQuietHours(): bool

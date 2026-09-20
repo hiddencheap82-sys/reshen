@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Core\Response;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ManifestController;
 use App\Http\Middleware\AuthRequired;
 use App\Http\Middleware\VerifyCsrf;
 
@@ -12,6 +13,10 @@ use App\Http\Middleware\VerifyCsrf;
 $router->get('/', function () {
     return Response::redirect('/login');
 });
+
+// مانیفست PWA — در لحظه ساخته می‌شود تا برای هر سالن، اسم و صفحهٔ
+// شروعِ خودش را بدهد (ت-۳۲).
+$router->get('/manifest.webmanifest', [ManifestController::class, 'show']);
 
 // --- Auth -----------------------------------------------------------------
 $router->get('/login', [AuthController::class, 'showLogin']);

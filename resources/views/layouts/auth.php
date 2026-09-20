@@ -14,8 +14,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title><?= e($title ?? 'رشن') ?></title>
 <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
-<link rel="manifest" href="<?= e(url('manifest.webmanifest')) ?>">
-<link rel="icon" href="<?= e(asset('icons/icon.svg')) ?>" type="image/svg+xml">
+<?php include BASE_PATH . '/resources/views/components/pwa-head.php'; ?>
 <meta name="color-scheme" content="light dark">
 <?php include BASE_PATH . '/resources/views/components/theme-boot.php'; ?>
 </head>

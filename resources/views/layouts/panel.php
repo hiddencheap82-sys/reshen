@@ -13,6 +13,7 @@ $navItems = [
     ['href' => '/panel/staff', 'label' => 'آرایشگرها', 'icon' => 'scissors', 'roles' => ['owner','manager']],
     ['href' => '/panel/services', 'label' => 'خدمات', 'icon' => 'tag', 'roles' => ['owner','manager']],
     ['href' => '/panel/qr', 'label' => 'کد QR', 'icon' => 'qr', 'roles' => ['owner','manager','reception']],
+    ['href' => '/panel/sms', 'label' => 'الگوی پیامک', 'icon' => 'message', 'roles' => ['owner','manager']],
     ['href' => '/panel/settings', 'label' => 'تنظیمات سالن', 'icon' => 'cog', 'roles' => ['owner','manager']],
 ];
 $visibleNav = array_values(array_filter($navItems, fn($i) => in_array($role, $i['roles'], true)));
@@ -25,18 +26,11 @@ $currentPath = '/' . trim($_SERVER['REQUEST_URI'] ?? '', '/');
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title><?= e($title ?? 'رشن') ?></title>
 <link rel="stylesheet" href="<?= asset('css/app.css') ?>">
-<link rel="manifest" href="<?= url('manifest.webmanifest') ?>">
-<link rel="icon" href="<?= asset('icons/icon.svg') ?>" type="image/svg+xml">
-<link rel="apple-touch-icon" href="<?= asset('icons/icon.svg') ?>">
+<?php include BASE_PATH . '/resources/views/components/pwa-head.php'; ?>
 <meta name="theme-color" content="#1C1917">
 <style>
   .nav-active{ background:var(--accent-soft); color:var(--accent); font-weight:700; }
 </style>
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('<?= url('service-worker.js') ?>'));
-  }
-</script>
 <?php include BASE_PATH . '/resources/views/components/theme-boot.php'; ?>
 </head>
 <body class="antialiased">
@@ -195,6 +189,8 @@ $currentPath = '/' . trim($_SERVER['REQUEST_URI'] ?? '', '/');
     <?php endif; ?>
   </div>
 </nav>
+
+<?php include BASE_PATH . '/resources/views/components/install-prompt.php'; ?>
 
 </body>
 </html>

@@ -8,6 +8,9 @@ use App\Core\DB;
 use App\Domain\Catalog\ServiceRepository;
 use App\Domain\Customer\CustomerRepository;
 use App\Domain\Messaging\SmsManager;
+use App\Domain\Messaging\SmsNotifier;
+use App\Support\Clock;
+use App\Support\JalaliCalendar;
 use App\Domain\Queue\AppointmentRepository;
 use DateTimeImmutable;
 use RuntimeException;
@@ -102,16 +105,29 @@ final class BookingService
         return true;
     }
 
+    /**
+     * پیامک تأیید رزرو.
+     *
+     * از راه الگو می‌رود نه متن آزاد (ت-۲۹): روی خط خدماتی، متنِ آزاد
+     * تحویل نمی‌شود ولی در پنل «ارسال شد» می‌خورد.
+     *
+     * لینک پیگیری از متن حذف شد چون الگوی ثبت‌شده نمی‌تواند لینکِ متغیر
+     * داشته باشد. مشتری از همان صفحه‌ای که رزرو کرده لینکش را می‌بیند.
+     */
     private function sendConfirmation(int $salonId, array $appointment, array $customer): void
     {
         if ($customer['phone'] === null) {
             return;
         }
-        $salon = DB::selectOne('SELECT name FROM salons WHERE id = ?', [$salonId]);
-        $link = rtrim((string) \App\Core\Config::get('app.url'), '/') . '/q/' . $appointment['public_token'];
-        $when = \App\Support\Jalali::format(new DateTimeImmutable($appointment['scheduled_at']), 'D j M، H:i');
 
-        $message = "نوبت شما در {$salon['name']} ثبت شد: {$when}\nپیگیری نوبت: {$link}";
-        SmsManager::send($customer['phone'], $message);
+        $salon = DB::selectOne('SELECT name FROM salons WHERE id = ?', [$salonId]);
+        $at = new DateTimeImmutable($appointment['scheduled_at']);
+
+        (new SmsNotifier())->notify($salonId, $appointment, 'booking_confirmed', [
+            'name' => trim(explode(' ', (string) ($customer['name'] ?? 'مشتری'))[0]) ?: 'مشتری',
+            'salon' => $salon['name'] ?? '',
+            'date' => JalaliCalendar::humanDate($at),
+            'time' => Clock::hm($at->format('H:i')),
+        ]);
     }
 }
