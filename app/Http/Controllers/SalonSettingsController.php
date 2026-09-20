@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Core\Auth;
-use App\Support\Theme;
+use App\Core\Config;
 use App\Core\DB;
 use App\Core\Request;
-use App\Support\Clock;
 use App\Core\Response;
 use App\Domain\Salon\HolidayRepository;
 use App\Domain\Salon\WorkingHoursRepository;
+use App\Support\Clock;
+use App\Support\ImageUpload;
 use App\Support\Jalali;
+use App\Support\Theme;
 
 final class SalonSettingsController extends Controller
 {
@@ -46,10 +48,54 @@ final class SalonSettingsController extends Controller
             'theme' => Theme::resolve((string) $request->input('theme', '')),
         ], 'id = :id', ['id' => Auth::salonId()]);
 
+        $logoMessage = $this->handleLogo($request);
+
         // نشست را تازه کن وگرنه پنل تا ورود بعدی رنگ قبلی را نشان می‌دهد
         Auth::setSalon(Auth::salonId());
 
+        if ($logoMessage !== null) {
+            return $this->withError($logoMessage, '/panel/settings');
+        }
+
         return $this->withSuccess('اطلاعات سالن ذخیره شد.', '/panel/settings');
+    }
+
+    /**
+     * لوگو: آپلود تازه یا حذف.
+     *
+     * پیام خطا برمی‌گرداند یا null. بقیهٔ فرم جدا ذخیره شده، پس
+     * مشکل لوگو نباید نام و آدرسِ درست را هم دور بریزد — کاربر فرم را
+     * پر کرده و اگر همه‌چیز برگردد، دوباره پرش می‌کند بی‌آنکه بفهمد چرا.
+     */
+    private function handleLogo(Request $request): ?string
+    {
+        $salonId = Auth::salonId();
+        $dir = BASE_PATH . '/public/' . Config::get('reshen.uploads.logos_dir', 'uploads/logos');
+        $current = DB::selectOne('SELECT logo_file FROM salons WHERE id = ?', [$salonId])['logo_file'] ?? null;
+
+        if ($request->input('remove_logo') !== null) {
+            ImageUpload::delete($dir, $current);
+            DB::update('salons', ['logo_file' => null], 'id = :id', ['id' => $salonId]);
+
+            return null;
+        }
+
+        $result = ImageUpload::saveImage($request->file('logo'), $dir, 'logo');
+
+        if ($result['error'] !== null) {
+            return $result['error'];
+        }
+
+        if (!$result['ok']) {
+            return null; // چیزی آپلود نشده — عادی است
+        }
+
+        // فایل قبلی بعد از موفقیتِ فایل تازه پاک می‌شود، نه قبلش: اگر
+        // ذخیره شکست بخورد، سالن بدون لوگو نمی‌ماند.
+        ImageUpload::delete($dir, $current);
+        DB::update('salons', ['logo_file' => $result['path']], 'id = :id', ['id' => $salonId]);
+
+        return null;
     }
 
     public function updateHours(Request $request): Response

@@ -21,6 +21,21 @@ if (!function_exists('url')) {
     }
 }
 
+if (!function_exists('salon_logo_url')) {
+    /** آدرس لوگوی سالن، یا null اگر نداشته باشد. */
+    function salon_logo_url(?string $file): ?string
+    {
+        if ($file === null || $file === '') {
+            return null;
+        }
+
+        $dir = (string) App\Core\Config::get('reshen.uploads.logos_dir', 'uploads/logos');
+
+        // basename: نام از دیتابیس می‌آید ولی باز هم مسیرزدایی می‌شود.
+        return url($dir . '/' . basename($file));
+    }
+}
+
 if (!function_exists('absolute_url')) {
     /**
      * آدرس کامل با دامنه — برای QR، پیامک، و هر چیزی که بیرون از مرورگر

@@ -154,6 +154,7 @@ final class HealthCheck
         foreach ([
             'storage/logs' => 'لاگ خطا و پیامک',
             'storage/uploads/customer_photos' => 'عکس مشتری',
+            'public/uploads/logos' => 'لوگوی سالن',
         ] as $relative => $why) {
             $path = BASE_PATH . '/' . $relative;
             $exists = is_dir($path);

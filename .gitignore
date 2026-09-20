@@ -38,3 +38,8 @@ tools/docx/package*.json
 /dist/
 .phpunit.cache/
 .env.testing
+
+# لوگوهای آپلودشده — دادهٔ مشتری‌اند، نه کد.
+# خودِ پوشه و .htaccess کامیت می‌شوند چون نصب به آن‌ها نیاز دارد.
+/public/uploads/logos/*
+!/public/uploads/logos/.gitkeep

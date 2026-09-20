@@ -57,7 +57,18 @@ $step = $step ?? null;
           </span>
         </div>
 
-        <h1 class="text-xl font-extrabold leading-tight"><?= e($salon['name']) ?></h1>
+        <?php $salonLogo = salon_logo_url($salon['logo_file'] ?? null); ?>
+        <div class="flex items-center gap-3">
+          <?php if ($salonLogo !== null): ?>
+            <!-- لوگوی سالن. شفافیتش حفظ شده، پس روی سرصفحهٔ تیره
+                 می‌نشیند بدون مستطیل سفید. -->
+            <span class="w-14 h-14 shrink-0 rounded-2xl grid place-items-center overflow-hidden bg-white/10">
+              <img src="<?= e($salonLogo) ?>" alt="لوگوی <?= e($salon['name']) ?>"
+                   class="w-full h-full object-contain" width="56" height="56" loading="eager">
+            </span>
+          <?php endif; ?>
+          <h1 class="text-xl font-extrabold leading-tight min-w-0"><?= e($salon['name']) ?></h1>
+        </div>
 
         <?php if (!empty($salon['address']) || !empty($salon['city'])): ?>
           <p class="flex items-start gap-1.5 text-[12px] text-ink-300 mt-2 leading-relaxed">

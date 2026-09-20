@@ -32,8 +32,12 @@ done
 
 # پوشه‌های نوشتنی، خالی ولی موجود
 mkdir -p "$STAGE/storage/logs" "$STAGE/storage/uploads/customer_photos"
+# پوشهٔ لوگو باید در بسته باشد: روی هاست سخت‌گیر، PHP اجازهٔ ساختن پوشه
+# داخل public را ندارد و آپلود لوگو بی‌دلیل شکست می‌خورد.
+mkdir -p "$STAGE/public/uploads/logos"
 cp storage/.htaccess "$STAGE/storage/" 2>/dev/null || true
 touch "$STAGE/storage/logs/.gitkeep" "$STAGE/storage/uploads/customer_photos/.gitkeep"
+touch "$STAGE/public/uploads/logos/.gitkeep"
 
 echo "→ حذف چیزهایی که مشتری لازم ندارد"
 rm -rf "$STAGE/tools/assets/node_modules" "$STAGE/tools/assets" "$STAGE/tools/build-release.sh"

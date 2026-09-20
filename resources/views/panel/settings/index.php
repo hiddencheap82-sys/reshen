@@ -11,8 +11,46 @@
 <div class="grid lg:grid-cols-2 gap-5">
   <div class="glass rounded-2xl p-4 sm:p-5">
     <h2 class="card-title mb-4">مشخصات سالن</h2>
-    <form method="post" action="<?= url('panel/settings/profile') ?>" class="space-y-3">
+    <!-- enctype لازم است، وگرنه فایل اصلاً به سرور نمی‌رسد و
+         $_FILES خالی می‌ماند بدون هیچ خطایی. -->
+    <form method="post" action="<?= e(url('panel/settings/profile')) ?>"
+          enctype="multipart/form-data" class="space-y-3">
       <?= csrf_field() ?>
+
+      <?php $logoUrl = salon_logo_url($salon['logo_file'] ?? null); ?>
+      <div>
+        <span class="block text-[12px] font-bold text-ink-600 mb-2">لوگو</span>
+        <div class="flex items-center gap-3">
+          <span class="w-16 h-16 shrink-0 rounded-2xl grid place-items-center overflow-hidden
+                       <?= $logoUrl === null ? 'metal metal-ink' : '' ?>"
+                style="<?= $logoUrl === null ? '' : 'background:var(--accent-soft)' ?>">
+            <?php if ($logoUrl !== null): ?>
+              <img src="<?= e($logoUrl) ?>" alt="لوگوی <?= e($salon['name']) ?>"
+                   class="w-full h-full object-contain" width="64" height="64">
+            <?php else: ?>
+              <span class="text-2xl font-extrabold text-white" aria-hidden="true">ر</span>
+            <?php endif; ?>
+          </span>
+
+          <div class="flex-1 min-w-0">
+            <input type="file" name="logo" accept="image/png,image/jpeg,image/webp"
+                   aria-label="انتخاب فایل لوگو"
+                   class="block w-full text-[11px] text-ink-500
+                          file:me-2 file:h-10 file:px-3 file:rounded-lg file:border-0
+                          file:text-[12px] file:font-bold file:cursor-pointer
+                          file:bg-ink-100 file:text-ink-700">
+            <p class="text-[10.5px] text-ink-400 mt-1.5 leading-relaxed">
+              PNG یا JPG، تا ۳ مگابایت. به‌طور خودکار کوچک می‌شود.
+            </p>
+            <?php if ($logoUrl !== null): ?>
+              <label class="inline-flex items-center gap-1.5 text-[11px] text-ink-500 mt-1.5 cursor-pointer">
+                <input type="checkbox" name="remove_logo" value="1" class="w-4 h-4 accent-current">
+                حذف لوگوی فعلی
+              </label>
+            <?php endif; ?>
+          </div>
+        </div>
+      </div>
       <div>
         <label class="block text-xs text-ink-500 mb-1">نام سالن</label>
         <input type="text" name="name" value="<?= e($salon['name']) ?>" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
