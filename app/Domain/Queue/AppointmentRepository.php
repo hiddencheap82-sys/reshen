@@ -97,4 +97,37 @@ final class AppointmentRepository
 
         return (int) (DB::selectOne($sql, $params)['c'] ?? 0);
     }
+
+    /**
+     * خلاصهٔ امروزِ کل سالن، در یک کوئری.
+     *
+     * چرا یک کوئری و نه چهارتا: این عدد بالای صفحهٔ صف زنده است و هر ۱۵
+     * ثانیه با هر بار تازه‌شدن صفحه دوباره خوانده می‌شود. چهار رفت‌وبرگشت
+     * جدا، روی هاست اشتراکی ضعیف دیده می‌شود.
+     *
+     * @return array{total:int,completed:int,waiting:int,in_chair:int,no_show:int}
+     */
+    public function todaySummary(int $salonId): array
+    {
+        $row = DB::selectOne(
+            "SELECT
+                COUNT(*) AS total,
+                SUM(status = 'completed') AS completed,
+                SUM(status = 'queued') AS waiting,
+                SUM(status = 'in_chair') AS in_chair,
+                SUM(status = 'no_show') AS no_show
+             FROM appointments
+             WHERE salon_id = ?
+               AND DATE(COALESCE(actual_end_at, actual_start_at, scheduled_at, queued_at, created_at)) = CURDATE()",
+            [$salonId]
+        );
+
+        return [
+            'total' => (int) ($row['total'] ?? 0),
+            'completed' => (int) ($row['completed'] ?? 0),
+            'waiting' => (int) ($row['waiting'] ?? 0),
+            'in_chair' => (int) ($row['in_chair'] ?? 0),
+            'no_show' => (int) ($row['no_show'] ?? 0),
+        ];
+    }
 }

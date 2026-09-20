@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Core\DB;
+use App\Core\Config;
 use App\Core\Request;
 use App\Core\Response;
 use App\Core\Session;
@@ -14,6 +15,7 @@ use App\Domain\Identity\OtpService;
 use App\Domain\Staff\StaffRepository;
 use App\Support\IranMobile;
 use App\Support\Jalali;
+use App\Support\JalaliCalendar;
 use DateTimeImmutable;
 use RuntimeException;
 
@@ -107,19 +109,87 @@ final class BookingWizardController extends Controller
         $booking = new BookingService();
         $slotsByTime = $booking->freeSlots((int) $salon['id'], $wizard['staff_id'] ?? null, $date, $duration);
 
-        $days = [];
-        for ($i = 0; $i < 7; $i++) {
-            $d = (new DateTimeImmutable('today'))->modify("+{$i} days");
-            $days[] = ['value' => $d->format('Y-m-d'), 'label' => Jalali::format($d, 'D j M')];
+        /*
+         * ماهی که تقویم نشان می‌دهد. پیش‌فرض ماهِ تاریخ انتخاب‌شده است،
+         * ولی کاربر می‌تواند با دکمه‌های قبل/بعد جابه‌جا شود — پس ماه از
+         * پارامتر آدرس هم خوانده می‌شود.
+         */
+        [$todayJy, $todayJm] = Jalali::fromDateTime(new DateTimeImmutable('today'));
+        [$dateJy, $dateJm] = Jalali::fromDateTime($date);
+
+        $viewYear = (int) $request->query('jy', (string) $dateJy);
+        $viewMonth = (int) $request->query('jm', (string) $dateJm);
+        if ($viewMonth < 1 || $viewMonth > 12) {
+            $viewMonth = $dateJm;
+            $viewYear = $dateJy;
         }
+
+        /*
+         * وضعیت هر روزِ ماه: آیا اصلاً وقتی آزاد دارد؟
+         *
+         * بدون این، تقویم روزهایی را قابل انتخاب نشان می‌دهد که سالن
+         * تعطیل است یا همهٔ نوبت‌هایش پر شده — و مشتری بعد از دو کلیک
+         * به صفحهٔ خالی می‌رسد. بهتر است همان اول ببیند کدام روزها باز است.
+         */
+        $dayStates = $this->monthAvailability(
+            (int) $salon['id'],
+            $wizard['staff_id'] ?? null,
+            $duration,
+            $viewYear,
+            $viewMonth
+        );
 
         return $this->page('layouts.booking', 'booking.slots', [
             'title' => 'انتخاب زمان',
             'salon' => $salon,
-            'days' => $days,
+            'calendar' => JalaliCalendar::month($viewYear, $viewMonth, $dayStates),
+            'minMonth' => ['year' => $todayJy, 'month' => $todayJm],
             'selectedDate' => $dateParam,
+            'selectedDateLabel' => JalaliCalendar::relativeDate($date),
             'slots' => array_keys($slotsByTime),
         ]);
+    }
+
+    /**
+     * برای هر روز ماه، بگو وقت آزاد دارد یا نه.
+     *
+     * @return array<string,array{available:bool,label:string}>
+     */
+    private function monthAvailability(
+        int $salonId,
+        ?int $staffId,
+        int $duration,
+        int $jy,
+        int $jm
+    ): array {
+        $today = new DateTimeImmutable('today');
+        $horizon = $today->modify('+' . (int) Config::get('reshen.booking.max_days_ahead', 30) . ' days');
+        $booking = new BookingService();
+
+        $states = [];
+        $daysInMonth = Jalali::daysInJalaliMonth($jy, $jm);
+
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $date = Jalali::toDateTime($jy, $jm, $day);
+            $key = $date->format('Y-m-d');
+
+            if ($date < $today) {
+                $states[$key] = ['available' => false, 'label' => 'گذشته'];
+                continue;
+            }
+
+            if ($date > $horizon) {
+                $states[$key] = ['available' => false, 'label' => 'هنوز باز نشده'];
+                continue;
+            }
+
+            $free = $booking->freeSlots($salonId, $staffId, $date, $duration);
+            $states[$key] = $free === []
+                ? ['available' => false, 'label' => 'بدون وقت آزاد']
+                : ['available' => true, 'label' => ''];
+        }
+
+        return $states;
     }
 
     public function phoneStep(Request $request): Response

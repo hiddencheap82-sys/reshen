@@ -4,11 +4,59 @@
  * @var array $services
  * @var array $staffList
  * @var int $todayCount
+ * @var array $todaySummary
+ * @var ?array $salonEarnings
  */
 use App\Core\Auth;
+use App\Support\JalaliCalendar;
+
 $role = Auth::role();
+$today = new DateTimeImmutable('today');
+$sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'no_show'=>0];
 ?>
 <script>setTimeout(() => location.reload(), 15000);</script>
+
+<!--
+  نوار خلاصهٔ امروز.
+
+  چرا تاریخ شمسی اینجاست: صاحب سالن روز را با تاریخ شمسی می‌شناسد، و
+  «پنج‌شنبه» برایش معنای عملیاتی دارد (شلوغ‌ترین روز هفته). تاریخ میلادی
+  یا نبودِ تاریخ، این صفحه را از واقعیت جدا می‌کند.
+-->
+<div class="bg-white rounded-2xl border border-slate-100 p-4 mb-4">
+  <div class="flex items-baseline justify-between mb-3">
+    <div>
+      <div class="text-sm font-bold text-slate-800">
+        <?= e(JalaliCalendar::humanDate($today, true)) ?>
+      </div>
+      <?php if (App\Support\Jalali::isWeekend($today)): ?>
+        <div class="text-[11px] text-rose-500 font-semibold mt-0.5">آخر هفته — روز شلوغ</div>
+      <?php endif; ?>
+    </div>
+    <?php if ($salonEarnings !== null): ?>
+      <div class="text-left">
+        <div class="text-[11px] text-slate-400">فروش امروز</div>
+        <div class="text-lg font-extrabold text-brand-700 tabular-nums">
+          <?= e(toman((int) ($salonEarnings['total'] ?? 0))) ?>
+        </div>
+      </div>
+    <?php endif; ?>
+  </div>
+
+  <dl class="grid grid-cols-4 gap-2">
+    <?php foreach ([
+      ['در انتظار', $sum['waiting'],   'text-amber-600', 'bg-amber-50'],
+      ['روی صندلی', $sum['in_chair'],  'text-brand-700', 'bg-brand-50'],
+      ['انجام‌شده', $sum['completed'], 'text-green-700', 'bg-green-50'],
+      ['غیبت',      $sum['no_show'],   'text-slate-500', 'bg-slate-50'],
+    ] as [$label, $value, $fg, $bg]): ?>
+      <div class="<?= $bg ?> rounded-xl py-2 px-1 text-center">
+        <dd class="text-xl font-extrabold <?= $fg ?> tabular-nums"><?= e(fa_num((int) $value)) ?></dd>
+        <dt class="text-[11px] text-slate-500 mt-0.5"><?= e($label) ?></dt>
+      </div>
+    <?php endforeach; ?>
+  </dl>
+</div>
 
 <div class="flex items-center justify-between mb-4">
   <h1 class="text-lg font-bold text-slate-800">صف زنده</h1>

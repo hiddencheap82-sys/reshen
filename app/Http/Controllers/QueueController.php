@@ -35,6 +35,12 @@ final class QueueController extends Controller
             'staffList' => $staffList,
             'todayCount' => (new \App\Domain\Queue\AppointmentRepository())->todayCompletedCount($salonId, $myStaffId),
             'todayEarnings' => $todayEarnings,
+            'todaySummary' => (new \App\Domain\Queue\AppointmentRepository())->todaySummary($salonId),
+            // درآمد کل سالن فقط برای صاحب و مدیر — آرایشگر نباید درآمد
+            // بقیه را ببیند، وگرنه در سالن دعوا می‌شود (سند امنیت، بخش ۴).
+            'salonEarnings' => in_array(Auth::role(), ['owner', 'manager'], true)
+                ? (new \App\Domain\Payment\PaymentRepository())->dailyTotal($salonId, date('Y-m-d'), null)
+                : null,
         ]);
     }
 
