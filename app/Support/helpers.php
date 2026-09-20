@@ -21,6 +21,33 @@ if (!function_exists('url')) {
     }
 }
 
+if (!function_exists('absolute_url')) {
+    /**
+     * آدرس کامل با دامنه — برای QR، پیامک، و هر چیزی که بیرون از مرورگر
+     * می‌رود و آدرس نسبی برایش بی‌معنی است.
+     *
+     * دامنه از خودِ درخواست خوانده می‌شود نه از APP_URL، چون صاحب سالن
+     * ممکن است دامنه را عوض کند و یادش برود .env را به‌روز کند — آن‌وقت
+     * QRای چاپ می‌شود که به جای اشتباه می‌برد. اگر درخواستی در کار نباشد
+     * (اجرای کران از خط فرمان)، APP_URL می‌ماند.
+     */
+    function absolute_url(string $path = ''): string
+    {
+        $host = $_SERVER['HTTP_HOST'] ?? '';
+
+        if ($host === '') {
+            return rtrim((string) App\Core\Config::get('app.url', ''), '/')
+                . '/' . ltrim($path, '/');
+        }
+
+        $https = ($_SERVER['HTTPS'] ?? '') !== '' && ($_SERVER['HTTPS'] ?? '') !== 'off';
+        // پشت پراکسی یا کش (روی cPanel معمول است) طرح اصلی اینجا می‌آید.
+        $proto = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ($https ? 'https' : 'http');
+
+        return $proto . '://' . $host . url($path);
+    }
+}
+
 if (!function_exists('asset')) {
     function asset(string $path): string
     {
@@ -57,6 +84,58 @@ if (!function_exists('jdate')) {
         }
 
         return Jalali::format(new DateTimeImmutable($datetime), $format);
+    }
+}
+
+if (!function_exists('jalali_date_from_request')) {
+    /**
+     * سه فیلدِ انتخابگر تاریخ شمسی را به «Y-m-d» میلادی تبدیل می‌کند.
+     *
+     * فهرست روز همیشه ۱ تا ۳۱ است چون طول ماه شمسی ثابت نیست (شش ماه
+     * اول ۳۱، شش ماه بعد ۳۰، و اسفند ۲۹ یا ۳۰). اگر کسی «۳۱ مهر» را
+     * انتخاب کند، به‌جای خطا دادن به آخرین روزِ همان ماه بریده می‌شود —
+     * منظورِ کاربر روشن است و پرت کردنش از فرم بیرون، کمکی نمی‌کند.
+     *
+     * تاریخ ناقص یا بیرون از بازه، null برمی‌گرداند تا فراخوان تصمیم
+     * بگیرد.
+     */
+    function jalali_date_from_request(App\Core\Request $request, string $name): ?string
+    {
+        $y = $request->input($name . '_y');
+        $m = $request->input($name . '_m');
+        $d = $request->input($name . '_d');
+
+        if ($y === null || $y === '' || $m === null || $m === '' || $d === null || $d === '') {
+            return null;
+        }
+
+        $y = (int) $y;
+        $m = (int) $m;
+        $d = (int) $d;
+
+        if ($y < 1300 || $y > 1500 || $m < 1 || $m > 12 || $d < 1) {
+            return null;
+        }
+
+        $d = min($d, Jalali::daysInJalaliMonth($y, $m));
+
+        return Jalali::toDateTime($y, $m, $d)->format('Y-m-d');
+    }
+}
+
+if (!function_exists('fa_time')) {
+    /** «۱۹:۳۰» — ۲۴ساعته با رقم فارسی. برای ستون‌هایی که باید تراز بمانند. */
+    function fa_time(?string $time): string
+    {
+        return $time === null || $time === '' ? '' : App\Support\Clock::hm($time);
+    }
+}
+
+if (!function_exists('fa_time_label')) {
+    /** «۷:۳۰ شب» — برای جایی که ساعت تنهاست و باید یک‌نگاهی خوانده شود. */
+    function fa_time_label(?string $time): string
+    {
+        return $time === null || $time === '' ? '' : App\Support\Clock::label($time);
     }
 }
 

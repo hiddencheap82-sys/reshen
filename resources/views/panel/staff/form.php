@@ -2,7 +2,7 @@
 <div class="max-w-lg">
 <div class="flex items-center gap-3 mb-5">
   <a href="<?= url('panel/staff') ?>" class="text-ink-400">←</a>
-  <h1 class="text-lg font-bold text-ink-800"><?= $staff ? 'ویرایش آرایشگر' : 'آرایشگر جدید' ?></h1>
+  <h1 class="page-title"><?= $staff ? 'ویرایش آرایشگر' : 'آرایشگر جدید' ?></h1>
 </div>
 
 <form method="post" action="<?= url($staff ? 'panel/staff/' . $staff['id'] : 'panel/staff') ?>" class="glass rounded-2xl p-5 space-y-4">

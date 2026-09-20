@@ -47,6 +47,32 @@ final class BookingWizardController extends Controller
         ]);
     }
 
+    /**
+     * منوی خدمات — فهرست خواندنی، بدون شروع رزرو.
+     *
+     * چرا جدا از صفحهٔ اصلی: آنجا خدمت‌ها چک‌باکس‌اند و هدفشان شروع
+     * رزرو است. ولی خیلی از مشتری‌ها اول فقط می‌خواهند بدانند «چی
+     * دارید و چند؟» — مخصوصاً وقتی لینک را در اینستاگرام دیده‌اند.
+     * با فهرستِ رزرو، سؤالِ قیمت جواب داده نمی‌شود مگر اینکه وارد
+     * جریان رزرو شوند.
+     *
+     * لینکِ جدا یعنی سالن می‌تواند همین را در بیو بگذارد.
+     */
+    public function services(Request $request): Response
+    {
+        $salon = $this->salonOrFail((string) $request->param('slug'));
+        if ($salon === null) {
+            return Response::html('سالن یافت نشد.', 404);
+        }
+
+        return $this->page('layouts.booking', 'booking.services', [
+            'title' => 'خدمات ' . $salon['name'],
+            'salon' => $salon,
+            'services' => (new ServiceRepository())->all((int) $salon['id'], true),
+            'liveStatus' => $this->liveStatus((int) $salon['id']),
+        ]);
+    }
+
     public function chooseServices(Request $request): Response
     {
         $salon = $this->salonOrFail((string) $request->param('slug'));

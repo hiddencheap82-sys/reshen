@@ -1,6 +1,6 @@
 <?php /** @var array $services */ ?>
 <div class="flex items-center justify-between mb-5">
-  <h1 class="text-lg font-bold text-ink-800">خدمات</h1>
+  <h1 class="page-title">خدمات</h1>
   <a href="<?= url('panel/services/create') ?>" class="btn-ink h-11 text-sm px-4">+ افزودن</a>
 </div>
 

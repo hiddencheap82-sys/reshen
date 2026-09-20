@@ -59,14 +59,14 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
 </div>
 
 <div class="flex items-center justify-between mb-4">
-  <h1 class="text-lg font-extrabold text-ink-900">صف زنده</h1>
+  <h1 class="page-title">صف زنده</h1>
   <?php if (in_array($role, ['owner','manager','reception'], true)): ?>
   <button onclick="document.getElementById('walkin-box').classList.toggle('hidden')" class="btn-accent metal h-11 text-[13px] px-4">+ افزودن حضوری</button>
   <?php endif; ?>
 </div>
 
 <div id="walkin-box" class="hidden bg-white rounded-2xl border border-ink-100 p-5 mb-5">
-  <h2 class="text-sm font-bold text-ink-700 mb-3">افزودن مراجعهٔ حضوری</h2>
+  <h2 class="card-title mb-3">افزودن مراجعهٔ حضوری</h2>
   <form method="post" action="<?= url('panel/queue/walkin') ?>" class="space-y-3">
     <?= csrf_field() ?>
     <div class="grid sm:grid-cols-2 gap-3">
@@ -129,7 +129,7 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
 
     <?php if (count($mine['queue']) > 1): ?>
     <div class="mt-5">
-      <h3 class="text-xs font-bold text-ink-400 mb-2">در صف</h3>
+      <h3 class="text-[12px] font-bold text-ink-500 mb-2">در صف</h3>
       <div class="space-y-2">
         <?php foreach (array_slice($mine['queue'], 1) as $row): ?>
         <div class="glass rounded-xl px-4 py-3 flex items-center justify-between">
@@ -165,7 +165,7 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
 
       <?php if (empty($group['queue'])): ?>
         <div class="px-4 py-8 text-center">
-          <p class="text-[12.5px] text-ink-400">کسی در صف نیست</p>
+          <p class="text-[12px] text-ink-400">کسی در صف نیست</p>
         </div>
       <?php endif; ?>
 
@@ -187,15 +187,15 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
                   <?= e($row['customer_name'] ?: 'مشتری') ?>
                 </span>
                 <?php if ($row['kind'] === 'booked'): ?>
-                  <span class="text-[10px] font-bold bg-ink-100 text-ink-600 rounded px-1.5 py-0.5 whitespace-nowrap">رزرو</span>
+                  <span class="text-[11px] font-bold bg-ink-100 text-ink-600 rounded px-1.5 py-0.5 whitespace-nowrap">رزرو</span>
                 <?php endif; ?>
               </div>
-              <p class="text-[11.5px] text-ink-500 mt-0.5 truncate">
+              <p class="text-[11px] text-ink-500 mt-0.5 truncate">
                 <?= e(implode('، ', array_column($row['items'], 'service_name'))) ?>
               </p>
             </div>
 
-            <span class="text-[11.5px] font-bold shrink-0 text-left tabular-nums
+            <span class="text-[11px] font-bold shrink-0 text-left tabular-nums
                          <?= $inChair ? 'text-accent' : 'text-ink-500' ?>">
               <?= e($row['display']['text'] ?? '') ?>
             </span>

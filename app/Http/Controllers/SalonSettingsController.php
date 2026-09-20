@@ -8,6 +8,7 @@ use App\Core\Auth;
 use App\Support\Theme;
 use App\Core\DB;
 use App\Core\Request;
+use App\Support\Clock;
 use App\Core\Response;
 use App\Domain\Salon\HolidayRepository;
 use App\Domain\Salon\WorkingHoursRepository;
@@ -56,10 +57,29 @@ final class SalonSettingsController extends Controller
         $repo = new WorkingHoursRepository();
         for ($weekday = 0; $weekday <= 6; $weekday++) {
             $closed = $request->input("closed_$weekday") !== null;
-            $opens = (string) $request->input("opens_$weekday", '09:00');
-            $closes = (string) $request->input("closes_$weekday", '21:00');
-            $breakStart = (string) $request->input("break_start_$weekday", '');
-            $breakEnd = (string) $request->input("break_end_$weekday", '');
+
+            // ساعت از دو <select> می‌آید (انتخابگر فارسی جایگزین
+            // <input type="time"> شده). اگر چیزی نیامد، پیش‌فرض می‌نشیند
+            // تا یک فرمِ ناقص، ساعت کاری روز را صفر نکند.
+            $opens = Clock::fromParts(
+                $request->input("opens_{$weekday}_h"),
+                $request->input("opens_{$weekday}_m")
+            ) ?? '09:00';
+            $closes = Clock::fromParts(
+                $request->input("closes_{$weekday}_h"),
+                $request->input("closes_{$weekday}_m")
+            ) ?? '21:00';
+
+            // استراحت اختیاری است: نبودنش null می‌ماند، نه ۰۰:۰۰.
+            $breakStart = Clock::fromParts(
+                $request->input("break_start_{$weekday}_h"),
+                $request->input("break_start_{$weekday}_m")
+            );
+            $breakEnd = Clock::fromParts(
+                $request->input("break_end_{$weekday}_h"),
+                $request->input("break_end_{$weekday}_m")
+            );
+
             $repo->setSalonDay(Auth::salonId(), $weekday, $opens, $closes, $closed, $breakStart, $breakEnd);
         }
 
@@ -83,11 +103,15 @@ final class SalonSettingsController extends Controller
 
     public function addHoliday(Request $request): Response
     {
-        $date = (string) $request->input('date');
-        $label = trim((string) $request->input('label', 'تعطیل'));
-        if ($date !== '') {
-            (new HolidayRepository())->add($date, $label);
+        // تاریخ از انتخابگر شمسی می‌آید (سه فیلد)، نه از ورودی میلادی.
+        $date = jalali_date_from_request($request, 'date');
+        $label = trim((string) $request->input('label', '')) ?: 'تعطیل';
+
+        if ($date === null) {
+            return $this->withError('تاریخ تعطیلی معتبر نبود.', '/panel/settings');
         }
+
+        (new HolidayRepository())->add($date, $label);
 
         return $this->withSuccess('تعطیلی اضافه شد.', '/panel/settings');
     }

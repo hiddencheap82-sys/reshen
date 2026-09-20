@@ -1,5 +1,5 @@
 <?php /** @var array $salon */ ?>
-<h1 class="text-base font-bold text-ink-800 mb-1">شمارهٔ موبایل</h1>
+<h1 class="text-[15px] font-extrabold text-ink-900 mb-1">شمارهٔ موبایل</h1>
 <p class="text-sm text-ink-500 mb-5">برای تأیید نهایی نوبت، شماره‌تان را وارد کنید. نیاز به نصب یا رمز نیست.</p>
 
 <?php if ($error = flash('error')): ?>

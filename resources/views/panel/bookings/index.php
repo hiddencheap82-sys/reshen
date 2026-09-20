@@ -32,8 +32,8 @@ $totalRows = array_sum(array_map(static fn ($d) => count($d['rows']), $days));
 
 <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
   <div>
-    <h1 class="text-lg font-extrabold text-ink-900">رزروها</h1>
-    <p class="text-[11.5px] text-ink-400 mt-0.5">
+    <h1 class="page-title">رزروها</h1>
+    <p class="text-[11px] text-ink-400 mt-0.5">
       <?= e(JalaliCalendar::humanDate($from)) ?> تا <?= e(JalaliCalendar::humanDate($to, true)) ?>
       <?php if ($onlyMine): ?> — فقط نوبت‌های خودت<?php endif; ?>
     </p>
@@ -45,7 +45,7 @@ $totalRows = array_sum(array_map(static fn ($d) => count($d['rows']), $days));
        aria-label="دو هفتهٔ قبل"><?= icon('chevron-start', 'w-4 h-4') ?></a>
     <?php if (!$isToday): ?>
       <a href="<?= e(url('panel/bookings')) ?>"
-         class="glass h-11 grid place-items-center rounded-xl px-4 text-[12.5px] font-bold text-ink-700 tap">امروز</a>
+         class="glass h-11 grid place-items-center rounded-xl px-4 text-[12px] font-bold text-ink-700 tap">امروز</a>
     <?php endif; ?>
     <a href="<?= e(url('panel/bookings?from=' . $next)) ?>"
        class="glass w-11 h-11 grid place-items-center rounded-xl text-ink-600 tap"
@@ -85,7 +85,7 @@ $totalRows = array_sum(array_map(static fn ($d) => count($d['rows']), $days));
       <section class="glass rounded-2xl overflow-hidden">
         <h2 class="flex items-baseline gap-2 px-4 py-3 border-b" style="border-color:var(--line)">
           <?php $full = JalaliCalendar::humanDate($day['date']); ?>
-          <span class="text-[13.5px] font-extrabold text-ink-900"><?= e($day['label']) ?></span>
+          <span class="text-[13px] font-extrabold text-ink-900"><?= e($day['label']) ?></span>
           <?php /* دورتر از پس‌فردا، برچسب نسبی خودش همان تاریخ است — دوبار ننویسیم */ ?>
           <?php if ($day['label'] !== $full): ?>
             <span class="text-[11px] text-ink-400"><?= e($full) ?></span>
@@ -111,8 +111,8 @@ $totalRows = array_sum(array_map(static fn ($d) => count($d['rows']), $days));
                     style="background:<?= e($r['staff_color'] ?: 'var(--line)') ?>" aria-hidden="true"></span>
 
               <div class="min-w-0 flex-1">
-                <p class="text-[13.5px] font-bold text-ink-800 truncate"><?= e($r['customer_name']) ?></p>
-                <p class="text-[11.5px] text-ink-400 truncate">
+                <p class="text-[13px] font-bold text-ink-800 truncate"><?= e($r['customer_name']) ?></p>
+                <p class="text-[11px] text-ink-400 truncate">
                   <?= e($r['staff_name'] ?? 'بدون آرایشگر مشخص') ?>
                   <?php if (!empty($r['customer_phone'])): ?>
                     · <span class="ltr tabular-nums"><?= e(fa_num($r['customer_phone'])) ?></span>
@@ -120,7 +120,7 @@ $totalRows = array_sum(array_map(static fn ($d) => count($d['rows']), $days));
                 </p>
               </div>
 
-              <span class="shrink-0 text-[10.5px] font-bold rounded-full px-2.5 py-1 <?= $fg ?> <?= $bg ?>">
+              <span class="shrink-0 text-[11px] font-bold rounded-full px-2.5 py-1 <?= $fg ?> <?= $bg ?>">
                 <?= e($label) ?>
               </span>
             </li>

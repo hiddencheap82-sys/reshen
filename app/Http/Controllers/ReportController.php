@@ -18,7 +18,8 @@ final class ReportController extends Controller
     public function daily(Request $request): Response
     {
         $salonId = Auth::salonId();
-        $date = (string) $request->query('date', date('Y-m-d'));
+        // فیلتر تاریخ، انتخابگر شمسی است (سه فیلد) نه ورودی میلادی.
+        $date = jalali_date_from_request($request, 'date') ?? date('Y-m-d');
         $payments = new PaymentRepository();
 
         $totals = $payments->dailyTotal($salonId, $date);

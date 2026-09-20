@@ -1,5 +1,5 @@
 <?php /** @var ?string $error */ ?>
-<h2 class="text-base font-bold text-ink-800 mb-1">اولین سالن‌تان را بسازید</h2>
+<h2 class="text-[15px] font-extrabold text-ink-900 mb-1">اولین سالن‌تان را بسازید</h2>
 <p class="text-sm text-ink-500 mb-5">کمتر از ۲ دقیقه. جزئیات را بعداً هم می‌توانید کامل کنید.</p>
 
 <?php if ($error): ?>

@@ -9,6 +9,7 @@ use App\Http\Middleware\VerifyCsrf;
 /** @var \App\Core\Router $router */
 
 $router->get('/s/{slug}', [BookingWizardController::class, 'landing']);
+$router->get('/s/{slug}/services', [BookingWizardController::class, 'services']);
 $router->get('/s/{slug}/staff', [BookingWizardController::class, 'staffStep']);
 $router->get('/s/{slug}/slots', [BookingWizardController::class, 'slotsStep']);
 $router->get('/s/{slug}/phone', [BookingWizardController::class, 'phoneStep']);

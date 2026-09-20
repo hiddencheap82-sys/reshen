@@ -12,22 +12,11 @@ $navItems = [
     ['href' => '/panel/reports', 'label' => 'گزارش‌ها', 'icon' => 'chart', 'roles' => ['owner','manager']],
     ['href' => '/panel/staff', 'label' => 'آرایشگرها', 'icon' => 'scissors', 'roles' => ['owner','manager']],
     ['href' => '/panel/services', 'label' => 'خدمات', 'icon' => 'tag', 'roles' => ['owner','manager']],
+    ['href' => '/panel/qr', 'label' => 'کد QR', 'icon' => 'qr', 'roles' => ['owner','manager','reception']],
     ['href' => '/panel/settings', 'label' => 'تنظیمات سالن', 'icon' => 'cog', 'roles' => ['owner','manager']],
 ];
 $visibleNav = array_values(array_filter($navItems, fn($i) => in_array($role, $i['roles'], true)));
 $currentPath = '/' . trim($_SERVER['REQUEST_URI'] ?? '', '/');
-$icon = function (string $name, string $class = 'w-5 h-5') {
-    $paths = [
-        'queue' => 'M4 6h16M4 12h16M4 18h7',
-        'users' => 'M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 100-8 4 4 0 000 8zm6 0a4 4 0 100-8',
-        'calendar' => 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
-        'chart' => 'M9 19v-6a2 2 0 012-2h2a2 2 0 012 2v6m-9 0h14a1 1 0 001-1V6a1 1 0 00-1-1H5a1 1 0 00-1 1v12a1 1 0 001 1z',
-        'scissors' => 'M6 9a3 3 0 100-6 3 3 0 000 6zm0 12a3 3 0 100-6 3 3 0 000 6zm12-15L6 18M9 9l9 9',
-        'tag' => 'M7 7h.01M7 3h5.586a1 1 0 01.707.293l6.414 6.414a1 1 0 010 1.414l-8.586 8.586a1 1 0 01-1.414 0L3.293 13.293A1 1 0 013 12.586V7a4 4 0 014-4z',
-        'cog' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z',
-    ];
-    return '<svg xmlns="http://www.w3.org/2000/svg" class="'.$class.'" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="'.($paths[$name] ?? '').'"/></svg>';
-};
 ?>
 <!doctype html>
 <html lang="fa" dir="rtl" data-font="<?= e((string) App\Core\Config::get('reshen.ui.font', 'vazirmatn')) ?>" <?= theme_attr(App\Core\Session::get('_salon_theme')) ?>>
@@ -67,7 +56,7 @@ $icon = function (string $name, string $class = 'w-5 h-5') {
     <nav class="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
       <?php foreach ($visibleNav as $item): $active = str_starts_with($currentPath, url($item['href'] === '/panel' ? '/panel' : $item['href'])) && ($item['href']!=='/panel' || $currentPath===rtrim(url('/panel'),'/')); ?>
       <a href="<?= url($item['href']) ?>" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-ink-600 hover:bg-ink-50 <?= $active ? 'nav-active' : '' ?>">
-        <?= $icon($item['icon']) ?>
+        <?= icon($item["icon"]) ?>
         <span><?= e($item['label']) ?></span>
       </a>
       <?php endforeach; ?>
@@ -75,12 +64,12 @@ $icon = function (string $name, string $class = 'w-5 h-5') {
     <div class="p-3 border-t border-ink-100">
       <?php if (Auth::isPlatformAdmin()): ?>
       <a href="<?= url('platform') ?>" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-amber-600 hover:bg-amber-50">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <?= icon('shield', 'w-5 h-5') ?>
         پنل پلتفرم
       </a>
       <?php endif; ?>
       <a href="<?= url('logout') ?>" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-ink-500 hover:bg-ink-50">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        <?= icon('logout', 'w-5 h-5') ?>
         خروج
       </a>
     </div>
@@ -90,9 +79,14 @@ $icon = function (string $name, string $class = 'w-5 h-5') {
   <div class="flex-1 flex flex-col min-w-0">
     <!-- Mobile top bar -->
     <header class="md:hidden sticky top-0 z-20 h-14 bg-white border-b border-ink-200 flex items-center justify-between px-4">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-ink-900 text-white flex items-center justify-center font-bold text-sm">ر</div>
-        <span class="font-bold text-sm"><?= e($salonName ?? 'رشن') ?></span>
+      <!--
+        min-w-0 و truncate لازم‌اند: بدون آن‌ها نام بلندِ سالن کوتاه
+        نمی‌شود و کل سرصفحه را پهن‌تر از صفحه می‌کند. روی صفحهٔ ۳۲۰
+        پیکسلی، همین ۲۳ پیکسل سرریز افقی می‌ساخت.
+      -->
+      <div class="flex items-center gap-2 min-w-0 flex-1">
+        <div class="w-8 h-8 shrink-0 rounded-lg metal metal-ink grid place-items-center font-bold text-sm">ر</div>
+        <span class="font-bold text-[13px] truncate"><?= e($salonName ?? 'رشن') ?></span>
       </div>
       <!--
         خروج: پیش از این یک آیکون ۲۰×۲۰ بدون نام دسترس‌پذیر بود — صفحه‌خوان
@@ -103,7 +97,7 @@ $icon = function (string $name, string $class = 'w-5 h-5') {
          class="w-11 h-11 grid place-items-center rounded-xl text-ink-500
                 hover:bg-ink-100 transition-colors cursor-pointer
                 focus-visible:outline-2 focus-visible:outline-ink-400">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        <?= icon('logout', 'w-5 h-5') ?>
       </a>
     </header>
 
@@ -127,16 +121,79 @@ $icon = function (string $name, string $class = 'w-5 h-5') {
   </div>
 </div>
 
-<!-- Mobile bottom nav -->
-<nav class="glass-bar md:hidden fixed bottom-0 inset-x-0 z-20 flex items-stretch h-16 px-1"
-     style="padding-bottom:env(safe-area-inset-bottom,0px)"
-     aria-label="ناوبری اصلی">
-  <?php foreach (array_slice($visibleNav, 0, 5) as $item): $active = $currentPath===rtrim(url($item['href']),'/') || ($item['href']==='/panel' && $currentPath===rtrim(url('/panel'),'/')); ?>
-  <a href="<?= url($item['href']) ?>" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] <?= $active ? 'text-accent' : 'text-ink-400' ?>">
-    <?= $icon($item['icon'], 'w-5 h-5') ?>
-    <span><?= e($item['label']) ?></span>
-  </a>
-  <?php endforeach; ?>
+<!--
+  ناوبری موبایل.
+  چهار مورد اول مستقیم، بقیه پشت «بیشتر».
+
+  چرا: صاحب سالن هشت گزینه دارد و کفِ صفحه جای چهار تا پنج تا بیشتر
+  نیست. پیش‌تر فهرست با array_slice بریده می‌شد و گزینه‌های آخر —
+  خدمات، کد QR و تنظیمات — روی موبایل **اصلاً در دسترس نبودند**.
+
+  <details> است نه جاوااسکریپت: بدون اسکریپت هم باز و بسته می‌شود.
+-->
+<?php
+  $navPrimary = array_slice($visibleNav, 0, 4);
+  $navRest = array_slice($visibleNav, 4);
+  $isActive = fn (array $i) => $currentPath === rtrim(url($i['href']), '/');
+?>
+<nav class="md:hidden fixed bottom-0 inset-x-0 z-30" aria-label="ناوبری اصلی">
+
+  <?php if ($navRest !== []): ?>
+    <details class="group" id="more-nav">
+      <summary class="list-none [&::-webkit-details-marker]:hidden"></summary>
+
+      <!-- پس‌زمینه: کلیک بیرون، شیت را می‌بندد -->
+      <label for="more-nav" class="fixed inset-0 bg-ink-950/45 backdrop-blur-[2px]"
+             onclick="document.getElementById('more-nav').removeAttribute('open')"
+             aria-hidden="true"></label>
+
+      <!--
+        min-w-0 روی خانه‌های گرید لازم است: خانهٔ گرید به‌طور پیش‌فرض
+        min-width:auto دارد و زیر عرضِ محتوایش کوچک نمی‌شود. برچسبی مثل
+        «تنظیمات سالن» شیت را پهن‌تر از صفحه می‌کرد و چون شیت داخل یک
+        nav با inset-x-0 است، کل صفحه سرریز افقی می‌گرفت.
+      -->
+      <div class="glass-bar absolute bottom-full inset-x-0 max-w-full rounded-t-2xl p-2 shadow-deep">
+        <div class="grid grid-cols-3 gap-1.5">
+          <?php foreach ($navRest as $item): ?>
+            <a href="<?= e(url($item['href'])) ?>"
+               class="min-w-0 flex flex-col items-center justify-center gap-1 h-[4.5rem] rounded-xl tap
+                      text-[11px] font-semibold <?= $isActive($item) ? 'text-accent' : 'text-ink-600' ?>"
+               <?= $isActive($item) ? 'aria-current="page"' : '' ?>
+               style="<?= $isActive($item) ? 'background:var(--accent-soft)' : '' ?>">
+              <?= icon($item['icon'], 'w-5 h-5 shrink-0') ?>
+              <span class="max-w-full truncate px-1"><?= e($item['label']) ?></span>
+            </a>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </details>
+  <?php endif; ?>
+
+  <div class="glass-bar flex items-stretch h-16 px-1"
+       style="padding-bottom:env(safe-area-inset-bottom,0px)">
+    <?php foreach ($navPrimary as $item): ?>
+      <a href="<?= e(url($item['href'])) ?>"
+         class="flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 text-[11px]
+                <?= $isActive($item) ? 'text-accent font-bold' : 'text-ink-400' ?>"
+         <?= $isActive($item) ? 'aria-current="page"' : '' ?>>
+        <?= icon($item['icon'], 'w-5 h-5 shrink-0') ?>
+        <span class="max-w-full truncate px-0.5"><?= e($item['label']) ?></span>
+      </a>
+    <?php endforeach; ?>
+
+    <?php if ($navRest !== []): ?>
+      <?php $restActive = array_filter($navRest, $isActive) !== []; ?>
+      <button type="button"
+              onclick="var d=document.getElementById('more-nav'); d.open ? d.removeAttribute('open') : d.setAttribute('open','');"
+              class="flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 text-[11px] cursor-pointer
+                     <?= $restActive ? 'text-accent font-bold' : 'text-ink-400' ?>"
+              aria-label="گزینه‌های بیشتر">
+        <?= icon('more', 'w-5 h-5') ?>
+        <span>بیشتر</span>
+      </button>
+    <?php endif; ?>
+  </div>
 </nav>
 
 </body>

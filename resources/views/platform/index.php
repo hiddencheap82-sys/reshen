@@ -1,5 +1,5 @@
 <?php /** @var array $salons @var array $metrics */ ?>
-<h1 class="text-lg font-bold text-ink-800 mb-5">پنل پلتفرم</h1>
+<h1 class="page-title mb-5">پنل پلتفرم</h1>
 
 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
   <div class="glass rounded-2xl p-4 text-center">

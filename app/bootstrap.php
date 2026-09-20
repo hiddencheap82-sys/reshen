@@ -13,6 +13,21 @@ define('BASE_PATH', dirname(__DIR__));
 require BASE_PATH . '/app/Core/Autoloader.php';
 Autoloader::register('App', BASE_PATH . '/app');
 
+/*
+ * اتولودر کامپوزر — اگر باشد.
+ *
+ * هستهٔ برنامه عمداً هیچ وابستگی زمان‌اجرایی ندارد (تصمیم ت-۰۱) و این
+ * خط آن را عوض نمی‌کند: بدون vendor هم بالا می‌آید. فقط یک قابلیت
+ * جانبی (ساخت QR) به کتابخانه تکیه دارد و خودش بررسی می‌کند که در
+ * دسترس هست یا نه.
+ *
+ * فایل نصب‌شده از zip همیشه vendor دارد؛ این شرط برای کسی است که ریپو
+ * را مستقیم clone کرده و هنوز composer install نزده.
+ */
+if (is_file(BASE_PATH . '/vendor/autoload.php')) {
+    require BASE_PATH . '/vendor/autoload.php';
+}
+
 Env::load(BASE_PATH . '/.env');
 Config::load(BASE_PATH . '/config');
 require BASE_PATH . '/app/Support/helpers.php';

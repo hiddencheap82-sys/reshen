@@ -4,12 +4,12 @@ $p = $preferences ?? [];
 ?>
 <div class="flex items-center gap-3 mb-5">
   <a href="<?= url('panel/customers') ?>" class="text-ink-400">←</a>
-  <h1 class="text-lg font-bold text-ink-800"><?= e($customer['name'] ?: 'بدون نام') ?></h1>
+  <h1 class="page-title"><?= e($customer['name'] ?: 'بدون نام') ?></h1>
 </div>
 
 <div class="grid lg:grid-cols-2 gap-5">
   <div class="glass rounded-2xl p-5">
-    <h2 class="text-sm font-bold text-ink-700 mb-4">مشخصات و دفترچهٔ آرایشگر</h2>
+    <h2 class="card-title mb-4">مشخصات و دفترچهٔ آرایشگر</h2>
     <form method="post" action="<?= url('panel/customers/' . $customer['id']) ?>" class="space-y-3">
       <?= csrf_field() ?>
       <div class="grid grid-cols-2 gap-3">
@@ -69,7 +69,7 @@ $p = $preferences ?? [];
     </div>
 
     <div class="glass rounded-2xl p-5">
-      <h2 class="text-sm font-bold text-ink-700 mb-3">تاریخچهٔ نوبت‌ها</h2>
+      <h2 class="card-title mb-3">تاریخچهٔ نوبت‌ها</h2>
       <div class="space-y-2">
         <?php foreach ($history as $h): ?>
         <div class="flex items-center justify-between text-sm border-b border-ink-50 pb-2">

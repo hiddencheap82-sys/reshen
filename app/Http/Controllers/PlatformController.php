@@ -86,27 +86,6 @@ final class PlatformController extends Controller
         return $this->redirect('/platform');
     }
 
-    public function adjustSmsCredit(Request $request): Response
-    {
-        $id = (int) $request->param('id');
-        $delta = (int) $request->input('delta', 0);
-        $salon = DB::selectOne('SELECT sms_credit FROM salons WHERE id = ?', [$id]);
-        if ($salon === null) {
-            return $this->withError('یافت نشد.', '/platform');
-        }
-
-        $newBalance = max(0, (int) $salon['sms_credit'] + $delta);
-        DB::update('salons', ['sms_credit' => $newBalance], 'id = :id', ['id' => $id]);
-        DB::insert('sms_wallet_transactions', [
-            'salon_id' => $id,
-            'delta' => $delta,
-            'balance_after' => $newBalance,
-            'reason' => 'platform_admin_adjustment',
-        ]);
-
-        return $this->withSuccess('کیف پیامک به‌روزرسانی شد.', '/platform/' . $id);
-    }
-
     private function platformMetrics(): array
     {
         $activeSalons = (int) (DB::selectOne("SELECT COUNT(*) AS c FROM salons WHERE is_active = 1")['c'] ?? 0);

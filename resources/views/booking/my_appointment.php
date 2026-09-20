@@ -8,7 +8,7 @@ $live = in_array($appointment['status'], ['confirmed','queued','in_chair'], true
 ?>
 <script>if (<?= $live ? 'true' : 'false' ?>) setTimeout(() => location.reload(), 20000);</script>
 
-<h1 class="text-base font-bold text-ink-800 mb-1">نوبت من</h1>
+<h1 class="text-[15px] font-extrabold text-ink-900 mb-1">نوبت من</h1>
 <p class="text-sm text-ink-500 mb-5"><?= e($salon['name']) ?></p>
 
 <div class="bg-ink-50 rounded-2xl p-5 text-center mb-5">

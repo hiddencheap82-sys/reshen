@@ -33,11 +33,11 @@ echo App\Core\View::render('components.jalali-calendar', [
 
 <div class="mt-5 rise rise-2">
   <div class="flex items-baseline justify-between mb-2">
-    <h2 class="text-[14px] font-extrabold text-ink-900">
+    <h2 class="card-title">
       ساعت‌های آزاد — <?= e($selectedDateLabel) ?>
     </h2>
     <?php if (!empty($slots)): ?>
-      <span class="text-[11.5px] text-ink-400 tabular-nums"><?= e(fa_num(count($slots))) ?> وقت</span>
+      <span class="text-[11px] text-ink-400 tabular-nums"><?= e(fa_num(count($slots))) ?> وقت</span>
     <?php endif; ?>
   </div>
 
@@ -45,7 +45,7 @@ echo App\Core\View::render('components.jalali-calendar', [
     <div class="glass rounded-2xl py-12 px-5 text-center">
       <?= icon('calendar-x', 'w-10 h-10 mx-auto text-ink-300 mb-3') ?>
       <p class="text-sm font-semibold text-ink-600 mb-1">این روز وقت آزادی ندارد</p>
-      <p class="text-[12.5px] text-ink-400">روز دیگری را از تقویم بالا انتخاب کنید.</p>
+      <p class="text-[12px] text-ink-400">روز دیگری را از تقویم بالا انتخاب کنید.</p>
     </div>
   <?php else: ?>
     <form method="post" action="<?= e(url($base)) ?>">
@@ -64,11 +64,14 @@ echo App\Core\View::render('components.jalali-calendar', [
          * مشتری معمولاً اول می‌داند «عصر می‌آیم»، بعد ساعت دقیق را
          * انتخاب می‌کند.
          */
-        $groups = ['صبح' => [], 'ظهر' => [], 'عصر' => []];
+        /*
+         * برش‌ها از App\Support\Clock می‌آید، نه از عددهای محلی. پیش‌تر
+         * اینجا مرزِ «عصر» ساعت ۱۶ بود و هر چیزی بعد از آن — حتی ۲۱:۰۰ —
+         * عصر شمرده می‌شد؛ در فارسی آن ساعت شب است.
+         */
+        $groups = ['صبح' => [], 'ظهر' => [], 'عصر' => [], 'شب' => []];
         foreach ($slots as $time) {
-            $hour = (int) substr($time, 0, 2);
-            $key = $hour < 12 ? 'صبح' : ($hour < 16 ? 'ظهر' : 'عصر');
-            $groups[$key][] = $time;
+            $groups[App\Support\Clock::partOfDay($time)][] = $time;
         }
         $index = 0;
         ?>
@@ -90,7 +93,7 @@ echo App\Core\View::render('components.jalali-calendar', [
                     <span class="slot glass h-12 grid place-items-center rounded-xl
                                  text-sm font-bold text-ink-800 tabular-nums cursor-pointer
                                  transition-all duration-200 ease-out-soft hover:shadow-lift">
-                      <?= e(fa_num($time)) ?>
+                      <?= e(fa_time($time)) ?>
                     </span>
                   </label>
                 <?php endforeach; ?>

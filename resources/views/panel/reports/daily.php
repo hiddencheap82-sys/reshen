@@ -3,12 +3,23 @@
 $methodLabels = ['cash'=>'نقدی','card_to_card'=>'کارت‌به‌کارت','pos'=>'کارتخوان','online'=>'آنلاین'];
 ?>
 <div class="flex items-center justify-between mb-5">
-  <h1 class="text-lg font-bold text-ink-800">گزارش روزانه</h1>
-  <a href="<?= url('panel/reports/monthly') ?>" class="text-xs text-accent hover:underline">گزارش ماهانه ←</a>
+  <h1 class="page-title">گزارش روزانه</h1>
+  <a href="<?= e(url('panel/reports/monthly')) ?>"
+     class="glass h-11 inline-flex items-center gap-1.5 rounded-xl px-3.5
+            text-[12px] font-bold text-accent tap shrink-0">
+    گزارش ماهانه
+    <?= icon('chevron-end', 'w-3.5 h-3.5') ?>
+  </a>
 </div>
 
-<form method="get" class="mb-5">
-  <input type="date" name="date" value="<?= e($date) ?>" onchange="this.form.submit()" class="rounded-xl border border-ink-200 px-3 py-2 text-sm">
+<form method="get" class="mb-5 flex flex-wrap items-center gap-2">
+  <?php $name = 'date'; $value = $date; $label = 'گزارش'; $years = [-2, 0];
+        include BASE_PATH . '/resources/views/components/jalali-date-input.php'; ?>
+  <button type="submit" class="btn-ink h-11 text-[13px] px-4">نمایش</button>
+  <?php if ($date !== date('Y-m-d')): ?>
+    <a href="<?= e(url('panel/reports')) ?>"
+       class="h-11 grid place-items-center rounded-xl px-4 text-[13px] font-bold text-ink-600 glass tap">امروز</a>
+  <?php endif; ?>
 </form>
 
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
@@ -32,7 +43,7 @@ $methodLabels = ['cash'=>'نقدی','card_to_card'=>'کارت‌به‌کارت'
 
 <div class="grid md:grid-cols-2 gap-5">
   <div class="glass rounded-2xl p-5">
-    <h2 class="text-sm font-bold text-ink-700 mb-3">به تفکیک روش پرداخت</h2>
+    <h2 class="card-title mb-3">به تفکیک روش پرداخت</h2>
     <?php foreach ($breakdown as $b): ?>
     <div class="flex items-center justify-between text-sm py-1.5">
       <span class="text-ink-600"><?= e($methodLabels[$b['method']] ?? $b['method']) ?></span>
@@ -42,7 +53,7 @@ $methodLabels = ['cash'=>'نقدی','card_to_card'=>'کارت‌به‌کارت'
     <?php if (empty($breakdown)): ?><p class="text-xs text-ink-400">پرداختی ثبت نشده.</p><?php endif; ?>
   </div>
   <div class="glass rounded-2xl p-5">
-    <h2 class="text-sm font-bold text-ink-700 mb-3">به تفکیک آرایشگر</h2>
+    <h2 class="card-title mb-3">به تفکیک آرایشگر</h2>
     <?php foreach ($byStaff as $s): ?>
     <div class="flex items-center justify-between text-sm py-1.5">
       <span class="text-ink-600"><?= e($s['name']) ?> <span class="text-[11px] text-ink-400">(<?= fa_num($s['count']) ?>)</span></span>

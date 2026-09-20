@@ -39,6 +39,7 @@ final class ServiceController extends Controller
         $repo = new ServiceRepository();
         $repo->create(Auth::salonId(), [
             'name' => $name,
+            'description' => self::description($request),
             'duration_minutes' => max(5, (int) $request->input('duration_minutes', 30)),
             'price' => Money::fromToman(max(0, (int) $request->input('price_toman', 0)))->rials,
         ]);
@@ -70,6 +71,7 @@ final class ServiceController extends Controller
         $repo = new ServiceRepository();
         $repo->update(Auth::salonId(), $id, [
             'name' => trim((string) $request->input('name', '')),
+            'description' => self::description($request),
             'duration_minutes' => max(5, (int) $request->input('duration_minutes', 30)),
             'price' => Money::fromToman(max(0, (int) $request->input('price_toman', 0)))->rials,
         ]);
@@ -102,5 +104,19 @@ final class ServiceController extends Controller
         }
 
         return $this->redirect('/panel/services');
+    }
+
+    /**
+     * توضیح خدمت — خالی یعنی null، نه رشتهٔ خالی.
+     *
+     * ستون NULL می‌پذیرد و ویوی منوی خدمات با empty() بررسی می‌کند؛
+     * رشتهٔ خالی هم رد می‌شود ولی null تمیزتر است و در گزارش‌گیری
+     * بعدی «پر نشده» را از «عمداً خالی» جدا نمی‌کند — پس یکی‌شان کنیم.
+     */
+    private static function description(Request $request): ?string
+    {
+        $text = trim((string) $request->input('description', ''));
+
+        return $text === '' ? null : mb_substr($text, 0, 300);
     }
 }

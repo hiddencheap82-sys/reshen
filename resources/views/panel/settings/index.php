@@ -6,11 +6,11 @@
  * @var int $currentJalaliYear
  */
 ?>
-<h1 class="text-lg font-bold text-ink-800 mb-5">تنظیمات سالن</h1>
+<h1 class="page-title mb-5">تنظیمات سالن</h1>
 
 <div class="grid lg:grid-cols-2 gap-5">
-  <div class="glass rounded-2xl p-5">
-    <h2 class="text-sm font-bold text-ink-700 mb-4">مشخصات سالن</h2>
+  <div class="glass rounded-2xl p-4 sm:p-5">
+    <h2 class="card-title mb-4">مشخصات سالن</h2>
     <form method="post" action="<?= url('panel/settings/profile') ?>" class="space-y-3">
       <?= csrf_field() ?>
       <div>
@@ -34,7 +34,7 @@
 
       <div>
         <label class="block text-xs font-bold text-ink-600 mb-2">رنگ صفحهٔ سالن</label>
-        <p class="text-[11.5px] text-ink-400 mb-3">
+        <p class="text-[11px] text-ink-400 mb-3">
           صفحه‌ای که مشتری می‌بیند با این رنگ نمایش داده می‌شود.
         </p>
 
@@ -49,28 +49,24 @@
                            transition-all duration-200 ease-out-soft cursor-pointer">
                 <span class="w-5 h-5 rounded-full shrink-0 ring-1 ring-black/10"
                       style="background:<?= e($palette['swatch']) ?>" aria-hidden="true"></span>
-                <span class="text-[12.5px] font-semibold text-ink-800"><?= e($palette['name']) ?></span>
+                <span class="text-[12px] font-semibold text-ink-800"><?= e($palette['name']) ?></span>
               </span>
             </label>
           <?php endforeach; ?>
         </fieldset>
       </div>
       <div class="bg-ink-50 rounded-xl px-3 py-2.5 text-xs text-ink-500">
-        لینک عمومی رزرو: <span dir="ltr" class="font-mono text-accent"><?= e(url('s/' . $salon['slug'])) ?></span>
-      </div>
-      <div class="flex items-center justify-between bg-ink-50 rounded-xl px-3 py-2.5 text-xs">
-        <span class="text-ink-500">موجودی کیف پیامک</span>
-        <span class="font-bold <?= (int)$salon['sms_credit'] <= 30 ? 'text-amber-600' : 'text-ink-700' ?>"><?= fa_num($salon['sms_credit']) ?> پیامک</span>
+        لینک عمومی رزرو: <span dir="ltr" class="code text-accent"><?= e(url('s/' . $salon['slug'])) ?></span>
       </div>
       <button type="submit" class="btn-accent metal w-full">ذخیره</button>
     </form>
   </div>
 
-  <div class="glass rounded-2xl p-5">
+  <div class="glass rounded-2xl p-4 sm:p-5">
     <div class="flex items-baseline justify-between mb-1">
-      <h2 class="text-sm font-extrabold text-ink-900">ساعت کاری و سانس‌بندی</h2>
+      <h2 class="card-title">ساعت کاری و سانس‌بندی</h2>
     </div>
-    <p class="text-[11.5px] text-ink-400 mb-4">
+    <p class="text-[11px] text-ink-400 mb-4">
       سانس‌های قابل رزرو از همین ساعت‌ها ساخته می‌شوند. استراحت، آن بازه را از رزرو درمی‌آورد.
     </p>
 
@@ -96,46 +92,59 @@
 
       <div class="h-px my-1" style="background:var(--line)" aria-hidden="true"></div>
 
-      <?php foreach ($weekdayNames as $i => $name):
+      <?php foreach ($weekdayNames as $i => $dayName):
           $h = $hours[$i] ?? null;
           $closed = $h ? (bool) $h['is_closed'] : false;
-          $bs = $h['break_start'] ?? null;
-          $be = $h['break_end'] ?? null;
+
+          /*
+           * مؤلفهٔ انتخابگر ساعت با include می‌آید، پس متغیرهایش در همین
+           * دامنه‌اند. تابعِ کوچکِ زیر آن‌ها را هر بار تازه ست می‌کند تا
+           * مقدارِ جامانده از دور قبل به دور بعد نشت نکند.
+           */
+          $timeField = function (string $field, ?string $val, string $lbl, bool $small, bool $empty) {
+              $name = $field;
+              $value = $val;
+              $label = $lbl;
+              $compact = $small;
+              $allowEmpty = $empty;
+              $minuteStep = 15;
+              include BASE_PATH . '/resources/views/components/time-input.php';
+          };
       ?>
-        <fieldset class="rounded-xl p-2.5 <?= $closed ? 'opacity-55' : '' ?>"
+        <fieldset class="rounded-xl p-3 <?= $closed ? 'opacity-55' : '' ?>"
                   style="background:var(--accent-soft)">
-          <legend class="sr-only"><?= e($name) ?></legend>
+          <legend class="sr-only"><?= e($dayName) ?></legend>
 
-          <div class="flex items-center gap-2 mb-2">
-            <span class="w-14 shrink-0 text-[13px] font-bold text-ink-800"><?= e($name) ?></span>
-
-            <input type="time" name="opens_<?= $i ?>"
-                   value="<?= e(substr((string) ($h['opens_at'] ?? '09:00:00'), 0, 5)) ?>"
-                   aria-label="ساعت باز شدن <?= e($name) ?>"
-                   class="h-10 rounded-lg border border-ink-200 bg-transparent px-2 text-xs tabular-nums">
-            <span class="text-ink-400 text-xs">تا</span>
-            <input type="time" name="closes_<?= $i ?>"
-                   value="<?= e(substr((string) ($h['closes_at'] ?? '21:00:00'), 0, 5)) ?>"
-                   aria-label="ساعت بسته شدن <?= e($name) ?>"
-                   class="h-10 rounded-lg border border-ink-200 bg-transparent px-2 text-xs tabular-nums">
-
-            <label class="flex items-center gap-1.5 text-[11.5px] text-ink-600 mr-auto cursor-pointer">
+          <!--
+            روی موبایل سه ردیف، روی صفحهٔ بزرگ‌تر فشرده‌تر.
+            نام روز و «تعطیل» همیشه کنار هم‌اند: تصمیمِ باز یا بسته بودن،
+            پیش از ساعت‌ها گرفته می‌شود.
+          -->
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <span class="text-[13px] font-bold text-ink-800"><?= e($dayName) ?></span>
+            <label class="flex items-center gap-1.5 text-[11px] text-ink-600 cursor-pointer
+                          py-1 px-1.5 -me-1.5 rounded-lg">
               <input type="checkbox" name="closed_<?= $i ?>" <?= $closed ? 'checked' : '' ?>
                      class="w-4 h-4 accent-current">
               تعطیل
             </label>
           </div>
 
-          <div class="flex items-center gap-2 ps-16">
+          <div class="flex flex-wrap items-center gap-x-2 gap-y-2 mb-2">
+            <?php $timeField("opens_{$i}", substr((string) ($h['opens_at'] ?? '09:00:00'), 0, 5),
+                             'باز شدن ' . $dayName, false, false); ?>
+            <span class="text-ink-400 text-xs shrink-0">تا</span>
+            <?php $timeField("closes_{$i}", substr((string) ($h['closes_at'] ?? '21:00:00'), 0, 5),
+                             'بسته شدن ' . $dayName, false, false); ?>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-x-2 gap-y-1.5">
             <span class="text-[11px] text-ink-500 shrink-0">استراحت</span>
-            <input type="time" name="break_start_<?= $i ?>" value="<?= e($bs ? substr($bs, 0, 5) : '') ?>"
-                   aria-label="شروع استراحت <?= e($name) ?>"
-                   class="h-9 rounded-lg border border-ink-200 bg-transparent px-2 text-[11px] tabular-nums">
-            <span class="text-ink-400 text-[11px]">تا</span>
-            <input type="time" name="break_end_<?= $i ?>" value="<?= e($be ? substr($be, 0, 5) : '') ?>"
-                   aria-label="پایان استراحت <?= e($name) ?>"
-                   class="h-9 rounded-lg border border-ink-200 bg-transparent px-2 text-[11px] tabular-nums">
-            <span class="text-[10.5px] text-ink-400 mr-auto">اختیاری</span>
+            <?php $timeField("break_start_{$i}", $h['break_start'] ?? null,
+                             'شروع استراحت ' . $dayName, true, true); ?>
+            <span class="text-ink-400 text-[11px] shrink-0">تا</span>
+            <?php $timeField("break_end_{$i}", $h['break_end'] ?? null,
+                             'پایان استراحت ' . $dayName, true, true); ?>
           </div>
         </fieldset>
       <?php endforeach; ?>
@@ -144,32 +153,53 @@
     </form>
   </div>
 
-  <div class="glass rounded-2xl p-5 lg:col-span-2">
+  <div class="glass rounded-2xl p-4 sm:p-5 lg:col-span-2">
     <div class="flex items-center justify-between mb-4">
-      <h2 class="text-sm font-bold text-ink-700">تعطیلات</h2>
-      <form method="post" action="<?= url('panel/settings/holidays/seed') ?>">
+      <h2 class="card-title">تعطیلات</h2>
+      <form method="post" action="<?= e(url('panel/settings/holidays/seed')) ?>">
         <?= csrf_field() ?>
-        <input type="hidden" name="jalali_year" value="<?= (int)$currentJalaliYear ?>">
-        <button class="text-xs bg-ink-100 hover:bg-ink-200 rounded-lg px-3 py-1.5">افزودن تعطیلات ثابت <?= fa_num($currentJalaliYear) ?></button>
+        <input type="hidden" name="jalali_year" value="<?= (int) $currentJalaliYear ?>">
+        <button class="glass h-11 rounded-xl px-3.5 text-[12px] font-bold text-ink-700 tap">
+          افزودن تعطیلات ثابت <?= e(fa_num($currentJalaliYear)) ?>
+        </button>
       </form>
     </div>
     <div class="space-y-1.5 mb-4">
       <?php foreach ($holidays as $h): ?>
-      <div class="flex items-center justify-between text-sm bg-ink-50 rounded-lg px-3 py-2">
-        <span><?= jdate($h['gregorian_date'], 'Y/m/d') ?> — <?= e($h['jalali_label']) ?></span>
-        <form method="post" action="<?= url('panel/settings/holidays/' . $h['id'] . '/remove') ?>">
+      <div class="flex items-center gap-2 bg-ink-50 rounded-xl ps-3 pe-1 py-1">
+        <span class="flex-1 min-w-0 text-[13px] text-ink-700">
+          <span class="tabular-nums"><?= e(jdate($h['gregorian_date'], 'Y/m/d')) ?></span>
+          <span class="text-ink-400">—</span>
+          <?= e($h['jalali_label']) ?>
+        </span>
+        <form method="post" action="<?= e(url('panel/settings/holidays/' . $h['id'] . '/remove')) ?>">
           <?= csrf_field() ?>
-          <button class="text-xs text-ink-400 hover:text-red-500">حذف</button>
+          <button class="w-11 h-11 grid place-items-center rounded-lg text-ink-400
+                         hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer
+                         focus-visible:outline-2 focus-visible:outline-accent"
+                  aria-label="حذف تعطیلی <?= e($h['jalali_label']) ?>">
+            <?= icon('x', 'w-4 h-4') ?>
+          </button>
         </form>
       </div>
       <?php endforeach; ?>
       <?php if (empty($holidays)): ?><p class="text-xs text-ink-400">تعطیلی ثبت نشده.</p><?php endif; ?>
     </div>
-    <form method="post" action="<?= url('panel/settings/holidays') ?>" class="flex items-center gap-2">
+    <!--
+      روی موبایل عمودی می‌چیند. افقی در ۳۲۰ پیکسل جا نمی‌شد و
+      سه انتخابگر تاریخ کنار فیلد عنوان، صفحه را ۳۹ پیکسل سرریز می‌کرد.
+    -->
+    <form method="post" action="<?= e(url('panel/settings/holidays')) ?>" class="space-y-2">
       <?= csrf_field() ?>
-      <input type="date" name="date" class="rounded-lg border border-ink-200 px-2 py-1.5 text-xs">
-      <input type="text" name="label" placeholder="عنوان (مثلاً تاسوعا)" class="flex-1 rounded-lg border border-ink-200 px-2 py-1.5 text-xs">
-      <button class="btn-ink h-9 text-xs px-3">افزودن دستی</button>
+      <?php $name = 'date'; $value = null; $label = 'تعطیلی';
+            include BASE_PATH . '/resources/views/components/jalali-date-input.php'; ?>
+      <div class="flex items-center gap-2">
+        <input type="text" name="label" placeholder="عنوان (مثلاً تاسوعا)"
+               aria-label="عنوان تعطیلی"
+               class="flex-1 min-w-0 h-11 rounded-lg border border-ink-200 bg-transparent px-3 text-[13px]
+                      focus:outline-none focus:ring-2 focus:ring-accent">
+        <button class="btn-ink h-11 text-[13px] px-4 shrink-0">افزودن</button>
+      </div>
     </form>
     <p class="text-[11px] text-ink-400 mt-2">تعطیلات قمری (مثل عید فطر، تاسوعا و عاشورا) هر سال جابه‌جا می‌شوند و باید دستی اضافه شوند.</p>
   </div>

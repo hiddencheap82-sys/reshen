@@ -1,5 +1,5 @@
 <?php /** @var array $customers @var string $q */ ?>
-<h1 class="text-lg font-bold text-ink-800 mb-4">مشتریان</h1>
+<h1 class="page-title mb-4">مشتریان</h1>
 
 <form method="get" action="<?= url('panel/customers') ?>" class="mb-4">
   <input type="text" name="q" value="<?= e($q) ?>" placeholder="جستجو با نام یا شماره..."

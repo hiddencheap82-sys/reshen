@@ -46,7 +46,7 @@ $atMin = $minMonth !== null
       </a>
     <?php endif; ?>
 
-    <h2 class="text-[14px] font-extrabold text-ink-900">
+    <h2 class="card-title">
       <?= e($cal['monthName']) ?> <?= e(fa_num($cal['year'])) ?>
     </h2>
 

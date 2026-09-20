@@ -6,6 +6,7 @@ use App\Core\Response;
 use App\Http\Controllers\BookingsController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\QrController;
 use App\Http\Controllers\QueueController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ServiceController;
@@ -22,6 +23,11 @@ $router->group(['middleware' => [AuthRequired::class, TenantRequired::class]], f
     $router->get('/panel', [QueueController::class, 'index']);
     $router->get('/panel/queue/poll', [QueueController::class, 'poll']);
     $router->get('/panel/bookings', [BookingsController::class, 'index']);
+
+    // برگهٔ QR — هر کسی که به پنل سالن دسترسی دارد می‌تواند چاپش کند.
+    $router->get('/panel/qr', [QrController::class, 'show']);
+    $router->get('/panel/qr.svg', [QrController::class, 'svg']);
+    $router->get('/panel/qr.png', [QrController::class, 'png']);
     $router->get('/panel/pay/{id}', [PaymentController::class, 'show']);
     $router->get('/panel/setup', function () {
         return Response::redirect('/panel/staff');

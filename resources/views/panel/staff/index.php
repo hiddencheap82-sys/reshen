@@ -1,6 +1,6 @@
 <?php /** @var array $staff */ ?>
 <div class="flex items-center justify-between mb-5">
-  <h1 class="text-lg font-bold text-ink-800">آرایشگرها</h1>
+  <h1 class="page-title">آرایشگرها</h1>
   <a href="<?= url('panel/staff/create') ?>" class="btn-ink h-11 text-sm px-4">+ افزودن</a>
 </div>
 
@@ -17,7 +17,7 @@
       <div class="font-bold text-ink-800 truncate"><?= e($s['name']) ?></div>
       <div class="text-xs text-ink-400"><?= $s['commission_percent'] !== null ? fa_num($s['commission_percent']) . '٪ درصد' : 'بدون درصد پیش‌فرض' ?></div>
     </div>
-    <?php if (!$s['is_active']): ?><span class="mr-auto text-[10px] bg-ink-100 text-ink-500 rounded-full px-2 py-0.5">غیرفعال</span><?php endif; ?>
+    <?php if (!$s['is_active']): ?><span class="mr-auto text-[11px] bg-ink-100 text-ink-500 rounded-full px-2 py-0.5">غیرفعال</span><?php endif; ?>
   </a>
   <?php endforeach; ?>
 </div>

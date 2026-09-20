@@ -11,7 +11,7 @@ foreach ($overrides as $o) { $overrideMap[(int)$o['staff_id']] = $o; }
 <div class="max-w-lg">
 <div class="flex items-center gap-3 mb-5">
   <a href="<?= url('panel/services') ?>" class="text-ink-400">←</a>
-  <h1 class="text-lg font-bold text-ink-800"><?= $service ? 'ویرایش خدمت' : 'خدمت جدید' ?></h1>
+  <h1 class="page-title"><?= $service ? 'ویرایش خدمت' : 'خدمت جدید' ?></h1>
 </div>
 
 <form method="post" action="<?= url($service ? 'panel/services/' . $service['id'] : 'panel/services') ?>" class="glass rounded-2xl p-5 space-y-4">
@@ -21,6 +21,19 @@ foreach ($overrides as $o) { $overrideMap[(int)$o['staff_id']] = $o; }
     <input type="text" name="name" required value="<?= e($service['name'] ?? '') ?>" placeholder="اصلاح مو"
       class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent">
   </div>
+  <div>
+    <label for="svc-desc" class="block text-sm text-ink-600 mb-1.5">
+      توضیح <span class="text-ink-400 font-normal">(اختیاری)</span>
+    </label>
+    <textarea name="description" id="svc-desc" rows="2" maxlength="300"
+      placeholder="مثلاً: شست‌وشو، اصلاح با ماشین و قیچی، حالت‌دهی"
+      class="w-full rounded-xl border border-ink-200 bg-transparent px-4 py-3 text-sm leading-relaxed
+             focus:outline-none focus:ring-2 focus:ring-accent"><?= e($service['description'] ?? '') ?></textarea>
+    <p class="text-[11px] text-ink-400 mt-1.5">
+      در «منوی خدمات» که مشتری می‌بیند نمایش داده می‌شود.
+    </p>
+  </div>
+
   <div class="grid grid-cols-2 gap-3">
     <div>
       <label class="block text-sm text-ink-600 mb-1.5">مدت (دقیقه)</label>
@@ -38,7 +51,7 @@ foreach ($overrides as $o) { $overrideMap[(int)$o['staff_id']] = $o; }
 
 <?php if ($service && !empty($staff)): ?>
 <div class="glass rounded-2xl p-5 mt-4">
-  <h2 class="text-sm font-bold text-ink-700 mb-1">مدت و قیمت اختصاصی هر آرایشگر</h2>
+  <h2 class="card-title mb-1">مدت و قیمت اختصاصی هر آرایشگر</h2>
   <p class="text-xs text-ink-400 mb-4">اگر خالی بگذارید، عدد عمومی بالا استفاده می‌شود.</p>
   <div class="space-y-3">
   <?php foreach ($staff as $st): $ov = $overrideMap[(int)$st['id']] ?? null; ?>

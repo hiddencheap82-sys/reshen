@@ -31,7 +31,7 @@
   <div class="text-center mb-6">
     <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-3 metal metal-ink
                 text-white text-2xl font-extrabold shadow-deep">ر</div>
-    <h1 class="text-xl font-extrabold text-ink-900">رشن</h1>
+    <h1 class="page-title">رشن</h1>
     <p class="text-xs text-ink-400 mt-1">زمانِ راست می‌گوید</p>
   </div>
   <div class="glass rounded-2xl p-6">

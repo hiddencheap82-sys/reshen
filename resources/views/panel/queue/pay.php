@@ -7,7 +7,7 @@
 use App\Support\Money;
 ?>
 <div class="max-w-md mx-auto">
-  <h1 class="text-lg font-bold text-ink-800 mb-1">تسویه</h1>
+  <h1 class="page-title mb-1">تسویه</h1>
   <p class="text-sm text-ink-500 mb-5"><?= e($customer['name'] ?? 'مشتری') ?></p>
 
   <div class="glass rounded-2xl p-5 mb-4">

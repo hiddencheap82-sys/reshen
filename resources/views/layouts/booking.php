@@ -57,21 +57,36 @@ $step = $step ?? null;
         <h1 class="text-xl font-extrabold leading-tight"><?= e($salon['name']) ?></h1>
 
         <?php if (!empty($salon['address']) || !empty($salon['city'])): ?>
-          <p class="flex items-start gap-1.5 text-[12.5px] text-ink-300 mt-2 leading-relaxed">
+          <p class="flex items-start gap-1.5 text-[12px] text-ink-300 mt-2 leading-relaxed">
             <?= icon('map-pin', 'w-3.5 h-3.5 mt-0.5 shrink-0 opacity-80') ?>
             <span><?= e(trim(($salon['city'] ?? '') . ' · ' . ($salon['address'] ?? ''), ' ·')) ?></span>
           </p>
         <?php endif; ?>
 
-        <?php if (!empty($salon['phone'])): ?>
-          <a href="tel:<?= e($salon['phone']) ?>"
-             class="inline-flex items-center gap-1.5 mt-3 h-9 px-3 rounded-lg text-[12.5px] font-semibold
+        <div class="flex flex-wrap items-center gap-2 mt-3">
+          <?php if (!empty($salon['phone'])): ?>
+            <a href="tel:<?= e($salon['phone']) ?>"
+               class="inline-flex items-center gap-1.5 h-11 px-3.5 rounded-xl text-[12px] font-semibold
+                      bg-white/10 hover:bg-white/15 text-white transition-colors tap
+                      focus-visible:outline-2 focus-visible:outline-accent">
+              <?= icon('phone', 'w-3.5 h-3.5') ?>
+              <span class="ltr tabular-nums"><?= e(fa_num($salon['phone'])) ?></span>
+            </a>
+          <?php endif; ?>
+
+          <!--
+            منوی خدمات. خیلی‌ها لینک را از اینستاگرام باز می‌کنند و اول
+            فقط می‌خواهند بدانند «چی دارید و چند؟» — بدون این دکمه،
+            جوابِ آن سؤال پشتِ جریان رزرو پنهان می‌ماند.
+          -->
+          <a href="<?= e(url('s/' . $salon['slug'] . '/services')) ?>"
+             class="inline-flex items-center gap-1.5 h-11 px-3.5 rounded-xl text-[12px] font-semibold
                     bg-white/10 hover:bg-white/15 text-white transition-colors tap
                     focus-visible:outline-2 focus-visible:outline-accent">
-            <?= icon('phone', 'w-3.5 h-3.5') ?>
-            <span class="ltr tabular-nums"><?= e(fa_num($salon['phone'])) ?></span>
+            <?= icon('tag', 'w-3.5 h-3.5') ?>
+            خدمات و قیمت‌ها
           </a>
-        <?php endif; ?>
+        </div>
       </div>
     </header>
 
@@ -89,7 +104,7 @@ $step = $step ?? null;
                 <?= $now ? 'aria-current="step"' : '' ?>>
               <span class="h-1 rounded-full transition-colors duration-300
                            <?= $done ? 'bg-accent' : ($now ? 'bg-ink-900' : 'bg-ink-200') ?>"></span>
-              <span class="text-[10.5px] font-semibold text-center
+              <span class="text-[11px] font-semibold text-center
                            <?= $now ? 'text-ink-900' : ($done ? 'text-accent' : 'text-ink-400') ?>">
                 <?= e($label) ?>
               </span>

@@ -1,5 +1,5 @@
 <?php /** @var array $salon @var array $staff */ ?>
-<h1 class="text-base font-bold text-ink-800 mb-1">انتخاب آرایشگر</h1>
+<h1 class="text-[15px] font-extrabold text-ink-900 mb-1">انتخاب آرایشگر</h1>
 <p class="text-sm text-ink-500 mb-5">می‌توانید انتخاب نکنید تا زودترین وقت آزاد پیشنهاد شود.</p>
 
 <form method="post" action="<?= url('s/' . $salon['slug'] . '/staff') ?>" class="space-y-2">

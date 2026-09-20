@@ -5,7 +5,7 @@ $monthNames = [1=>'فروردین',2=>'اردیبهشت',3=>'خرداد',4=>'ت�
 $maxDaily = max(array_map(fn($d) => (int)$d['total'], $dailySeries) ?: [1]);
 ?>
 <div class="flex items-center justify-between mb-5">
-  <h1 class="text-lg font-bold text-ink-800">گزارش ماهانه — <?= e($monthNames[$jm]) ?> <?= fa_num($jy) ?></h1>
+  <h1 class="page-title">گزارش ماهانه — <?= e($monthNames[$jm]) ?> <?= fa_num($jy) ?></h1>
   <a href="<?= url('panel/reports') ?>" class="text-xs text-accent hover:underline">گزارش روزانه ←</a>
 </div>
 
@@ -29,7 +29,7 @@ $maxDaily = max(array_map(fn($d) => (int)$d['total'], $dailySeries) ?: [1]);
 </div>
 
 <div class="glass rounded-2xl p-5 mb-5">
-  <h2 class="text-sm font-bold text-ink-700 mb-4">روند فروش روزانه</h2>
+  <h2 class="card-title mb-4">روند فروش روزانه</h2>
   <div class="flex items-end gap-1 h-32">
     <?php foreach ($dailySeries as $d): $h = max(4, (int)round(((int)$d['total'] / $maxDaily) * 100)); ?>
     <div class="flex-1 bg-gold-500 rounded-t" style="height:<?= $h ?>%" title="<?= e($d['d']) ?>"></div>
@@ -39,7 +39,7 @@ $maxDaily = max(array_map(fn($d) => (int)$d['total'], $dailySeries) ?: [1]);
 </div>
 
 <div class="glass rounded-2xl p-5">
-  <h2 class="text-sm font-bold text-ink-700 mb-3">به تفکیک روش پرداخت</h2>
+  <h2 class="card-title mb-3">به تفکیک روش پرداخت</h2>
   <?php foreach ($breakdown as $b): ?>
   <div class="flex items-center justify-between text-sm py-1.5">
     <span class="text-ink-600"><?= e($methodLabels[$b['method']] ?? $b['method']) ?></span>

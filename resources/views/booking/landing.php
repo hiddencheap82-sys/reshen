@@ -48,7 +48,7 @@
         <?php endif; ?>
       </div>
 
-      <span class="text-[10.5px] font-semibold text-ink-400 shrink-0">زنده</span>
+      <span class="text-[11px] font-semibold text-ink-400 shrink-0">زنده</span>
     </div>
   </div>
 <?php else: ?>
@@ -70,7 +70,7 @@
   <div class="glass rounded-2xl py-12 px-5 text-center">
     <?= icon('scissors', 'w-10 h-10 mx-auto text-ink-300 mb-3') ?>
     <p class="text-sm font-semibold text-ink-600">هنوز خدمتی تعریف نشده</p>
-    <p class="text-[12.5px] text-ink-400 mt-1">با خود آرایشگاه تماس بگیرید.</p>
+    <p class="text-[12px] text-ink-400 mt-1">با خود آرایشگاه تماس بگیرید.</p>
   </div>
 
 <?php else: ?>
@@ -95,7 +95,7 @@
             </span>
 
             <span class="flex-1 min-w-0">
-              <span class="block text-[14.5px] font-bold text-ink-900 truncate"><?= e($s['name']) ?></span>
+              <span class="block text-[14px] font-bold text-ink-900 truncate"><?= e($s['name']) ?></span>
               <span class="block text-[12px] text-ink-500 mt-0.5 tabular-nums">
                 <?= e(fa_num((int) $s['duration_minutes'])) ?> دقیقه
               </span>

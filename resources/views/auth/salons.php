@@ -1,5 +1,5 @@
 <?php /** @var array $memberships */ ?>
-<h2 class="text-base font-bold text-ink-800 mb-1">انتخاب سالن</h2>
+<h2 class="text-[15px] font-extrabold text-ink-900 mb-1">انتخاب سالن</h2>
 <p class="text-sm text-ink-500 mb-5">در چند سالن عضو هستید. کدام را باز کنیم؟</p>
 
 <div class="space-y-2">

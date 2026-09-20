@@ -15,6 +15,5 @@ $router->group(['middleware' => [PlatformAdminRequired::class]], function ($rout
 
     $router->group(['middleware' => [VerifyCsrf::class]], function ($router) {
         $router->post('/platform/{id}/impersonate', [PlatformController::class, 'impersonate']);
-        $router->post('/platform/{id}/sms-credit', [PlatformController::class, 'adjustSmsCredit']);
     });
 });
