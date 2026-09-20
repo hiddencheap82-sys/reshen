@@ -8,10 +8,42 @@ final class Session
 {
     public static function start(): void
     {
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            session_name((string) Config::get('app.session_name', 'reshen_session'));
-            session_start();
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            return;
         }
+
+        // در CLI (تست، کرون، مهاجرت) نشست معنی ندارد و session_start
+        // هشدار «headers already sent» می‌دهد.
+        if (PHP_SAPI === 'cli') {
+            return;
+        }
+
+        session_name((string) Config::get('app.session_name', 'reshen_session'));
+
+        /*
+         * پرچم‌های کوکی. پیش‌فرض PHP هیچ‌کدام را نمی‌گذارد:
+         *
+         *  httponly — جاوااسکریپت نتواند کوکی نشست را بخواند. بدون این،
+         *             هر XSS به تصاحب حساب تبدیل می‌شود.
+         *  samesite — کوکی با درخواست‌های بین‌سایتی فرستاده نشود (CSRF).
+         *             Lax و نه Strict، چون لینک «نوبت من» از پیامک باز
+         *             می‌شود و با Strict، کاربرِ واردشده بیرون می‌افتد.
+         *  secure   — فقط روی HTTPS. روی هاست بدون گواهی نباید روشن باشد
+         *             وگرنه ورود اصلاً کار نمی‌کند، پس از روی درخواست
+         *             تشخیص می‌دهیم.
+         */
+        $https = (($_SERVER['HTTPS'] ?? '') !== '' && $_SERVER['HTTPS'] !== 'off')
+            || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
+
+        session_set_cookie_params([
+            'lifetime' => 0,
+            'path' => Request::basePath() . '/',
+            'httponly' => true,
+            'samesite' => 'Lax',
+            'secure' => $https,
+        ]);
+
+        session_start();
     }
 
     public static function get(string $key, mixed $default = null): mixed
