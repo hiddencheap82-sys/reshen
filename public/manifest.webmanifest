@@ -1,0 +1,14 @@
+{
+  "name": "رشن",
+  "short_name": "رشن",
+  "description": "سامانهٔ نوبت‌دهی و مدیریت آرایشگاه مردانه",
+  "start_url": "./panel",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb",
+  "dir": "rtl",
+  "lang": "fa",
+  "icons": [
+    { "src": "assets/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

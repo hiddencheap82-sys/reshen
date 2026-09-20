@@ -1,0 +1,51 @@
+<?php /** @var array $salon @var array $owners @var array $auditLogs */ ?>
+<div class="flex items-center gap-3 mb-5">
+  <a href="<?= url('platform') ?>" class="text-slate-400">←</a>
+  <h1 class="text-lg font-bold text-slate-800"><?= e($salon['name']) ?></h1>
+</div>
+
+<div class="grid lg:grid-cols-2 gap-5">
+  <div class="bg-white rounded-2xl border border-slate-100 p-5">
+    <h2 class="text-sm font-bold text-slate-700 mb-3">اطلاعات سالن</h2>
+    <div class="text-sm space-y-1.5 text-slate-600">
+      <div>شهر: <?= e($salon['city'] ?? '—') ?></div>
+      <div>پلن: <?= e($salon['plan_code']) ?> · <?= fa_num($salon['seats']) ?> صندلی</div>
+      <div>کیف پیامک: <?= fa_num($salon['sms_credit']) ?> پیامک</div>
+      <div>تاریخ ثبت‌نام: <?= jdate($salon['created_at'], 'Y/m/d') ?></div>
+    </div>
+
+    <form method="post" action="<?= url('platform/' . $salon['id'] . '/impersonate') ?>" class="mt-4">
+      <?= csrf_field() ?>
+      <button class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl py-2.5 text-sm">ورود پشتیبانی به پنل این سالن</button>
+    </form>
+
+    <form method="post" action="<?= url('platform/' . $salon['id'] . '/sms-credit') ?>" class="mt-3 flex gap-2">
+      <?= csrf_field() ?>
+      <input type="number" name="delta" placeholder="مثلاً ۲۰۰ یا ۲۰۰-" class="flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm">
+      <button class="text-sm bg-slate-100 hover:bg-slate-200 rounded-xl px-4">اعمال</button>
+    </form>
+
+    <div class="mt-5">
+      <h3 class="text-xs font-bold text-slate-500 mb-2">اعضا</h3>
+      <?php foreach ($owners as $o): ?>
+      <div class="flex items-center justify-between text-xs py-1">
+        <span><?= e($o['name'] ?? '—') ?> <span dir="ltr" class="text-slate-400"><?= e($o['phone']) ?></span></span>
+        <span class="text-slate-400"><?= e(['owner'=>'صاحب','manager'=>'مدیر','staff'=>'آرایشگر','reception'=>'پذیرش'][$o['role']] ?? $o['role']) ?></span>
+      </div>
+      <?php endforeach; ?>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-slate-100 p-5">
+    <h2 class="text-sm font-bold text-slate-700 mb-3">لاگ دسترسی و رویدادها</h2>
+    <div class="space-y-2">
+      <?php foreach ($auditLogs as $log): ?>
+      <div class="text-xs border-b border-slate-50 pb-1.5">
+        <span class="font-bold text-slate-700"><?= e($log['action']) ?></span>
+        <span class="text-slate-400"> — <?= e($log['actor_phone'] ?? 'سیستم') ?> — <?= jdate($log['created_at'], 'Y/m/d H:i') ?></span>
+      </div>
+      <?php endforeach; ?>
+      <?php if (empty($auditLogs)): ?><p class="text-xs text-slate-400">رویدادی ثبت نشده.</p><?php endif; ?>
+    </div>
+  </div>
+</div>

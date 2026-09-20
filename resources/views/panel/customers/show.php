@@ -1,0 +1,89 @@
+<?php
+/** @var array $customer @var ?array $preferences @var array $history @var array $staff */
+$p = $preferences ?? [];
+?>
+<div class="flex items-center gap-3 mb-5">
+  <a href="<?= url('panel/customers') ?>" class="text-slate-400">←</a>
+  <h1 class="text-lg font-bold text-slate-800"><?= e($customer['name'] ?: 'بدون نام') ?></h1>
+</div>
+
+<div class="grid lg:grid-cols-2 gap-5">
+  <div class="bg-white rounded-2xl border border-slate-100 p-5">
+    <h2 class="text-sm font-bold text-slate-700 mb-4">مشخصات و دفترچهٔ آرایشگر</h2>
+    <form method="post" action="<?= url('panel/customers/' . $customer['id']) ?>" class="space-y-3">
+      <?= csrf_field() ?>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">نام</label>
+          <input type="text" name="name" value="<?= e($customer['name'] ?? '') ?>" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">موبایل</label>
+          <input type="text" dir="ltr" name="phone" value="<?= $customer['phone'] ? e(\App\Support\IranMobile::parse($customer['phone'])->localCompact()) : '' ?>" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-left">
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs text-slate-500 mb-1">آرایشگر ترجیحی</label>
+        <select name="preferred_staff_id" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm">
+          <option value="">—</option>
+          <?php foreach ($staff as $st): ?>
+          <option value="<?= (int)$st['id'] ?>" <?= (int)($customer['preferred_staff_id'] ?? 0) === (int)$st['id'] ? 'selected' : '' ?>><?= e($st['name']) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">شمارهٔ تیغ</label>
+          <input type="text" name="clipper_size" value="<?= e($p['clipper_size'] ?? '') ?>" placeholder="مثلاً شمارهٔ ۲" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">فرم مو</label>
+          <input type="text" name="hair_shape" value="<?= e($p['hair_shape'] ?? '') ?>" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm">
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs text-slate-500 mb-1">ریش</label>
+        <input type="text" name="beard_notes" value="<?= e($p['beard_notes'] ?? '') ?>" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm">
+      </div>
+      <div>
+        <label class="block text-xs text-slate-500 mb-1">حساسیت پوستی</label>
+        <input type="text" name="skin_sensitivity" value="<?= e($p['skin_sensitivity'] ?? '') ?>" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm">
+      </div>
+      <div>
+        <label class="block text-xs text-slate-500 mb-1">دفعهٔ قبل چه گفت</label>
+        <input type="text" name="last_barber_said" value="<?= e($p['last_barber_said'] ?? '') ?>" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm">
+      </div>
+      <div>
+        <label class="block text-xs text-slate-500 mb-1">یادداشت آزاد</label>
+        <textarea name="notes" rows="3" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm"><?= e($customer['notes'] ?? '') ?></textarea>
+      </div>
+      <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl py-2.5 text-sm">ذخیره</button>
+    </form>
+  </div>
+
+  <div>
+    <div class="bg-white rounded-2xl border border-slate-100 p-5 mb-4 grid grid-cols-3 text-center divide-x divide-x-reverse divide-slate-100">
+      <div><div class="text-xl font-extrabold text-slate-800"><?= fa_num($customer['visit_count']) ?></div><div class="text-[11px] text-slate-400">مراجعه</div></div>
+      <div><div class="text-xl font-extrabold text-slate-800"><?= fa_num($customer['no_show_count']) ?></div><div class="text-[11px] text-slate-400">غیبت</div></div>
+      <div><div class="text-xl font-extrabold text-slate-800"><?= fa_num($customer['trust_score']) ?></div><div class="text-[11px] text-slate-400">امتیاز اعتبار</div></div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-100 p-5">
+      <h2 class="text-sm font-bold text-slate-700 mb-3">تاریخچهٔ نوبت‌ها</h2>
+      <div class="space-y-2">
+        <?php foreach ($history as $h): ?>
+        <div class="flex items-center justify-between text-sm border-b border-slate-50 pb-2">
+          <div>
+            <div class="text-slate-700"><?= e($h['service_names'] ?: '—') ?></div>
+            <div class="text-[11px] text-slate-400"><?= e($h['staff_name'] ?? '') ?> · <?= jdate($h['created_at'], 'Y/m/d') ?></div>
+          </div>
+          <span class="text-[11px] px-2 py-0.5 rounded-full <?= $h['status']==='completed' ? 'bg-emerald-50 text-emerald-600' : ($h['status']==='no_show' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-500') ?>">
+            <?= e(['completed'=>'انجام‌شد','no_show'=>'غیبت','cancelled'=>'لغو'][$h['status']] ?? $h['status']) ?>
+          </span>
+        </div>
+        <?php endforeach; ?>
+        <?php if (empty($history)): ?><p class="text-xs text-slate-400">هنوز تاریخچه‌ای نیست.</p><?php endif; ?>
+      </div>
+    </div>
+  </div>
+</div>
