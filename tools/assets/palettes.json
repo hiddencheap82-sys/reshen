@@ -1,0 +1,56 @@
+{
+  "gold": {
+    "name": "طلایی",
+    "accent": "#A16207",
+    "accentHi": "#B45309",
+    "onAccent": "#FFFFFF",
+    "soft": "#FEFCE8",
+    "darkAccent": "#FBBF24",
+    "darkSoft": "#2A2410"
+  },
+  "emerald": {
+    "name": "زمردی",
+    "accent": "#047857",
+    "accentHi": "#065F46",
+    "onAccent": "#FFFFFF",
+    "soft": "#ECFDF5",
+    "darkAccent": "#34D399",
+    "darkSoft": "#0E2620"
+  },
+  "indigo": {
+    "name": "نیلی",
+    "accent": "#4338CA",
+    "accentHi": "#4F46E5",
+    "onAccent": "#FFFFFF",
+    "soft": "#EEF2FF",
+    "darkAccent": "#A5B4FC",
+    "darkSoft": "#1E1B3A"
+  },
+  "copper": {
+    "name": "مسی",
+    "accent": "#9A3412",
+    "accentHi": "#C2410C",
+    "onAccent": "#FFFFFF",
+    "soft": "#FFF7ED",
+    "darkAccent": "#FB923C",
+    "darkSoft": "#2A1710"
+  },
+  "teal": {
+    "name": "فیروزه‌ای",
+    "accent": "#0F766E",
+    "accentHi": "#115E59",
+    "onAccent": "#FFFFFF",
+    "soft": "#F0FDFA",
+    "darkAccent": "#5EEAD4",
+    "darkSoft": "#0C2523"
+  },
+  "ruby": {
+    "name": "یاقوتی",
+    "accent": "#BE123C",
+    "accentHi": "#E11D48",
+    "onAccent": "#FFFFFF",
+    "soft": "#FFF1F2",
+    "darkAccent": "#FDA4AF",
+    "darkSoft": "#2A1016"
+  }
+}

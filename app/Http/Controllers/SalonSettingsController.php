@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Core\Auth;
+use App\Support\Theme;
 use App\Core\DB;
 use App\Core\Request;
 use App\Core\Response;
@@ -39,7 +40,13 @@ final class SalonSettingsController extends Controller
             'city' => trim((string) $request->input('city', '')) ?: null,
             'address' => trim((string) $request->input('address', '')) ?: null,
             'phone' => trim((string) $request->input('phone', '')) ?: null,
+            // Theme::resolve مقدار ناشناخته را به پیش‌فرض برمی‌گرداند، پس
+            // چیزی جز پالت‌های تعریف‌شده در دیتابیس نمی‌نشیند.
+            'theme' => Theme::resolve((string) $request->input('theme', '')),
         ], 'id = :id', ['id' => Auth::salonId()]);
+
+        // نشست را تازه کن وگرنه پنل تا ورود بعدی رنگ قبلی را نشان می‌دهد
+        Auth::setSalon(Auth::salonId());
 
         return $this->withSuccess('اطلاعات سالن ذخیره شد.', '/panel/settings');
     }

@@ -10,6 +10,17 @@ use App\Core\Env;
  * scattered through the domain code.
  */
 return [
+
+    'ui' => [
+        /*
+         * خانوادهٔ فونت. «vazirmatn» یا «iranyekan».
+         *
+         * ایران‌یکان فونت تجاری است و در مخزن نیست. اگر لایسنسش را
+         * دارید، فایل‌های woff2 را در public/assets/fonts بگذارید و
+         * این را عوض کنید. راهنما: public/assets/fonts/README.md
+         */
+        'font' => Env::get('UI_FONT', 'vazirmatn'),
+    ],
     'queue' => [
         // Booked appointments outrank walk-ins from N minutes before to N after their slot.
         'priority_window_minutes' => 10,

@@ -42,12 +42,8 @@ echo App\Core\View::render('components.jalali-calendar', [
   </div>
 
   <?php if (empty($slots)): ?>
-    <div class="surface rounded-2xl py-12 px-5 text-center shadow-card">
-      <svg class="w-10 h-10 mx-auto text-ink-300 mb-3" fill="none" viewBox="0 0 24 24"
-           stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round"
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-      </svg>
+    <div class="glass rounded-2xl py-12 px-5 text-center">
+      <?= icon('calendar-x', 'w-10 h-10 mx-auto text-ink-300 mb-3') ?>
       <p class="text-sm font-semibold text-ink-600 mb-1">این روز وقت آزادی ندارد</p>
       <p class="text-[12.5px] text-ink-400">روز دیگری را از تقویم بالا انتخاب کنید.</p>
     </div>
@@ -91,7 +87,7 @@ echo App\Core\View::render('components.jalali-calendar', [
                 <?php foreach ($times as $time): $index++; ?>
                   <label class="pick relative block tap rise rise-<?= min((int) ceil($index / 6), 5) ?>">
                     <input type="radio" name="time" value="<?= e($time) ?>" required class="sr-only">
-                    <span class="slot surface h-12 grid place-items-center rounded-xl shadow-card
+                    <span class="slot glass h-12 grid place-items-center rounded-xl
                                  text-sm font-bold text-ink-800 tabular-nums cursor-pointer
                                  transition-all duration-200 ease-out-soft hover:shadow-lift">
                       <?= e(fa_num($time)) ?>
@@ -104,12 +100,9 @@ echo App\Core\View::render('components.jalali-calendar', [
         </div>
       </fieldset>
 
-      <button type="submit" class="btn-gold w-full">
+      <button type="submit" class="btn-accent metal w-full">
         ادامه
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-             stroke-width="2.5" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-        </svg>
+        <?= icon('chevron-end', 'w-4 h-4') ?>
       </button>
     </form>
   <?php endif; ?>

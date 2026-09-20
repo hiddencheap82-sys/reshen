@@ -31,6 +31,30 @@
         <label class="block text-xs text-ink-500 mb-1">آدرس</label>
         <input type="text" name="address" value="<?= e($salon['address'] ?? '') ?>" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
       </div>
+
+      <div>
+        <label class="block text-xs font-bold text-ink-600 mb-2">رنگ صفحهٔ سالن</label>
+        <p class="text-[11.5px] text-ink-400 mb-3">
+          صفحه‌ای که مشتری می‌بیند با این رنگ نمایش داده می‌شود.
+        </p>
+
+        <fieldset class="grid grid-cols-3 gap-2">
+          <legend class="sr-only">انتخاب پالت رنگی</legend>
+          <?php $current = App\Support\Theme::resolve($salon['theme'] ?? null); ?>
+          <?php foreach (App\Support\Theme::all() as $key => $palette): ?>
+            <label class="pick relative block tap">
+              <input type="radio" name="theme" value="<?= e($key) ?>" class="sr-only"
+                     <?= $key === $current ? 'checked' : '' ?>>
+              <span class="pick-card glass flex items-center gap-2 rounded-xl px-3 py-2.5
+                           transition-all duration-200 ease-out-soft cursor-pointer">
+                <span class="w-5 h-5 rounded-full shrink-0 ring-1 ring-black/10"
+                      style="background:<?= e($palette['swatch']) ?>" aria-hidden="true"></span>
+                <span class="text-[12.5px] font-semibold text-ink-800"><?= e($palette['name']) ?></span>
+              </span>
+            </label>
+          <?php endforeach; ?>
+        </fieldset>
+      </div>
       <div class="bg-ink-50 rounded-xl px-3 py-2.5 text-xs text-ink-500">
         لینک عمومی رزرو: <span dir="ltr" class="font-mono text-gold-700"><?= e(url('s/' . $salon['slug'])) ?></span>
       </div>

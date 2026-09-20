@@ -30,7 +30,7 @@ $icon = function (string $name, string $class = 'w-5 h-5') {
 };
 ?>
 <!doctype html>
-<html lang="fa" dir="rtl">
+<html lang="fa" dir="rtl" data-font="<?= e((string) App\Core\Config::get('reshen.ui.font', 'vazirmatn')) ?>" <?= theme_attr(App\Core\Session::get('_salon_theme')) ?>>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -41,7 +41,7 @@ $icon = function (string $name, string $class = 'w-5 h-5') {
 <link rel="apple-touch-icon" href="<?= asset('icons/icon.svg') ?>">
 <meta name="theme-color" content="#1C1917">
 <style>
-  .nav-active{ background:#FEFCE8; color:#854D0E; font-weight:700; }
+  .nav-active{ background:var(--accent-soft); color:var(--accent); font-weight:700; }
 </style>
 <script>
   if ('serviceWorker' in navigator) {
@@ -50,6 +50,8 @@ $icon = function (string $name, string $class = 'w-5 h-5') {
 </script>
 </head>
 <body class="antialiased">
+
+<?php include BASE_PATH . '/resources/views/components/icons.svg'; ?>
 
 <div class="flex min-h-screen">
   <!-- Desktop sidebar -->
@@ -124,11 +126,11 @@ $icon = function (string $name, string $class = 'w-5 h-5') {
 </div>
 
 <!-- Mobile bottom nav -->
-<nav class="md:hidden fixed bottom-0 inset-x-0 z-20 flex items-stretch h-16 px-1 border-t"
-     style="background:var(--surface);border-color:var(--line);padding-bottom:env(safe-area-inset-bottom,0px)"
+<nav class="glass-bar md:hidden fixed bottom-0 inset-x-0 z-20 flex items-stretch h-16 px-1"
+     style="padding-bottom:env(safe-area-inset-bottom,0px)"
      aria-label="ناوبری اصلی">
   <?php foreach (array_slice($visibleNav, 0, 5) as $item): $active = $currentPath===rtrim(url($item['href']),'/') || ($item['href']==='/panel' && $currentPath===rtrim(url('/panel'),'/')); ?>
-  <a href="<?= url($item['href']) ?>" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] <?= $active ? 'text-gold-700' : 'text-ink-400' ?>">
+  <a href="<?= url($item['href']) ?>" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] <?= $active ? 'text-accent' : 'text-ink-400' ?>">
     <?= $icon($item['icon'], 'w-5 h-5') ?>
     <span><?= e($item['label']) ?></span>
   </a>

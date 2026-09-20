@@ -31,7 +31,7 @@ $atMin = $minMonth !== null
     && ($cal['year'] < $minMonth['year']
         || ($cal['year'] === $minMonth['year'] && $cal['month'] <= $minMonth['month']));
 ?>
-<div class="surface rounded-2xl overflow-hidden shadow-card rise rise-1" role="group"
+<div class="glass rounded-2xl overflow-hidden rise rise-1" role="group"
      aria-label="تقویم — <?= e($cal['monthName']) ?> <?= e(fa_num($cal['year'])) ?>">
 
   <div class="flex items-center justify-between px-2 py-2 border-b" style="border-color:var(--line)">
@@ -40,11 +40,9 @@ $atMin = $minMonth !== null
     <?php else: ?>
       <a href="<?= e($navFor($cal['prev']['year'], $cal['prev']['month'])) ?>"
          class="w-11 h-11 grid place-items-center rounded-xl text-ink-500 hover:bg-ink-100
-                focus-visible:outline-2 focus-visible:outline-gold-600 transition-colors cursor-pointer"
+                focus-visible:outline-2 focus-visible:outline-accent transition-colors cursor-pointer"
          aria-label="ماه قبل">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-        </svg>
+        <?= icon('chevron-start', 'w-5 h-5') ?>
       </a>
     <?php endif; ?>
 
@@ -54,11 +52,9 @@ $atMin = $minMonth !== null
 
     <a href="<?= e($navFor($cal['next']['year'], $cal['next']['month'])) ?>"
        class="w-11 h-11 grid place-items-center rounded-xl text-ink-500 hover:bg-ink-100
-              focus-visible:outline-2 focus-visible:outline-gold-600 transition-colors cursor-pointer"
+              focus-visible:outline-2 focus-visible:outline-accent transition-colors cursor-pointer"
        aria-label="ماه بعد">
-      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-      </svg>
+      <?= icon('chevron-end', 'w-5 h-5') ?>
     </a>
   </div>
 
@@ -66,7 +62,7 @@ $atMin = $minMonth !== null
     <div class="grid grid-cols-7 gap-1 mb-1" aria-hidden="true">
       <?php foreach (JalaliCalendar::WEEKDAY_INITIALS as $i => $initial): ?>
         <div class="h-7 grid place-items-center text-[11px] font-bold
-                    <?= $i >= 5 ? 'text-gold-700' : 'text-ink-400' ?>">
+                    <?= $i >= 5 ? 'text-accent' : 'text-ink-400' ?>">
           <?= e($initial) ?>
         </div>
       <?php endforeach; ?>
@@ -100,13 +96,13 @@ $atMin = $minMonth !== null
                  <?= $isSelected ? 'aria-current="date"' : '' ?>
                  class="h-11 grid place-items-center rounded-xl text-sm tabular-nums font-semibold
                         transition-colors cursor-pointer
-                        focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gold-600
+                        focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent
                         <?php if ($isSelected): ?>
-                          bg-ink-900 text-white shadow-lift
+                          metal
                         <?php elseif ($cell['isToday']): ?>
-                          ring-2 ring-gold-600 text-gold-700 font-extrabold hover:bg-gold-50
+                          ring-accent text-accent font-extrabold hover:bg-accent-soft
                         <?php elseif ($cell['isWeekend']): ?>
-                          text-gold-700 hover:bg-gold-50
+                          text-accent hover:bg-accent-soft
                         <?php else: ?>
                           text-ink-700 hover:bg-ink-100
                         <?php endif; ?>">

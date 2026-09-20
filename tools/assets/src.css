@@ -1,7 +1,23 @@
+/*
+ * فونت‌ها.
+ *
+ * وزیرمتن پیش‌فرض است چون لایسنس OFL دارد و فروش تجاری محصول را
+ * بلامانع می‌گذارد. ایران‌یکان فونت تجاری است و بدون خرید لایسنس
+ * نباید توزیع شود — توضیح کامل در public/assets/fonts/README.md.
+ *
+ * اگر لایسنس دارید: فایل‌های woff2 را در همان پوشه بگذارید و
+ * UI_FONT=iranyekan را در .env بنویسید. تعریف @font-face از قبل
+ * اینجاست، پس ساخت دوبارهٔ CSS لازم نیست.
+ */
 @font-face{font-family:'Vazirmatn';font-style:normal;font-weight:400;font-display:swap;
   src:url('../fonts/Vazirmatn-Regular.woff2') format('woff2');}
 @font-face{font-family:'Vazirmatn';font-style:normal;font-weight:700;font-display:swap;
   src:url('../fonts/Vazirmatn-Bold.woff2') format('woff2');}
+
+@font-face{font-family:'IRANYekanX';font-style:normal;font-weight:400;font-display:swap;
+  src:url('../fonts/IRANYekanX-Regular.woff2') format('woff2');}
+@font-face{font-family:'IRANYekanX';font-style:normal;font-weight:700;font-display:swap;
+  src:url('../fonts/IRANYekanX-Bold.woff2') format('woff2');}
 
 @tailwind base;
 @tailwind components;
@@ -11,17 +27,20 @@
   :root{
     --bg:#FAFAF9; --surface:#FFFFFF; --line:#E7E5E4;
     --text:#1C1917; --text-dim:#78716C;
-    --accent:#A16207; --accent-soft:#FEFCE8;
+    --font-sans:'Vazirmatn','Tahoma',sans-serif;
+    --accent:#A16207; --accent-hi:#B45309;
+    --on-accent:#FFFFFF; --accent-soft:#FEFCE8;
   }
   @media (prefers-color-scheme: dark){
     :root{
       --bg:#0C0A09; --surface:#1C1917; --line:#292524;
       --text:#F5F5F4; --text-dim:#A8A29E;
-      --accent:#FBBF24; --accent-soft:#292524;
+      --accent:#FBBF24; --accent-hi:#FBBF24;
+      --on-accent:#0C0A09; --accent-soft:#2A2410;
     }
   }
   body{
-    font-family:'Vazirmatn','Tahoma',sans-serif;
+    font-family:var(--font-sans);
     background:var(--bg); color:var(--text);
     -webkit-font-smoothing:antialiased;
   }
@@ -34,17 +53,6 @@
 @layer components {
   .surface{background:var(--surface);border:1px solid var(--line)}
 
-  /* دکمهٔ اصلی — طلاییِ کم‌مصرف */
-  .btn-gold{
-    @apply inline-flex items-center justify-center gap-2 h-12 px-5 rounded-xl
-           font-bold text-white cursor-pointer select-none
-           transition-all duration-200 ease-out-soft;
-    background:linear-gradient(180deg,#B45309 0%,#A16207 100%);
-    box-shadow:0 1px 2px rgb(12 10 9/.18), inset 0 1px 0 rgb(255 255 255/.14);
-  }
-  .btn-gold:hover{filter:brightness(1.07)}
-  .btn-gold:active{transform:translateY(1px);filter:brightness(.96)}
-  .btn-gold:focus-visible{outline:2px solid #A16207;outline-offset:2px}
 
   .btn-ink{
     @apply inline-flex items-center justify-center gap-2 h-12 px-5 rounded-xl
@@ -59,8 +67,6 @@
   .tap{@apply transition-all duration-200 ease-out-soft cursor-pointer}
   .tap:active{transform:scale(.985)}
 
-  /* نوار ظریف بالای کارت‌های تأکیدی */
-  .hairline-gold{box-shadow:inset 0 2px 0 0 #A16207}
 
   /*
    * کارت انتخاب (خدمت، آرایشگر).
@@ -71,27 +77,22 @@
    * انتخاب می‌کرد و هیچ بازخوردی نمی‌دید.
    */
   .pick input:checked ~ .pick-card{
-    border-color:#A16207; background:#FEFCE8;
+    border-color:var(--accent); background:var(--accent-soft);
   }
   .pick input:checked ~ .pick-card .pick-box{
-    background:#A16207; border-color:#A16207;
+    background:var(--accent); border-color:var(--accent); color:var(--on-accent);
   }
   .pick input:checked ~ .pick-card .pick-tick{opacity:1}
   .pick input:checked ~ .slot{
-    background:#1C1917; border-color:#1C1917; color:#fff;
+    background:var(--accent); border-color:var(--accent); color:var(--on-accent);
   }
-  .pick input:focus-visible ~ .slot{outline:2px solid #A16207;outline-offset:2px}
-  @media (prefers-color-scheme: dark){
-    .pick input:checked ~ .slot{background:#FBBF24;border-color:#FBBF24;color:#1C1917}
-  }
+  .pick input:focus-visible ~ .slot{outline:2px solid var(--accent);outline-offset:2px}
+
 
   .pick input:focus-visible ~ .pick-card{
-    outline:2px solid #A16207; outline-offset:2px;
+    outline:2px solid var(--accent); outline-offset:2px;
   }
-  @media (prefers-color-scheme: dark){
-    .pick input:checked ~ .pick-card{background:#292524;border-color:#FBBF24}
-    .pick input:checked ~ .pick-card .pick-box{background:#FBBF24;border-color:#FBBF24}
-  }
+
 }
 
 /* ——— حرکت ——— */
@@ -110,6 +111,215 @@
     transition-duration:.01ms !important;scroll-behavior:auto !important;
   }
   .rise{animation:none;opacity:1;transform:none}
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+ * پالت‌های رنگی
+ *
+ * هر سالن می‌تواند یکی را انتخاب کند و صفحهٔ اختصاصی‌اش همان رنگ را
+ * می‌گیرد. رنگ روی <html data-theme="..."> می‌نشیند، پس همه‌چیز با یک
+ * ویژگی عوض می‌شود.
+ *
+ * همهٔ این رنگ‌ها با tools/assets/check-contrast.py سنجیده شده‌اند و از
+ * آستانهٔ ۴٫۵:۱ عبور می‌کنند — در هر دو حالت روشن و تیره. دو موردشان
+ * (زمردی و فیروزه‌ای) اول رد شدند و رنگ هاورشان تیره‌تر شد.
+ * ═══════════════════════════════════════════════════════════════ */
+[data-theme="gold"]{
+  --accent:#A16207; --accent-hi:#B45309;
+  --on-accent:#FFFFFF; --accent-soft:#FEFCE8;
+  --accent-glass:#A1620726;
+}
+@media (prefers-color-scheme: dark){
+  [data-theme="gold"]{
+    --accent:#FBBF24; --accent-hi:#FBBF24;
+    --on-accent:#0C0A09; --accent-soft:#2A2410;
+    --accent-glass:#FBBF241F;
+  }
+}
+[data-theme="emerald"]{
+  --accent:#047857; --accent-hi:#065F46;
+  --on-accent:#FFFFFF; --accent-soft:#ECFDF5;
+  --accent-glass:#04785726;
+}
+@media (prefers-color-scheme: dark){
+  [data-theme="emerald"]{
+    --accent:#34D399; --accent-hi:#34D399;
+    --on-accent:#0C0A09; --accent-soft:#0E2620;
+    --accent-glass:#34D3991F;
+  }
+}
+[data-theme="indigo"]{
+  --accent:#4338CA; --accent-hi:#4F46E5;
+  --on-accent:#FFFFFF; --accent-soft:#EEF2FF;
+  --accent-glass:#4338CA26;
+}
+@media (prefers-color-scheme: dark){
+  [data-theme="indigo"]{
+    --accent:#A5B4FC; --accent-hi:#A5B4FC;
+    --on-accent:#0C0A09; --accent-soft:#1E1B3A;
+    --accent-glass:#A5B4FC1F;
+  }
+}
+[data-theme="copper"]{
+  --accent:#9A3412; --accent-hi:#C2410C;
+  --on-accent:#FFFFFF; --accent-soft:#FFF7ED;
+  --accent-glass:#9A341226;
+}
+@media (prefers-color-scheme: dark){
+  [data-theme="copper"]{
+    --accent:#FB923C; --accent-hi:#FB923C;
+    --on-accent:#0C0A09; --accent-soft:#2A1710;
+    --accent-glass:#FB923C1F;
+  }
+}
+[data-theme="teal"]{
+  --accent:#0F766E; --accent-hi:#115E59;
+  --on-accent:#FFFFFF; --accent-soft:#F0FDFA;
+  --accent-glass:#0F766E26;
+}
+@media (prefers-color-scheme: dark){
+  [data-theme="teal"]{
+    --accent:#5EEAD4; --accent-hi:#5EEAD4;
+    --on-accent:#0C0A09; --accent-soft:#0C2523;
+    --accent-glass:#5EEAD41F;
+  }
+}
+[data-theme="ruby"]{
+  --accent:#BE123C; --accent-hi:#E11D48;
+  --on-accent:#FFFFFF; --accent-soft:#FFF1F2;
+  --accent-glass:#BE123C26;
+}
+@media (prefers-color-scheme: dark){
+  [data-theme="ruby"]{
+    --accent:#FDA4AF; --accent-hi:#FDA4AF;
+    --on-accent:#0C0A09; --accent-soft:#2A1016;
+    --accent-glass:#FDA4AF1F;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * شیشه و فلزِ روان
+ *
+ * الهام از iOS: سطح‌هایی که پشتشان را محو نشان می‌دهند، و لبه‌هایی که
+ * مثل فلز صیقلی نور را می‌گیرند.
+ *
+ * دو احتیاط که بدون آن‌ها این سبک خراب می‌شود:
+ *
+ *  ۱. بدون `backdrop-filter`، شیشه به یک مستطیل نیمه‌شفافِ ناخوانا
+ *     تبدیل می‌شود. پس پیش‌فرض، سطحِ مات است و شیشه فقط وقتی فعال
+ *     می‌شود که مرورگر پشتیبانی کند (@supports).
+ *
+ *  ۲. `blur` روی موبایل ارزان هزینه دارد. شعاع را کم نگه می‌داریم
+ *     (۱۲–۲۰px نه ۴۰px) و لایه‌های شیشه‌ای را می‌شماریم — نه اینکه
+ *     همه‌چیز شیشه باشد. اگر کاربر شفافیت را کم کرده باشد
+ *     (prefers-reduced-transparency)، کلاً مات می‌شود.
+ * ═══════════════════════════════════════════════════════════════ */
+@layer components {
+  .glass{
+    background:var(--glass-solid);
+    border:1px solid var(--glass-line);
+    box-shadow:0 1px 2px rgb(12 10 9/.05), 0 8px 24px -12px rgb(12 10 9/.12);
+  }
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)){
+    .glass{
+      background:var(--glass-bg);
+      -webkit-backdrop-filter:saturate(180%) blur(16px);
+      backdrop-filter:saturate(180%) blur(16px);
+    }
+  }
+  @media (prefers-reduced-transparency: reduce){
+    .glass{background:var(--glass-solid);backdrop-filter:none;-webkit-backdrop-filter:none}
+  }
+
+  /* نوار شناور پایین — همان حسِ تب‌بار iOS */
+  .glass-bar{
+    background:var(--glass-solid);
+    border-top:1px solid var(--glass-line);
+  }
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)){
+    .glass-bar{
+      background:var(--glass-bar-bg);
+      -webkit-backdrop-filter:saturate(180%) blur(20px);
+      backdrop-filter:saturate(180%) blur(20px);
+    }
+  }
+
+  /*
+   * فلزِ روان — گرادیان چندمرحله‌ای با یک خطِ نوری در بالا.
+   * برخلاف گرادیان دومرحله‌ای ساده، اینجا نور از یک لبه می‌تابد و
+   * در میانه کمی تیره می‌شود؛ همان چیزی که سطح فلز صیقلی را
+   * باورپذیر می‌کند.
+   */
+  .metal{
+    position:relative; overflow:hidden;
+    background:
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--accent) 88%, white) 0%,
+        var(--accent) 38%,
+        color-mix(in srgb, var(--accent) 88%, black) 72%,
+        var(--accent) 100%);
+    color:var(--on-accent);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255/.28),
+      inset 0 -1px 0 rgb(0 0 0/.18),
+      0 1px 2px rgb(12 10 9/.22);
+  }
+  /* بازتاب نور که با لمس حرکت می‌کند */
+  .metal::after{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(105deg,transparent 30%,rgb(255 255 255/.22) 47%,transparent 62%);
+    transform:translateX(-120%);
+    transition:transform .7s cubic-bezier(.22,1,.36,1);
+    pointer-events:none;
+  }
+  .metal:hover::after,.metal:focus-visible::after{transform:translateX(120%)}
+  .metal:active{filter:brightness(.95)}
+  .metal:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  /* نسخهٔ خنثی برای کنش‌های ثانویه */
+  .metal-ink{
+    background:linear-gradient(180deg,#44403C 0%,#292524 40%,#1C1917 100%);
+    color:#fff;
+    box-shadow:inset 0 1px 0 rgb(255 255 255/.16),0 1px 2px rgb(12 10 9/.24);
+  }
+
+  /* دکمهٔ اصلی — حالا از متغیر پالت رنگ می‌گیرد */
+  .btn-accent{
+    @apply inline-flex items-center justify-center gap-2 h-12 px-5 rounded-2xl
+           font-bold cursor-pointer select-none
+           transition-all duration-200 ease-out-soft;
+  }
+  .btn-accent:active{transform:translateY(1px)}
+
+  .chip-accent{
+    background:var(--accent-soft); color:var(--accent);
+  }
+  .ring-accent{box-shadow:0 0 0 2px var(--accent)}
+  .hairline-accent{box-shadow:inset 0 2px 0 0 var(--accent)}
+
+  /* ابزارهای رنگِ پالت — ویوها این‌ها را می‌نویسند، نه رنگ ثابت */
+  .bg-accent{background-color:var(--accent)}
+  .bg-accent-soft{background-color:var(--accent-soft)}
+  .text-accent{color:var(--accent)}
+  .border-accent{border-color:var(--accent)}
+  .outline-accent{outline-color:var(--accent)}
+  .focus-visible\:outline-accent:focus-visible{outline-color:var(--accent)}
+}
+
+:root{
+  --glass-bg:rgb(255 255 255/.72);
+  --glass-solid:#FFFFFF;
+  --glass-line:rgb(12 10 9/.08);
+  --glass-bar-bg:rgb(255 255 255/.82);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --glass-bg:rgb(28 25 23/.66);
+    --glass-solid:#1C1917;
+    --glass-line:rgb(255 255 255/.10);
+    --glass-bar-bg:rgb(12 10 9/.80);
+  }
 }
 
 
@@ -152,7 +362,7 @@
   .bg-ink-50{background-color:#1C1917}
   .bg-ink-100{background-color:#292524}
   .bg-ink-900{background-color:#F5F5F4;color:#1C1917}
-  .bg-gold-50,.bg-gold-50\/60{background-color:#292524}
+  .bg-accent-soft{background-color:var(--accent-soft)}
   .hover\:bg-ink-100:hover{background-color:#292524}
   .hover\:bg-gold-50:hover{background-color:#292524}
   .hover\:bg-ink-50:hover{background-color:#1C1917}
@@ -175,3 +385,7 @@
   input,select,textarea{background:#1C1917;color:#F5F5F4;border-color:#292524}
   input::placeholder,textarea::placeholder{color:#78716C}
 }
+
+
+/* خانوادهٔ فونت وقتی UI_FONT=iranyekan باشد */
+html[data-font="iranyekan"]{--font-sans:'IRANYekanX','Vazirmatn','Tahoma',sans-serif}

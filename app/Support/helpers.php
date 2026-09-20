@@ -85,3 +85,33 @@ if (!function_exists('old')) {
         return $old[$key] ?? $default;
     }
 }
+
+if (!function_exists('icon')) {
+    /**
+     * آیکون از اسپرایت — «Lucide» با لایسنس ISC.
+     *
+     * چرا اسپرایت و نه SVG درون‌خطی در هر ویو: مسیرهای SVG تکراری،
+     * هم HTML را باد می‌کنند هم نگهداری را سخت. با <use> هر آیکون یک
+     * ارجاع است و مرورگر یک بار تعریفش را می‌خواند.
+     *
+     * چرا اموجی نه: اموجی روی هر سیستم‌عامل شکل دیگری دارد، با رنگ متن
+     * هماهنگ نمی‌شود، و صفحه‌خوان اسمش را بلند می‌خواند.
+     */
+    function icon(string $name, string $class = 'w-5 h-5', ?string $label = null): string
+    {
+        $aria = $label === null
+            ? 'aria-hidden="true"'
+            : 'role="img" aria-label="' . e($label) . '"';
+
+        return '<svg class="' . e($class) . '" ' . $aria . '>'
+             . '<use href="#i-' . e($name) . '"></use></svg>';
+    }
+}
+
+if (!function_exists('theme_attr')) {
+    /** ویژگیِ data-theme برای تگ <html>. */
+    function theme_attr(?string $key): string
+    {
+        return 'data-theme="' . e(App\Support\Theme::resolve($key)) . '"';
+    }
+}

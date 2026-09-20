@@ -23,7 +23,7 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
   «پنج‌شنبه» برایش معنای عملیاتی دارد (شلوغ‌ترین روز هفته). تاریخ میلادی
   یا نبودِ تاریخ، این صفحه را از واقعیت جدا می‌کند.
 -->
-<div class="surface rounded-2xl shadow-card p-4 mb-4 rise hairline-gold">
+<div class="surface rounded-2xl shadow-card p-4 mb-4 rise hairline-accent">
   <div class="flex items-baseline justify-between mb-3">
     <div>
       <div class="text-[15px] font-extrabold text-ink-900">
@@ -61,7 +61,7 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
 <div class="flex items-center justify-between mb-4">
   <h1 class="text-lg font-extrabold text-ink-900">صف زنده</h1>
   <?php if (in_array($role, ['owner','manager','reception'], true)): ?>
-  <button onclick="document.getElementById('walkin-box').classList.toggle('hidden')" class="btn-gold h-11 text-[13px] px-4">+ افزودن حضوری</button>
+  <button onclick="document.getElementById('walkin-box').classList.toggle('hidden')" class="btn-accent metal h-11 text-[13px] px-4">+ افزودن حضوری</button>
   <?php endif; ?>
 </div>
 
@@ -215,7 +215,7 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
             <?php else: ?>
               <form method="post" action="<?= e(url('panel/queue/' . $row['id'] . '/complete')) ?>" class="flex-1">
                 <?= csrf_field() ?>
-                <button class="btn-gold w-full h-11 text-[13px]">تمام شد و تسویه</button>
+                <button class="btn-accent metal w-full h-11 text-[13px]">تمام شد و تسویه</button>
               </form>
             <?php endif; ?>
 

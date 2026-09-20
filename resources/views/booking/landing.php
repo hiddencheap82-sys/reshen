@@ -9,11 +9,7 @@
 <?php if ($error = flash('error')): ?>
   <div role="alert"
        class="flex items-start gap-2 bg-red-50 text-red-800 text-sm rounded-xl px-4 py-3 mb-4 border border-red-100">
-    <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-         stroke-width="2" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round"
-            d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-    </svg>
+    <?= icon('alert', 'w-4 h-4 mt-0.5 shrink-0') ?>
     <span><?= e($error) ?></span>
   </div>
 <?php endif; ?>
@@ -26,7 +22,7 @@
   لحظه‌ای صف را ندارند.
 -->
 <?php if ($liveStatus['open']): ?>
-  <div class="rise surface rounded-2xl shadow-card overflow-hidden mb-5 hairline-gold">
+  <div class="rise glass rounded-2xl overflow-hidden mb-5 hairline-accent">
     <div class="px-4 py-3.5 flex items-center gap-3">
       <span class="relative flex w-2.5 h-2.5 shrink-0" aria-hidden="true">
         <span class="absolute inline-flex w-full h-full rounded-full bg-green-500 opacity-60 animate-ping"></span>
@@ -56,7 +52,7 @@
     </div>
   </div>
 <?php else: ?>
-  <div class="rise surface rounded-2xl shadow-card px-4 py-3.5 mb-5 flex items-center gap-3">
+  <div class="rise glass rounded-2xl px-4 py-3.5 mb-5 flex items-center gap-3">
     <span class="w-2.5 h-2.5 rounded-full bg-ink-300 shrink-0" aria-hidden="true"></span>
     <div>
       <p class="text-sm font-bold text-ink-700">الان بسته است</p>
@@ -71,12 +67,8 @@
 </div>
 
 <?php if (empty($services)): ?>
-  <div class="surface rounded-2xl py-12 px-5 text-center">
-    <svg class="w-10 h-10 mx-auto text-ink-300 mb-3" fill="none" viewBox="0 0 24 24"
-         stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round"
-            d="M6 9a3 3 0 100-6 3 3 0 000 6zm0 12a3 3 0 100-6 3 3 0 000 6zm12-15L6 18M9 9l9 9"/>
-    </svg>
+  <div class="glass rounded-2xl py-12 px-5 text-center">
+    <?= icon('scissors', 'w-10 h-10 mx-auto text-ink-300 mb-3') ?>
     <p class="text-sm font-semibold text-ink-600">هنوز خدمتی تعریف نشده</p>
     <p class="text-[12.5px] text-ink-400 mt-1">با خود آرایشگاه تماس بگیرید.</p>
   </div>
@@ -94,15 +86,12 @@
                  class="sr-only" data-price="<?= (int) $s['price'] ?>"
                  data-minutes="<?= (int) $s['duration_minutes'] ?>">
 
-          <span class="pick-card surface flex items-center gap-3.5 rounded-2xl px-4 py-3.5 shadow-card
+          <span class="pick-card glass flex items-center gap-3.5 rounded-2xl px-4 py-3.5
                        transition-all duration-200 ease-out-soft hover:shadow-lift">
 
             <span class="pick-box w-6 h-6 shrink-0 rounded-lg border-2 border-ink-300 grid place-items-center
                          transition-colors duration-200" aria-hidden="true">
-              <svg class="pick-tick w-3.5 h-3.5 text-white opacity-0 transition-opacity duration-200"
-                   fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-              </svg>
+              <?= icon('check', 'pick-tick w-3.5 h-3.5 opacity-0 transition-opacity duration-200') ?>
             </span>
 
             <span class="flex-1 min-w-0">
@@ -121,7 +110,7 @@
     </fieldset>
 
     <!-- جمع انتخاب‌ها؛ تا چیزی انتخاب نشده دیده نمی‌شود -->
-    <div id="svc-total" class="hidden surface rounded-2xl px-4 py-3 mt-3 shadow-card">
+    <div id="svc-total" class="hidden glass rounded-2xl px-4 py-3 mt-3">
       <div class="flex items-center justify-between text-[13px]">
         <span class="text-ink-500">جمع</span>
         <span class="font-extrabold text-ink-900 tabular-nums" id="svc-sum"></span>
@@ -132,12 +121,9 @@
       </div>
     </div>
 
-    <button type="submit" class="btn-gold w-full mt-4">
+    <button type="submit" class="btn-accent metal w-full mt-4">
       ادامه
-      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-           stroke-width="2.5" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-      </svg>
+      <?= icon('chevron-end', 'w-4 h-4') ?>
     </button>
   </form>
 

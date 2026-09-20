@@ -93,8 +93,12 @@ final class Auth
     {
         Session::put('salon_id', $salonId);
         self::$membershipCache = null;
-        $salon = DB::selectOne('SELECT name FROM salons WHERE id = ?', [$salonId]);
+        $salon = DB::selectOne('SELECT name, theme FROM salons WHERE id = ?', [$salonId]);
         Session::put('_salon_name', $salon['name'] ?? null);
+
+        // پالت رنگی در نشست می‌ماند تا قالب پنل برای رندر هر صفحه یک
+        // کوئری اضافه نزند.
+        Session::put('_salon_theme', $salon['theme'] ?? null);
     }
 
     /** @return array<int,array> memberships (salon_id, role, salon name) for the logged-in user */
