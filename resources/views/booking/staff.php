@@ -15,5 +15,5 @@
     <span class="text-sm font-medium text-ink-800"><?= e($st['name']) ?></span>
   </label>
   <?php endforeach; ?>
-  <button type="submit" class="w-full bg-ink-900 hover:bg-ink-800 text-white font-bold rounded-xl py-3 mt-4">ادامه</button>
+  <button type="submit" class="btn-ink w-full mt-4">ادامه</button>
 </form>

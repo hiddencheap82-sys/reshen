@@ -11,26 +11,26 @@
   <div>
     <label class="block text-sm text-ink-600 mb-1.5">نام سالن</label>
     <input type="text" name="name" required autofocus placeholder="آرایشگاه شهاب"
-      class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+      class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
   </div>
   <div class="grid grid-cols-2 gap-3">
     <div>
       <label class="block text-sm text-ink-600 mb-1.5">شهر</label>
       <input type="text" name="city" placeholder="شیراز"
-        class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+        class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
     </div>
     <div>
       <label class="block text-sm text-ink-600 mb-1.5">تعداد صندلی</label>
       <input type="number" name="seats" value="1" min="1" max="20"
-        class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+        class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
     </div>
   </div>
   <div>
     <label class="block text-sm text-ink-600 mb-1.5">آدرس (اختیاری)</label>
     <input type="text" name="address" placeholder="خیابان..."
-      class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+      class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
   </div>
-  <button type="submit" class="w-full bg-ink-900 hover:bg-ink-800 text-white font-bold rounded-xl py-3 transition">
+  <button type="submit" class="btn-ink w-full">
     ساخت سالن و شروع
   </button>
 </form>

@@ -20,8 +20,8 @@
 <form method="post" action="<?= url('login/verify') ?>" class="space-y-4">
   <?= csrf_field() ?>
   <input type="text" name="code" inputmode="numeric" autofocus maxlength="5" placeholder="١٢٣٤٥"
-    class="w-full rounded-xl border border-ink-200 px-4 py-3 text-center text-2xl tracking-[0.5em] focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent">
-  <button type="submit" class="w-full bg-ink-900 hover:bg-ink-800 text-white font-bold rounded-xl py-3 transition">
+    class="w-full rounded-xl border border-ink-200 px-4 py-3 text-center text-2xl tracking-[0.5em] focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
+  <button type="submit" class="btn-ink w-full">
     تأیید و ورود
   </button>
 </form>

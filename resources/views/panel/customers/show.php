@@ -8,7 +8,7 @@ $p = $preferences ?? [];
 </div>
 
 <div class="grid lg:grid-cols-2 gap-5">
-  <div class="bg-white rounded-2xl border border-ink-100 p-5">
+  <div class="glass rounded-2xl p-5">
     <h2 class="text-sm font-bold text-ink-700 mb-4">مشخصات و دفترچهٔ آرایشگر</h2>
     <form method="post" action="<?= url('panel/customers/' . $customer['id']) ?>" class="space-y-3">
       <?= csrf_field() ?>
@@ -57,18 +57,18 @@ $p = $preferences ?? [];
         <label class="block text-xs text-ink-500 mb-1">یادداشت آزاد</label>
         <textarea name="notes" rows="3" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm"><?= e($customer['notes'] ?? '') ?></textarea>
       </div>
-      <button type="submit" class="w-full bg-ink-900 hover:bg-ink-800 text-white font-bold rounded-xl py-2.5 text-sm">ذخیره</button>
+      <button type="submit" class="btn-accent metal w-full">ذخیره</button>
     </form>
   </div>
 
   <div>
-    <div class="bg-white rounded-2xl border border-ink-100 p-5 mb-4 grid grid-cols-3 text-center divide-x divide-x-reverse divide-ink-100">
+    <div class="glass rounded-2xl p-5 mb-4 grid grid-cols-3 text-center divide-x divide-x-reverse divide-ink-100">
       <div><div class="text-xl font-extrabold text-ink-800"><?= fa_num($customer['visit_count']) ?></div><div class="text-[11px] text-ink-400">مراجعه</div></div>
       <div><div class="text-xl font-extrabold text-ink-800"><?= fa_num($customer['no_show_count']) ?></div><div class="text-[11px] text-ink-400">غیبت</div></div>
       <div><div class="text-xl font-extrabold text-ink-800"><?= fa_num($customer['trust_score']) ?></div><div class="text-[11px] text-ink-400">امتیاز اعتبار</div></div>
     </div>
 
-    <div class="bg-white rounded-2xl border border-ink-100 p-5">
+    <div class="glass rounded-2xl p-5">
       <h2 class="text-sm font-bold text-ink-700 mb-3">تاریخچهٔ نوبت‌ها</h2>
       <div class="space-y-2">
         <?php foreach ($history as $h): ?>

@@ -48,6 +48,7 @@ $icon = function (string $name, string $class = 'w-5 h-5') {
     window.addEventListener('load', () => navigator.serviceWorker.register('<?= url('service-worker.js') ?>'));
   }
 </script>
+<?php include BASE_PATH . '/resources/views/components/theme-boot.php'; ?>
 </head>
 <body class="antialiased">
 
@@ -97,6 +98,7 @@ $icon = function (string $name, string $class = 'w-5 h-5') {
         خروج: پیش از این یک آیکون ۲۰×۲۰ بدون نام دسترس‌پذیر بود — صفحه‌خوان
         فقط «لینک» می‌خواند و انگشت هم به‌سختی می‌گرفتش.
       -->
+      <?php include BASE_PATH . '/resources/views/components/theme-toggle.php'; ?>
       <a href="<?= e(url('logout')) ?>" aria-label="خروج از حساب" title="خروج"
          class="w-11 h-11 grid place-items-center rounded-xl text-ink-500
                 hover:bg-ink-100 transition-colors cursor-pointer

@@ -10,12 +10,12 @@
   <?= csrf_field() ?>
   <div>
     <label class="block text-sm text-ink-600 mb-1.5">نام (اختیاری)</label>
-    <input type="text" name="name" class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500">
+    <input type="text" name="name" class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent">
   </div>
   <div>
     <label class="block text-sm text-ink-600 mb-1.5">شمارهٔ موبایل</label>
     <input type="tel" name="phone" required dir="ltr" placeholder="۰۹۱۲۳۴۵۶۷۸۹" autofocus
-      class="w-full rounded-xl border border-ink-200 px-4 py-3 text-left text-lg tracking-wider focus:outline-none focus:ring-2 focus:ring-brand-500">
+      class="w-full rounded-xl border border-ink-200 px-4 py-3 text-left text-lg tracking-wider focus:outline-none focus:ring-2 focus:ring-accent">
   </div>
-  <button type="submit" class="w-full bg-ink-900 hover:bg-ink-800 text-white font-bold rounded-xl py-3">ارسال کد تأیید</button>
+  <button type="submit" class="btn-ink w-full">ارسال کد تأیید</button>
 </form>

@@ -6,19 +6,19 @@ $maxDaily = max(array_map(fn($d) => (int)$d['total'], $dailySeries) ?: [1]);
 ?>
 <div class="flex items-center justify-between mb-5">
   <h1 class="text-lg font-bold text-ink-800">گزارش ماهانه — <?= e($monthNames[$jm]) ?> <?= fa_num($jy) ?></h1>
-  <a href="<?= url('panel/reports') ?>" class="text-xs text-gold-700 hover:underline">گزارش روزانه ←</a>
+  <a href="<?= url('panel/reports') ?>" class="text-xs text-accent hover:underline">گزارش روزانه ←</a>
 </div>
 
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-  <div class="bg-white rounded-2xl border border-ink-100 p-4 text-center">
-    <div class="text-2xl font-extrabold text-gold-700"><?= toman((int)$totals['total']) ?></div>
+  <div class="glass rounded-2xl p-4 text-center">
+    <div class="text-2xl font-extrabold text-accent"><?= toman((int)$totals['total']) ?></div>
     <div class="text-[11px] text-ink-400 mt-1">فروش کل</div>
   </div>
-  <div class="bg-white rounded-2xl border border-ink-100 p-4 text-center">
+  <div class="glass rounded-2xl p-4 text-center">
     <div class="text-2xl font-extrabold text-ink-800"><?= fa_num($totals['count']) ?></div>
     <div class="text-[11px] text-ink-400 mt-1">تعداد نوبت</div>
   </div>
-  <div class="bg-white rounded-2xl border border-ink-100 p-4 text-center">
+  <div class="glass rounded-2xl p-4 text-center">
     <div class="text-2xl font-extrabold text-ink-800"><?= toman((int)$totals['tips']) ?></div>
     <div class="text-[11px] text-ink-400 mt-1">انعام</div>
   </div>
@@ -28,7 +28,7 @@ $maxDaily = max(array_map(fn($d) => (int)$d['total'], $dailySeries) ?: [1]);
   </div>
 </div>
 
-<div class="bg-white rounded-2xl border border-ink-100 p-5 mb-5">
+<div class="glass rounded-2xl p-5 mb-5">
   <h2 class="text-sm font-bold text-ink-700 mb-4">روند فروش روزانه</h2>
   <div class="flex items-end gap-1 h-32">
     <?php foreach ($dailySeries as $d): $h = max(4, (int)round(((int)$d['total'] / $maxDaily) * 100)); ?>
@@ -38,7 +38,7 @@ $maxDaily = max(array_map(fn($d) => (int)$d['total'], $dailySeries) ?: [1]);
   </div>
 </div>
 
-<div class="bg-white rounded-2xl border border-ink-100 p-5">
+<div class="glass rounded-2xl p-5">
   <h2 class="text-sm font-bold text-ink-700 mb-3">به تفکیک روش پرداخت</h2>
   <?php foreach ($breakdown as $b): ?>
   <div class="flex items-center justify-between text-sm py-1.5">

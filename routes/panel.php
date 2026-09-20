@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Core\Response;
+use App\Http\Controllers\BookingsController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\QueueController;
@@ -20,6 +21,7 @@ use App\Http\Middleware\VerifyCsrf;
 $router->group(['middleware' => [AuthRequired::class, TenantRequired::class]], function ($router) {
     $router->get('/panel', [QueueController::class, 'index']);
     $router->get('/panel/queue/poll', [QueueController::class, 'poll']);
+    $router->get('/panel/bookings', [BookingsController::class, 'index']);
     $router->get('/panel/pay/{id}', [PaymentController::class, 'show']);
     $router->get('/panel/setup', function () {
         return Response::redirect('/panel/staff');

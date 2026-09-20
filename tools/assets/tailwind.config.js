@@ -12,7 +12,12 @@ module.exports = {
     '../../app/**/*.php',
     '../../public/**/*.php',
   ],
-  darkMode: 'media',
+  /*
+   * کلاسی، نه مدیاکوئری: کاربر خودش روشن/تیره را انتخاب می‌کند و
+   * انتخابش در localStorage می‌ماند. با 'media' کلید تغییرِ حالت
+   * بی‌اثر می‌شد چون تیلویند به تنظیم سیستم‌عامل نگاه می‌کرد.
+   */
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: { sans: ['Vazirmatn', 'Tahoma', 'sans-serif'] },
@@ -41,6 +46,13 @@ module.exports = {
         'lift': '0 4px 12px -2px rgb(12 10 9 / 0.10), 0 2px 6px -2px rgb(12 10 9 / 0.06)',
         'deep': '0 12px 32px -8px rgb(12 10 9 / 0.18)',
       },
+      /*
+       * پیش‌فرضِ حلقهٔ فوکوس. بدون این، ring-2 آبیِ پیش‌فرضِ تیلویند را
+       * می‌گذاشت و چون بعد از ring-accent می‌آمد، در هر شش پالت روی
+       * آن می‌نشست — همه‌جا حلقهٔ آبی روی طرحی که یک ذره آبی نداشت.
+       */
+      ringColor: { DEFAULT: 'var(--accent)' },
+      ringOffsetColor: { DEFAULT: 'var(--surface)' },
       borderRadius: { '2xl': '1rem', '3xl': '1.375rem' },
       transitionTimingFunction: {
         // حرکت باید «جا بیفتد»، نه اینکه بپرد

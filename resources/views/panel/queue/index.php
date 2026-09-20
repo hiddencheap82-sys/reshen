@@ -23,20 +23,20 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
   «پنج‌شنبه» برایش معنای عملیاتی دارد (شلوغ‌ترین روز هفته). تاریخ میلادی
   یا نبودِ تاریخ، این صفحه را از واقعیت جدا می‌کند.
 -->
-<div class="surface rounded-2xl shadow-card p-4 mb-4 rise hairline-accent">
+<div class="glass rounded-2xl p-4 mb-4 rise hairline-accent">
   <div class="flex items-baseline justify-between mb-3">
     <div>
       <div class="text-[15px] font-extrabold text-ink-900">
         <?= e(JalaliCalendar::humanDate($today, true)) ?>
       </div>
       <?php if (App\Support\Jalali::isWeekend($today)): ?>
-        <div class="text-[11px] text-gold-700 font-bold mt-0.5">آخر هفته — روز شلوغ</div>
+        <div class="text-[11px] text-accent font-bold mt-0.5">آخر هفته — روز شلوغ</div>
       <?php endif; ?>
     </div>
     <?php if ($salonEarnings !== null): ?>
       <div class="text-left">
         <div class="text-[11px] text-ink-400">فروش امروز</div>
-        <div class="text-xl font-extrabold text-gold-700 tabular-nums">
+        <div class="text-xl font-extrabold text-accent tabular-nums">
           <?= e(toman((int) ($salonEarnings['total'] ?? 0))) ?>
         </div>
       </div>
@@ -45,7 +45,7 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
 
   <dl class="grid grid-cols-4 gap-2">
     <?php foreach ([
-      ['در انتظار', $sum['waiting'],   'text-gold-700', 'bg-gold-50'],
+      ['در انتظار', $sum['waiting'],   'text-accent', 'bg-gold-50'],
       ['روی صندلی', $sum['in_chair'],  'text-ink-900', 'bg-ink-100'],
       ['انجام‌شده', $sum['completed'], 'text-green-700', 'bg-green-50'],
       ['غیبت',      $sum['no_show'],   'text-ink-500', 'bg-ink-50'],
@@ -92,38 +92,38 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
         <?php endforeach; ?>
       </select>
     </div>
-    <button type="submit" class="bg-ink-900 hover:bg-ink-800 text-white text-sm font-bold rounded-xl px-5 py-2.5">افزودن به صف</button>
+    <button type="submit" class="btn-accent metal px-5">افزودن به صف</button>
   </form>
 </div>
 
 <?php if ($role === 'staff' && $myStaffId !== null): ?>
   <?php $mine = null; foreach ($snapshot as $g) { if ((int)$g['staff']['id'] === $myStaffId) { $mine = $g; } } ?>
-  <div class="bg-white rounded-2xl border border-ink-100 p-5 mb-5 text-center">
+  <div class="glass rounded-2xl p-5 mb-5 text-center">
     <div class="text-xs text-ink-400 mb-1">امروز تو چقدر درآوردی</div>
-    <div class="text-3xl font-extrabold text-gold-700"><?= toman((int)($todayEarnings['total'] ?? 0)) ?></div>
+    <div class="text-3xl font-extrabold text-accent"><?= toman((int)($todayEarnings['total'] ?? 0)) ?></div>
     <div class="text-xs text-ink-400 mt-1"><?= fa_num($todayCount) ?> نوبت انجام‌شده</div>
   </div>
 
   <?php if ($mine && !empty($mine['queue'])): $current = $mine['queue'][0]; ?>
     <?php if ($current['status'] === 'in_chair'): ?>
-      <div class="bg-white rounded-2xl border border-ink-100 p-5 mb-3">
+      <div class="glass rounded-2xl p-5 mb-3">
         <div class="text-xs text-ink-400 mb-1">روی صندلی</div>
         <div class="text-xl font-bold text-ink-800"><?= e($current['customer_name'] ?: 'مشتری') ?></div>
         <div class="text-xs text-ink-400 mt-1"><?= e(implode('، ', array_column($current['items'], 'service_name'))) ?></div>
       </div>
       <form method="post" action="<?= url('panel/queue/' . $current['id'] . '/complete') ?>">
         <?= csrf_field() ?>
-        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xl rounded-2xl py-8 shadow-lg shadow-emerald-100">تمام شد</button>
+        <button type="submit" class="btn-done w-full font-extrabold text-xl rounded-2xl py-8">تمام شد</button>
       </form>
     <?php else: ?>
-      <div class="bg-white rounded-2xl border border-ink-100 p-5 mb-3">
+      <div class="glass rounded-2xl p-5 mb-3">
         <div class="text-xs text-ink-400 mb-1">نفر بعدی</div>
         <div class="text-xl font-bold text-ink-800"><?= e($current['customer_name'] ?: 'مشتری') ?></div>
         <div class="text-xs text-ink-400 mt-1"><?= e(implode('، ', array_column($current['items'], 'service_name'))) ?></div>
       </div>
       <form method="post" action="<?= url('panel/queue/' . $current['id'] . '/start') ?>">
         <?= csrf_field() ?>
-        <button type="submit" class="w-full bg-ink-900 hover:bg-ink-800 text-white font-extrabold text-xl rounded-2xl py-8 shadow-lg shadow-blue-100">شروع</button>
+        <button type="submit" class="btn-ink w-full font-extrabold text-xl rounded-2xl py-8 h-auto">شروع</button>
       </form>
     <?php endif; ?>
 
@@ -132,7 +132,7 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
       <h3 class="text-xs font-bold text-ink-400 mb-2">در صف</h3>
       <div class="space-y-2">
         <?php foreach (array_slice($mine['queue'], 1) as $row): ?>
-        <div class="bg-white rounded-xl border border-ink-100 px-4 py-3 flex items-center justify-between">
+        <div class="glass rounded-xl px-4 py-3 flex items-center justify-between">
           <span class="text-sm text-ink-700"><?= e($row['customer_name'] ?: 'مشتری') ?></span>
           <span class="text-xs text-ink-400"><?= e($row['display']['text'] ?? '') ?></span>
         </div>
@@ -147,7 +147,7 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
 <?php else: ?>
   <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
     <?php foreach ($snapshot as $gi => $group): ?>
-    <section class="surface rounded-2xl overflow-hidden shadow-card rise rise-<?= min($gi + 1, 5) ?>"
+    <section class="glass rounded-2xl overflow-hidden shadow-card rise rise-<?= min($gi + 1, 5) ?>"
              aria-label="صف <?= e($group['staff']['name']) ?>">
 
       <header class="px-4 py-3 flex items-center gap-2.5 border-b" style="border-color:var(--line)">
@@ -158,7 +158,7 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
         <span class="font-extrabold text-[14px] text-ink-900 flex-1"><?= e($group['staff']['name']) ?></span>
         <?php $n = count($group['queue']); ?>
         <span class="text-[11px] font-bold tabular-nums px-2 py-1 rounded-lg
-                     <?= $n > 0 ? 'bg-gold-50 text-gold-700' : 'text-ink-400' ?>">
+                     <?= $n > 0 ? 'bg-gold-50 text-accent' : 'text-ink-400' ?>">
           <?= $n > 0 ? e(fa_num($n)) . ' نفر' : 'خالی' ?>
         </span>
       </header>
@@ -196,7 +196,7 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
             </div>
 
             <span class="text-[11.5px] font-bold shrink-0 text-left tabular-nums
-                         <?= $inChair ? 'text-gold-700' : 'text-ink-500' ?>">
+                         <?= $inChair ? 'text-accent' : 'text-ink-500' ?>">
               <?= e($row['display']['text'] ?? '') ?>
             </span>
           </div>

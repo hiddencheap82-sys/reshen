@@ -9,27 +9,35 @@ use App\Support\Jalali;
 use DateTimeImmutable;
 
 /**
- * Free-slot search for online booking (A05/A06). Walks the staff's working
- * hours for the given day in 15-minute steps and keeps any start time whose
- * [start, start+duration] window doesn't collide with an existing booked
- * appointment or a time-off block.
+ * جستجوی سانس‌های آزاد برای رزرو آنلاین.
+ *
+ * ساعت کاری آرایشگر را در آن روز قدم‌به‌قدم می‌پیماید و هر زمان شروعی را
+ * نگه می‌دارد که بازهٔ [شروع، شروع + مدت خدمت] با هیچ نوبت رزروشده،
+ * مرخصی، یا **استراحت روزانه** تداخل نداشته باشد.
+ *
+ * طول قدم (سانس‌بندی) از تنظیمات سالن می‌آید، نه از یک عدد ثابت در کد:
+ * سالنی که کوتاه‌ترین خدمتش ۲۰ دقیقه است، نباید سانس ۱۵ دقیقه‌ای ببیند.
  */
 final class SlotFinder
 {
-    private const STEP_MINUTES = 15;
+    /** وقتی سالن چیزی تنظیم نکرده باشد. */
+    private const DEFAULT_STEP_MINUTES = 15;
 
     /** @return string[] "H:i" start times */
     public function freeSlotsForStaff(int $salonId, int $staffId, DateTimeImmutable $date, int $durationMinutes): array
     {
         $weekday = Jalali::weekday($date);
 
-        $hours = DB::selectOne(
-            'SELECT * FROM working_hours WHERE salon_id = ? AND staff_id = ? AND weekday = ?',
-            [$salonId, $staffId, $weekday]
-        ) ?? DB::selectOne(
+        $salonHours = DB::selectOne(
             'SELECT * FROM working_hours WHERE salon_id = ? AND staff_id IS NULL AND weekday = ?',
             [$salonId, $weekday]
         );
+        $staffHours = DB::selectOne(
+            'SELECT * FROM working_hours WHERE salon_id = ? AND staff_id = ? AND weekday = ?',
+            [$salonId, $staffId, $weekday]
+        );
+
+        $hours = $this->mergeHours($salonHours, $staffHours);
 
         if ($hours === null || (int) $hours['is_closed'] === 1) {
             return [];
@@ -46,6 +54,18 @@ final class SlotFinder
 
         $busy = $this->busyIntervals($salonId, $staffId, $dateStr);
 
+        // استراحت روزانه مثل یک نوبتِ اشغال رفتار می‌کند. اگر اینجا
+        // نیاید، مشتری برای ساعتی نوبت می‌گیرد که کسی سر کار نیست.
+        if (!empty($hours['break_start']) && !empty($hours['break_end'])) {
+            $breakFrom = new DateTimeImmutable($dateStr . ' ' . $hours['break_start']);
+            $breakTo = new DateTimeImmutable($dateStr . ' ' . $hours['break_end']);
+            if ($breakTo > $breakFrom) {
+                $busy[] = [$breakFrom, $breakTo];
+            }
+        }
+
+        $step = $this->stepMinutes($salonId);
+
         $slots = [];
         $cursor = $dayStart;
         while ($cursor->modify("+{$durationMinutes} minutes") <= $dayEnd) {
@@ -53,10 +73,59 @@ final class SlotFinder
             if ($cursor > $now && !$this->overlaps($cursor, $slotEnd, $busy)) {
                 $slots[] = $cursor->format('H:i');
             }
-            $cursor = $cursor->modify('+' . self::STEP_MINUTES . ' minutes');
+            $cursor = $cursor->modify('+' . $step . ' minutes');
         }
 
         return $slots;
+    }
+
+    /**
+     * ساعت کاری آرایشگر روی ساعت کاری سالن.
+     *
+     * ردیف اختصاصی آرایشگر، ساعت باز و بستهٔ خودش را تعیین می‌کند. ولی
+     * **استراحت را پاک نمی‌کند**: تعطیلی ظهر یک واقعیتِ سطحِ سالن است
+     * (مغازه بسته است)، نه سلیقهٔ یک آرایشگر. اگر ردیف آرایشگر استراحت
+     * نداشته باشد، استراحت سالن سر جایش می‌ماند.
+     *
+     * بدون این ادغام، لحظه‌ای که برای یک آرایشگر ساعت اختصاصی ثبت شود،
+     * استراحتی که صاحب سالن در تنظیمات گذاشته بی‌صدا از کار می‌افتد و
+     * مشتری برای وسط تعطیلی نوبت می‌گیرد.
+     *
+     * @param array<string,mixed>|null $salon
+     * @param array<string,mixed>|null $staff
+     * @return array<string,mixed>|null
+     */
+    private function mergeHours(?array $salon, ?array $staff): ?array
+    {
+        if ($staff === null) {
+            return $salon;
+        }
+
+        if ($salon !== null && empty($staff['break_start'])) {
+            $staff['break_start'] = $salon['break_start'] ?? null;
+            $staff['break_end'] = $salon['break_end'] ?? null;
+        }
+
+        return $staff;
+    }
+
+    /**
+     * طول سانس سالن، با حفاظ.
+     *
+     * صفر یا منفی، حلقهٔ بالا را بی‌نهایت می‌کند؛ عدد خیلی بزرگ هم عملاً
+     * رزرو را غیرممکن. پس بین ۵ تا ۱۲۰ دقیقه بریده می‌شود.
+     */
+    private function stepMinutes(int $salonId): int
+    {
+        static $cache = [];
+
+        if (!isset($cache[$salonId])) {
+            $row = DB::selectOne('SELECT slot_step_minutes FROM salons WHERE id = ?', [$salonId]);
+            $value = (int) ($row['slot_step_minutes'] ?? self::DEFAULT_STEP_MINUTES);
+            $cache[$salonId] = max(5, min(120, $value ?: self::DEFAULT_STEP_MINUTES));
+        }
+
+        return $cache[$salonId];
     }
 
     /** @return array<int,array{0:DateTimeImmutable,1:DateTimeImmutable}> */

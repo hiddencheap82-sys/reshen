@@ -11,9 +11,9 @@
   <div>
     <label class="block text-sm text-ink-600 mb-1.5">شمارهٔ موبایل</label>
     <input type="tel" name="phone" inputmode="numeric" autofocus placeholder="۰۹۱۲۳۴۵۶۷۸۹"
-      class="w-full rounded-xl border border-ink-200 px-4 py-3 text-left ltr text-lg tracking-wider focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent" dir="ltr">
+      class="w-full rounded-xl border border-ink-200 px-4 py-3 text-left ltr text-lg tracking-wider focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent" dir="ltr">
   </div>
-  <button type="submit" class="w-full bg-ink-900 hover:bg-ink-800 text-white font-bold rounded-xl py-3 transition">
+  <button type="submit" class="btn-ink w-full">
     ارسال کد
   </button>
 </form>

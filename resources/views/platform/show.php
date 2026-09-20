@@ -5,7 +5,7 @@
 </div>
 
 <div class="grid lg:grid-cols-2 gap-5">
-  <div class="bg-white rounded-2xl border border-ink-100 p-5">
+  <div class="glass rounded-2xl p-5">
     <h2 class="text-sm font-bold text-ink-700 mb-3">اطلاعات سالن</h2>
     <div class="text-sm space-y-1.5 text-ink-600">
       <div>شهر: <?= e($salon['city'] ?? '—') ?></div>
@@ -36,7 +36,7 @@
     </div>
   </div>
 
-  <div class="bg-white rounded-2xl border border-ink-100 p-5">
+  <div class="glass rounded-2xl p-5">
     <h2 class="text-sm font-bold text-ink-700 mb-3">لاگ دسترسی و رویدادها</h2>
     <div class="space-y-2">
       <?php foreach ($auditLogs as $log): ?>

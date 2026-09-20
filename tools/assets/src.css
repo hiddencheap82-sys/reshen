@@ -31,14 +31,12 @@
     --accent:#A16207; --accent-hi:#B45309;
     --on-accent:#FFFFFF; --accent-soft:#FEFCE8;
   }
-  @media (prefers-color-scheme: dark){
-    :root{
-      --bg:#0C0A09; --surface:#1C1917; --line:#292524;
-      --text:#F5F5F4; --text-dim:#A8A29E;
+  html.dark{
+      --bg:#0A151E; --surface:#102431; --line:#1C3446;
+      --text:#E9F1F6; --text-dim:#94AEBE;
       --accent:#FBBF24; --accent-hi:#FBBF24;
-      --on-accent:#0C0A09; --accent-soft:#2A2410;
+      --on-accent:#0A151E; --accent-soft:#283430;
     }
-  }
   body{
     font-family:var(--font-sans);
     background:var(--bg); color:var(--text);
@@ -56,10 +54,37 @@
 
   .btn-ink{
     @apply inline-flex items-center justify-center gap-2 h-12 px-5 rounded-xl
-           font-bold text-white bg-ink-900 cursor-pointer
+           font-bold text-white cursor-pointer
            transition-all duration-200 ease-out-soft;
+    /* همان پرداختِ فلزیِ .metal-ink — کنش ثانویه هم نباید تخت باشد */
+    background:linear-gradient(180deg,#44403C 0%,#292524 40%,#1C1917 100%);
+    box-shadow:inset 0 1px 0 rgb(255 255 255/.16),0 1px 2px rgb(12 10 9/.24);
   }
-  .btn-ink:hover{@apply bg-ink-800}
+  .btn-ink:hover{filter:brightness(1.12)}
+
+  /*
+   * «تمام شد» — تنها دکمهٔ سبز برنامه.
+   *
+   * سبز اینجا معنا دارد و تزئین نیست: آرایشگر وسط کار، با یک دست، بدون
+   * خواندن، باید پیدایش کند. پس رنگش با هیچ کنش دیگری مشترک نیست.
+   * سبزِ ثابت است نه پالتی — در هر شش پالت همین سبز می‌ماند.
+   */
+  .btn-done{
+    @apply inline-flex items-center justify-center gap-2 px-5 rounded-xl
+           font-bold text-white cursor-pointer
+           transition-all duration-200 ease-out-soft;
+    /* هر سه توقفِ گرادیان باید با متن سفید از ۴٫۵:۱ رد شوند، نه فقط
+       تیره‌ترینشان — متن روی وسطِ دکمه هم خوانده می‌شود. */
+    background:linear-gradient(180deg,#047857 0%,#065F46 45%,#064E3B 100%);
+    box-shadow:inset 0 1px 0 rgb(255 255 255/.28),0 1px 3px rgb(6 95 70/.4);
+  }
+  .btn-done:hover{filter:brightness(1.08)}
+  .btn-done:active{transform:translateY(1px)}
+  .btn-done:focus-visible{outline:2px solid #059669;outline-offset:2px}
+  html.dark .btn-done{
+    background:linear-gradient(180deg,#6EE7B7 0%,#34D399 45%,#10B981 100%);
+    color:#052E22;
+  }
   .btn-ink:active{transform:translateY(1px)}
   .btn-ink:focus-visible{outline:2px solid #1C1917;outline-offset:2px}
 
@@ -130,73 +155,61 @@
   --on-accent:#FFFFFF; --accent-soft:#FEFCE8;
   --accent-glass:#A1620726;
 }
-@media (prefers-color-scheme: dark){
-  [data-theme="gold"]{
+html.dark[data-theme="gold"]{
     --accent:#FBBF24; --accent-hi:#FBBF24;
-    --on-accent:#0C0A09; --accent-soft:#2A2410;
+    --on-accent:#0A151E; --accent-soft:#283430;
     --accent-glass:#FBBF241F;
   }
-}
 [data-theme="emerald"]{
   --accent:#047857; --accent-hi:#065F46;
   --on-accent:#FFFFFF; --accent-soft:#ECFDF5;
   --accent-glass:#04785726;
 }
-@media (prefers-color-scheme: dark){
-  [data-theme="emerald"]{
+html.dark[data-theme="emerald"]{
     --accent:#34D399; --accent-hi:#34D399;
-    --on-accent:#0C0A09; --accent-soft:#0E2620;
+    --on-accent:#0A151E; --accent-soft:#14363B;
     --accent-glass:#34D3991F;
   }
-}
 [data-theme="indigo"]{
   --accent:#4338CA; --accent-hi:#4F46E5;
   --on-accent:#FFFFFF; --accent-soft:#EEF2FF;
   --accent-glass:#4338CA26;
 }
-@media (prefers-color-scheme: dark){
-  [data-theme="indigo"]{
+html.dark[data-theme="indigo"]{
     --accent:#A5B4FC; --accent-hi:#A5B4FC;
-    --on-accent:#0C0A09; --accent-soft:#1E1B3A;
+    --on-accent:#0A151E; --accent-soft:#1F3245;
     --accent-glass:#A5B4FC1F;
   }
-}
 [data-theme="copper"]{
   --accent:#9A3412; --accent-hi:#C2410C;
   --on-accent:#FFFFFF; --accent-soft:#FFF7ED;
   --accent-glass:#9A341226;
 }
-@media (prefers-color-scheme: dark){
-  [data-theme="copper"]{
+html.dark[data-theme="copper"]{
     --accent:#FB923C; --accent-hi:#FB923C;
-    --on-accent:#0C0A09; --accent-soft:#2A1710;
+    --on-accent:#0A151E; --accent-soft:#282F32;
     --accent-glass:#FB923C1F;
   }
-}
 [data-theme="teal"]{
   --accent:#0F766E; --accent-hi:#115E59;
   --on-accent:#FFFFFF; --accent-soft:#F0FDFA;
   --accent-glass:#0F766E26;
 }
-@media (prefers-color-scheme: dark){
-  [data-theme="teal"]{
+html.dark[data-theme="teal"]{
     --accent:#5EEAD4; --accent-hi:#5EEAD4;
-    --on-accent:#0C0A09; --accent-soft:#0C2523;
+    --on-accent:#0A151E; --accent-soft:#183841;
     --accent-glass:#5EEAD41F;
   }
-}
 [data-theme="ruby"]{
   --accent:#BE123C; --accent-hi:#E11D48;
   --on-accent:#FFFFFF; --accent-soft:#FFF1F2;
   --accent-glass:#BE123C26;
 }
-@media (prefers-color-scheme: dark){
-  [data-theme="ruby"]{
+html.dark[data-theme="ruby"]{
     --accent:#FDA4AF; --accent-hi:#FDA4AF;
-    --on-accent:#0C0A09; --accent-soft:#2A1016;
+    --on-accent:#0A151E; --accent-soft:#28313E;
     --accent-glass:#FDA4AF1F;
   }
-}
 
 /* ═══════════════════════════════════════════════════════════════════
  * شیشه و فلزِ روان
@@ -295,7 +308,9 @@
   .chip-accent{
     background:var(--accent-soft); color:var(--accent);
   }
-  .ring-accent{box-shadow:0 0 0 2px var(--accent)}
+  /* متغیر را ست می‌کند تا ring-2 خودش رنگ را بردارد — box-shadow خام
+     در جنگِ ترتیبِ قواعد می‌باخت. */
+  .ring-accent{--tw-ring-color:var(--accent)}
   .hairline-accent{box-shadow:inset 0 2px 0 0 var(--accent)}
 
   /* ابزارهای رنگِ پالت — ویوها این‌ها را می‌نویسند، نه رنگ ثابت */
@@ -313,14 +328,24 @@
   --glass-line:rgb(12 10 9/.08);
   --glass-bar-bg:rgb(255 255 255/.82);
 }
-@media (prefers-color-scheme: dark){
-  :root{
-    --glass-bg:rgb(28 25 23/.66);
-    --glass-solid:#1C1917;
-    --glass-line:rgb(255 255 255/.10);
-    --glass-bar-bg:rgb(12 10 9/.80);
+html.dark{
+    --glass-bg:rgb(16 36 49/.68);
+    --glass-solid:#102431;
+    --glass-line:rgb(148 174 190/.16);
+    --glass-bar-bg:rgb(10 21 30/.82);
   }
-}
+
+/*
+ * سرصفحهٔ صفحهٔ سالن.
+ *
+ * چرا متغیر و نه استایل درون‌خطی: استایل درون‌خطی را هیچ قاعده‌ای در
+ * حالت تیره نمی‌تواند کنار بزند. نتیجه‌اش سرصفحهٔ قهوه‌ای روی بدنهٔ
+ * نفتی بود — دو رنگِ بی‌ربط زیر هم.
+ *
+ * در حالت تیره از سطحِ صفحه تیره‌تر است تا هنوز «بالاتر» به نظر برسد.
+ */
+:root{ --hero:linear-gradient(145deg,#1C1917 0%,#292524 55%,#1C1917 100%); }
+html.dark{ --hero:linear-gradient(145deg,#071019 0%,#14303F 55%,#071019 100%); }
 
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -335,56 +360,82 @@
  * ابزارها را اینجا در مدیاکوئری تیره بازتعریف می‌کنیم. چون بعد از
  * ‎@tailwind utilities‎ می‌آیند، با همان ویژگی‌مندی برنده می‌شوند.
  * ═══════════════════════════════════════════════════════════════ */
-@media (prefers-color-scheme: dark){
-  /*
+/*
    * استثنا: هر چیزی داخل .on-dark همیشه روی زمینهٔ تیره می‌نشیند
    * (سرصفحهٔ سالن)، پس نباید وارونه شود — وگرنه در حالت تیره
    * متنِ تیره روی زمینهٔ تیره می‌رود.
    */
-  .on-dark .text-ink-300{color:#D6D3D1}
-  .on-dark .text-ink-400{color:#A8A29E}
-  .on-dark .text-white{color:#fff}
+  html.dark .on-dark .text-ink-300{color:#B9CCD8}
+html.dark .on-dark .text-ink-400{color:#94AEBE}
+html.dark .on-dark .text-white{color:#fff}
+/* متن — نردبان روشنایی وارونه می‌شود */
+  html.dark .text-ink-950, html.dark .text-ink-900{color:#E9F1F6}
+html.dark .text-ink-800{color:#D4E2EA}
+html.dark .text-ink-700{color:#B9CCD8}
+html.dark .text-ink-600, html.dark .text-ink-500{color:#94AEBE}
+html.dark .text-ink-400{color:#7793A6}
+html.dark .text-ink-300{color:#4E6C80}
+html.dark .text-white{color:#E9F1F6}
+/* طلایی در زمینهٔ تیره باید روشن‌تر باشد تا کنتراست حفظ شود */
+  html.dark .text-gold-700, html.dark .text-gold-600{color:#FBBF24}
+/* سطوح */
+  html.dark .bg-white{background-color:#102431}
+html.dark .bg-ink-50{background-color:#102431}
+html.dark .bg-ink-100{background-color:#1C3446}
+html.dark .bg-ink-900{background-color:#E9F1F6;color:#102431}
+html.dark .bg-accent-soft{background-color:var(--accent-soft)}
+html.dark .hover\:bg-ink-100:hover{background-color:#1C3446}
+html.dark .hover\:bg-gold-50:hover{background-color:#1C3446}
+html.dark .hover\:bg-ink-50:hover{background-color:#102431}
+/* خط‌ها */
+  html.dark .border-ink-100, html.dark .border-ink-200, html.dark .border-ink-300{border-color:#1C3446}
+html.dark .divide-ink-100>*+*{border-color:#1C3446}
+/* رنگ‌های معنایی — نسخهٔ کم‌اشباع برای زمینهٔ تیره */
+  html.dark .bg-green-50{background-color:#14261A}
+html.dark .text-green-700{color:#4ADE80}
+html.dark .bg-red-50{background-color:#2A1416}
+html.dark .text-red-600, html.dark .text-red-700, html.dark .text-red-800{color:#F87171}
+html.dark .bg-amber-50{background-color:#1C3446}
+html.dark .text-amber-700{color:#FBBF24}
+html.dark .border-red-100{border-color:#3F1D1D}
+/*
+ * فلزِ خنثی در حالت تیره.
+ *
+ * گرادیان زغالیِ .metal-ink روی زمینهٔ نفتی تقریباً ناپدید می‌شود، پس
+ * وارونه می‌شود: فولادِ صیقلی. هم دیده می‌شود، هم همان حسِ «متال» را
+ * می‌دهد و تخت نیست.
+ */
+  html.dark .btn-ink,
+html.dark .metal-ink{
+    background:linear-gradient(180deg,#F4F9FC 0%,#DCE8EF 45%,#BFD2DE 100%);
+    color:#102431;
+    box-shadow:inset 0 1px 0 rgb(255 255 255/.7),0 1px 3px rgb(0 0 0/.38);
+  }
+html.dark .btn-ink:hover{filter:brightness(1.04)}
+/* ورودی‌ها */
+  html.dark input, html.dark select, html.dark textarea{background:#102431;color:#E9F1F6;border-color:#1C3446}
+html.dark input::placeholder, html.dark textarea::placeholder{color:#7793A6}
 
-  /* متن — نردبان روشنایی وارونه می‌شود */
-  .text-ink-950,.text-ink-900{color:#F5F5F4}
-  .text-ink-800{color:#E7E5E4}
-  .text-ink-700{color:#D6D3D1}
-  .text-ink-600,.text-ink-500{color:#A8A29E}
-  .text-ink-400{color:#78716C}
-  .text-ink-300{color:#57534E}
-  .text-white{color:#F5F5F4}
-
-  /* طلایی در زمینهٔ تیره باید روشن‌تر باشد تا کنتراست حفظ شود */
-  .text-gold-700,.text-gold-600{color:#FBBF24}
-
-  /* سطوح */
-  .bg-white{background-color:#1C1917}
-  .bg-ink-50{background-color:#1C1917}
-  .bg-ink-100{background-color:#292524}
-  .bg-ink-900{background-color:#F5F5F4;color:#1C1917}
-  .bg-accent-soft{background-color:var(--accent-soft)}
-  .hover\:bg-ink-100:hover{background-color:#292524}
-  .hover\:bg-gold-50:hover{background-color:#292524}
-  .hover\:bg-ink-50:hover{background-color:#1C1917}
-
-  /* خط‌ها */
-  .border-ink-100,.border-ink-200,.border-ink-300{border-color:#292524}
-  .divide-ink-100>*+*{border-color:#292524}
-
-  /* رنگ‌های معنایی — نسخهٔ کم‌اشباع برای زمینهٔ تیره */
-  .bg-green-50{background-color:#14261A} .text-green-700{color:#4ADE80}
-  .bg-red-50{background-color:#2A1416}   .text-red-600,.text-red-700,.text-red-800{color:#F87171}
-  .bg-amber-50{background-color:#292524} .text-amber-700{color:#FBBF24}
-  .border-red-100{border-color:#3F1D1D}
-
-  /* دکمهٔ زغالی در تیره باید روشن شود، وگرنه با زمینه یکی می‌شود */
-  .btn-ink{background:#F5F5F4;color:#1C1917}
-  .btn-ink:hover{background:#E7E5E4}
-
-  /* ورودی‌ها */
-  input,select,textarea{background:#1C1917;color:#F5F5F4;border-color:#292524}
-  input::placeholder,textarea::placeholder{color:#78716C}
-}
+/*
+ * ابزارهایی که در بازنویسی اول جا مانده بودند.
+ *
+ * هر کدام یک باگ واقعی می‌ساختند، نه فقط زشتی:
+ *   bg-ink-200  → نوار پیشرفتِ «مرحلهٔ بعد» هم‌روشناییِ مرحلهٔ فعلی
+ *                 می‌شد؛ مشتری نمی‌فهمید کجای کار است.
+ *   bg-ink-800  → هاورِ دکمهٔ زغالی. در تیره خودِ دکمه روشن می‌شود ولی
+ *                 هاورش تیره می‌ماند؛ متنِ تیره روی زمینهٔ تیره ناپدید.
+ *   bg-gold-50  → لکهٔ کِرِمِ روشن وسط صفحهٔ نفتی، با متنِ طلاییِ روشن
+ *                 رویش. عملاً ناخوانا.
+ */
+html.dark .bg-ink-200,
+html.dark .hover\:bg-ink-200:hover{background-color:#1C3446}
+html.dark .bg-ink-300{background-color:#2A4257}
+html.dark .hover\:bg-ink-800:hover{background-color:#D4E2EA;color:#102431}
+html.dark .bg-gold-50,
+html.dark .bg-gold-50\/50,
+html.dark .hover\:bg-gold-50:hover,
+html.dark .has-\[\:checked\]\:bg-gold-50:has(:checked){background-color:var(--accent-soft)}
+html.dark .has-\[\:checked\]\:border-gold-600:has(:checked){border-color:var(--accent)}
 
 
 /* خانوادهٔ فونت وقتی UI_FONT=iranyekan باشد */

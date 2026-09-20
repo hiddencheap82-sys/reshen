@@ -22,7 +22,11 @@ def ratio(a, b):
     return (hi + 0.05) / (lo + 0.05)
 
 LIGHT_BG, LIGHT_SURFACE, LIGHT_TEXT = '#FAFAF9', '#FFFFFF', '#1C1917'
-DARK_BG,  DARK_SURFACE,  DARK_TEXT  = '#0C0A09', '#1C1917', '#F5F5F4'
+# آبی نفتی تیره — همان مقادیری که در html.dark داخل src.css نشسته‌اند.
+# اگر آنجا عوض شد، اینجا هم باید عوض شود وگرنه این اسکریپت رنگی را
+# می‌سنجد که اصلاً منتشر نمی‌شود.
+DARK_BG,  DARK_SURFACE,  DARK_TEXT  = '#0A151E', '#102431', '#E9F1F6'
+DARK_DIM = '#7793A6'
 
 palettes = json.loads(pathlib.Path(__file__).with_name('palettes.json').read_text('utf-8'))
 
@@ -40,6 +44,7 @@ for key, p in palettes.items():
         ('تأکید تیره روی سطح تیره',   p['darkAccent'], DARK_SURFACE, 4.5),
         ('تأکید تیره روی زمینهٔ تیره',p['darkAccent'], DARK_BG,      4.5),
         ('متن روی سطح نرمِ تیره',     DARK_TEXT,     p['darkSoft'],  4.5),
+        ('تأکید روی سطح نرمِ تیره',   p['darkAccent'], p['darkSoft'], 4.5),
     ]
     for label, fg, bg, need in checks:
         r = ratio(fg, bg)
@@ -48,6 +53,29 @@ for key, p in palettes.items():
             fails.append((p['name'], label, round(r, 2), need))
         print(f"{p['name']:<12} {label:<34} {r:>6.2f}  {'✓' if ok else '✗ کمتر از ' + str(need)}")
     print()
+
+# رنگ‌های ثابتِ خارج از پالت — دکمهٔ «تمام شد» و فلزِ خنثی.
+# هر سه توقفِ گرادیان سنجیده می‌شود، نه فقط تیره‌ترینش: متن روی وسطِ
+# دکمه هم خوانده می‌شود و یک بار همین‌جا رد شد (۳٫۷۷).
+for label, fg, bg in [
+    ('«تمام شد» بالا',   '#FFFFFF', '#047857'),
+    ('«تمام شد» وسط',    '#FFFFFF', '#065F46'),
+    ('«تمام شد» پایین',  '#FFFFFF', '#064E3B'),
+    ('«تمام شد» تیره بالا',  '#052E22', '#6EE7B7'),
+    ('«تمام شد» تیره وسط',   '#052E22', '#34D399'),
+    ('«تمام شد» تیره پایین', '#052E22', '#10B981'),
+    ('فلزِ خنثی تیره بالا',  '#102431', '#F4F9FC'),
+    ('فلزِ خنثی تیره پایین', '#102431', '#BFD2DE'),
+    ('متن تیره روی زمینهٔ تیره', DARK_TEXT, DARK_BG),
+    ('متن تیره روی سطح تیره',   DARK_TEXT, DARK_SURFACE),
+    ('متن کم‌رنگ روی سطح تیره', DARK_DIM,  DARK_SURFACE),
+    ('متن کم‌رنگ روی زمینهٔ تیره', DARK_DIM, DARK_BG),
+]:
+    r = ratio(fg, bg)
+    if r < 4.5:
+        fails.append(('حالت تیره', label, round(r, 2), 4.5))
+    print(f"{'حالت تیره':<12} {label:<34} {r:>6.2f}  {'✓' if r >= 4.5 else '✗ کمتر از 4.5'}")
+print()
 
 if fails:
     print(f'\n{len(fails)} آزمون رد شد:')

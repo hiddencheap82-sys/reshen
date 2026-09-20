@@ -58,10 +58,19 @@ final class SalonSettingsController extends Controller
             $closed = $request->input("closed_$weekday") !== null;
             $opens = (string) $request->input("opens_$weekday", '09:00');
             $closes = (string) $request->input("closes_$weekday", '21:00');
-            $repo->setSalonDay(Auth::salonId(), $weekday, $opens, $closes, $closed);
+            $breakStart = (string) $request->input("break_start_$weekday", '');
+            $breakEnd = (string) $request->input("break_end_$weekday", '');
+            $repo->setSalonDay(Auth::salonId(), $weekday, $opens, $closes, $closed, $breakStart, $breakEnd);
         }
 
-        return $this->withSuccess('ساعت کاری ذخیره شد.', '/panel/settings');
+        // طول سانس: بین ۵ تا ۱۲۰ دقیقه. صفر، حلقهٔ تولید سانس را
+        // بی‌نهایت می‌کند؛ SlotFinder هم حفاظ دارد ولی بهتر است مقدار
+        // معیوب اصلاً ذخیره نشود.
+        $step = (int) $request->input('slot_step_minutes', 15);
+        DB::update('salons', ['slot_step_minutes' => max(5, min(120, $step ?: 15))],
+            'id = :id', ['id' => Auth::salonId()]);
+
+        return $this->withSuccess('ساعت کاری و سانس‌بندی ذخیره شد.', '/panel/settings');
     }
 
     public function seedHolidays(Request $request): Response

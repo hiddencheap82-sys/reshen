@@ -18,8 +18,9 @@ $step = $step ?? null;
 <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
 <link rel="manifest" href="<?= e(url('manifest.webmanifest')) ?>">
 <link rel="icon" href="<?= e(asset('icons/icon.svg')) ?>" type="image/svg+xml">
-<meta name="theme-color" content="#1C1917">
+<meta name="theme-color" content="#1C1917" id="theme-color">
 <meta name="color-scheme" content="light dark">
+<?php include BASE_PATH . '/resources/views/components/theme-boot.php'; ?>
 </head>
 <body class="min-h-dvh">
 
@@ -34,7 +35,7 @@ $step = $step ?? null;
       باشد — سالنی که هنوز لوگو آپلود نکرده هم باید آبرومند به نظر برسد.
     -->
     <header class="on-dark relative overflow-hidden text-white px-5 pt-7 pb-6"
-            style="background:linear-gradient(145deg,#1C1917 0%,#292524 55%,#1C1917 100%)">
+            style="background:var(--hero)">
 
       <div class="absolute inset-0 opacity-[0.07]" aria-hidden="true"
            style="background-image:repeating-linear-gradient(135deg,#fff 0 1px,transparent 1px 9px)"></div>
@@ -46,6 +47,11 @@ $step = $step ?? null;
           <span class="w-7 h-7 rounded-lg grid place-items-center text-[13px] font-extrabold text-ink-950"
                 style="background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 55%,white),var(--accent))" aria-hidden="true">ر</span>
           <span class="text-[11px] tracking-wide text-ink-300">رشن</span>
+
+          <!-- کلید روشن/تیره در انتهای همان ردیف، دور از دکمه‌های رزرو -->
+          <span class="ms-auto -my-2 -me-2">
+            <?php $toggleTone = 'on-dark'; include BASE_PATH . '/resources/views/components/theme-toggle.php'; ?>
+          </span>
         </div>
 
         <h1 class="text-xl font-extrabold leading-tight"><?= e($salon['name']) ?></h1>

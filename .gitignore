@@ -37,3 +37,4 @@ tools/docx/package*.json
 /tools/assets/package*.json
 /dist/
 .phpunit.cache/
+.env.testing

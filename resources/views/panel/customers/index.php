@@ -3,13 +3,13 @@
 
 <form method="get" action="<?= url('panel/customers') ?>" class="mb-4">
   <input type="text" name="q" value="<?= e($q) ?>" placeholder="جستجو با نام یا شماره..."
-    class="w-full rounded-xl border border-ink-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+    class="w-full rounded-xl border border-ink-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
 </form>
 
 <?php if (empty($customers)): ?>
-  <div class="bg-white rounded-2xl border border-dashed border-ink-200 p-10 text-center text-ink-400">مشتری‌ای یافت نشد.</div>
+  <div class="glass rounded-2xl p-10 text-center text-ink-400">مشتری‌ای یافت نشد.</div>
 <?php else: ?>
-<div class="bg-white rounded-2xl border border-ink-100 divide-y divide-ink-100">
+<div class="glass rounded-2xl divide-y divide-ink-100">
   <?php foreach ($customers as $c): ?>
   <a href="<?= url('panel/customers/' . $c['id']) ?>" class="flex items-center justify-between px-5 py-3.5 hover:bg-ink-50">
     <div>
