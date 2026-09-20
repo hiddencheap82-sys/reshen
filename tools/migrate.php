@@ -2,64 +2,48 @@
 
 declare(strict_types=1);
 
+/**
+ * اجرای مهاجرت‌های دیتابیس از خط فرمان.
+ *
+ *   php tools/migrate.php            اجرای مهاجرت‌های جدید
+ *   php tools/migrate.php --fresh    ریست کامل (فقط توسعه!)
+ *
+ * منطق واقعی در App\Core\Migrator است تا نصاب وب و این ابزار دقیقاً
+ * یک کار را بکنند — اگر دو جا نوشته شود، نصبِ مشتری با نصبِ
+ * توسعه‌دهنده فرق می‌کند و این بدترین نوع باگ است.
+ */
+
 require dirname(__DIR__) . '/app/bootstrap.php';
 
-use App\Core\DB;
+use App\Core\Config;
+use App\Core\Migrator;
 
-$pdo = DB::connection();
+$migrator = new Migrator(BASE_PATH . '/database/migrations');
 
-$pdo->exec(<<<SQL
-    CREATE TABLE IF NOT EXISTS schema_migrations (
-        id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        filename VARCHAR(255) NOT NULL UNIQUE,
-        applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-SQL);
-
-$applied = array_column($pdo->query('SELECT filename FROM schema_migrations')->fetchAll(), 'filename');
-
-$dir = dirname(__DIR__) . '/database/migrations';
-$files = glob($dir . '/*.sql') ?: [];
-sort($files);
-
-$fresh = in_array('--fresh', $argv, true);
-
-if ($fresh) {
-    echo "Dropping all tables...\n";
-    $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
-    $tables = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
-    foreach ($tables as $table) {
-        $pdo->exec("DROP TABLE IF EXISTS `$table`");
-    }
-    $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
-    $applied = [];
-    $pdo->exec(<<<SQL
-        CREATE TABLE IF NOT EXISTS schema_migrations (
-            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            filename VARCHAR(255) NOT NULL UNIQUE,
-            applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-    SQL);
-}
-
-$ran = 0;
-foreach ($files as $file) {
-    $name = basename($file);
-    if (in_array($name, $applied, true)) {
-        continue;
-    }
-    echo "Applying $name ... ";
-    $sql = file_get_contents($file);
-    try {
-        $pdo->exec($sql);
-        DB::insert('schema_migrations', ['filename' => $name]);
-        echo "OK\n";
-        $ran++;
-    } catch (Throwable $e) {
-        echo "FAILED\n";
-        echo $e->getMessage() . "\n";
+if (in_array('--fresh', $argv, true)) {
+    if (Config::get('app.env') === 'production') {
+        fwrite(STDERR, "روی محیط production اجازه ندارد. APP_ENV را بررسی کنید.\n");
         exit(1);
     }
+    echo "حذف همهٔ جدول‌ها...\n";
+    $migrator->dropAllTables();
 }
 
-echo $ran === 0 ? "Nothing to migrate.\n" : "$ran migration(s) applied.\n";
+$report = $migrator->run();
+
+if ($report === []) {
+    echo "چیزی برای اجرا نیست.\n";
+    exit(0);
+}
+
+$failed = false;
+foreach ($report as $row) {
+    if ($row['ok']) {
+        echo "  ✓ {$row['file']}\n";
+    } else {
+        echo "  ✗ {$row['file']}\n    {$row['error']}\n";
+        $failed = true;
+    }
+}
+
+exit($failed ? 1 : 0);
