@@ -7,8 +7,171 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ——— چیزهایی که تیلویند پوشش نمی‌دهد ——— */
-body{font-family:'Vazirmatn','Tahoma',sans-serif;}
-.nav-active{background:#eff6ff;color:#1d4ed8;font-weight:700;}
-/* اعداد فارسی در ورودی‌ها چپ‌به‌راست بمانند */
-input[type="tel"],input[type="number"],.ltr{direction:ltr;unicode-bidi:plaintext;}
+@layer base {
+  :root{
+    --bg:#FAFAF9; --surface:#FFFFFF; --line:#E7E5E4;
+    --text:#1C1917; --text-dim:#78716C;
+    --accent:#A16207; --accent-soft:#FEFCE8;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0C0A09; --surface:#1C1917; --line:#292524;
+      --text:#F5F5F4; --text-dim:#A8A29E;
+      --accent:#FBBF24; --accent-soft:#292524;
+    }
+  }
+  body{
+    font-family:'Vazirmatn','Tahoma',sans-serif;
+    background:var(--bg); color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+  /* عدد فارسی در ستون کنار هم بنشیند */
+  .tabular-nums{font-variant-numeric:tabular-nums}
+  /* ورودی‌های عددی چپ‌به‌راست بمانند */
+  input[type="tel"],input[type="number"],.ltr{direction:ltr;unicode-bidi:plaintext}
+}
+
+@layer components {
+  .surface{background:var(--surface);border:1px solid var(--line)}
+
+  /* دکمهٔ اصلی — طلاییِ کم‌مصرف */
+  .btn-gold{
+    @apply inline-flex items-center justify-center gap-2 h-12 px-5 rounded-xl
+           font-bold text-white cursor-pointer select-none
+           transition-all duration-200 ease-out-soft;
+    background:linear-gradient(180deg,#B45309 0%,#A16207 100%);
+    box-shadow:0 1px 2px rgb(12 10 9/.18), inset 0 1px 0 rgb(255 255 255/.14);
+  }
+  .btn-gold:hover{filter:brightness(1.07)}
+  .btn-gold:active{transform:translateY(1px);filter:brightness(.96)}
+  .btn-gold:focus-visible{outline:2px solid #A16207;outline-offset:2px}
+
+  .btn-ink{
+    @apply inline-flex items-center justify-center gap-2 h-12 px-5 rounded-xl
+           font-bold text-white bg-ink-900 cursor-pointer
+           transition-all duration-200 ease-out-soft;
+  }
+  .btn-ink:hover{@apply bg-ink-800}
+  .btn-ink:active{transform:translateY(1px)}
+  .btn-ink:focus-visible{outline:2px solid #1C1917;outline-offset:2px}
+
+  /* کارتی که با لمس واکنش نشان می‌دهد */
+  .tap{@apply transition-all duration-200 ease-out-soft cursor-pointer}
+  .tap:active{transform:scale(.985)}
+
+  /* نوار ظریف بالای کارت‌های تأکیدی */
+  .hairline-gold{box-shadow:inset 0 2px 0 0 #A16207}
+
+  /*
+   * کارت انتخاب (خدمت، آرایشگر).
+   *
+   * چرا CSS دستی و نه peer-checked تیلویند: peer فقط روی «هم‌نیا»ها
+   * کار می‌کند (.peer:checked ~ .x). مربع تیک و خودِ تیک، تودرتو داخل
+   * کارت‌اند، پس با peer-checked هرگز رنگ نمی‌گرفتند — یعنی کاربر
+   * انتخاب می‌کرد و هیچ بازخوردی نمی‌دید.
+   */
+  .pick input:checked ~ .pick-card{
+    border-color:#A16207; background:#FEFCE8;
+  }
+  .pick input:checked ~ .pick-card .pick-box{
+    background:#A16207; border-color:#A16207;
+  }
+  .pick input:checked ~ .pick-card .pick-tick{opacity:1}
+  .pick input:checked ~ .slot{
+    background:#1C1917; border-color:#1C1917; color:#fff;
+  }
+  .pick input:focus-visible ~ .slot{outline:2px solid #A16207;outline-offset:2px}
+  @media (prefers-color-scheme: dark){
+    .pick input:checked ~ .slot{background:#FBBF24;border-color:#FBBF24;color:#1C1917}
+  }
+
+  .pick input:focus-visible ~ .pick-card{
+    outline:2px solid #A16207; outline-offset:2px;
+  }
+  @media (prefers-color-scheme: dark){
+    .pick input:checked ~ .pick-card{background:#292524;border-color:#FBBF24}
+    .pick input:checked ~ .pick-card .pick-box{background:#FBBF24;border-color:#FBBF24}
+  }
+}
+
+/* ——— حرکت ——— */
+@layer utilities {
+  .rise{animation:rise .42s cubic-bezier(.22,1,.36,1) both}
+  .rise-1{animation-delay:.04s} .rise-2{animation-delay:.08s}
+  .rise-3{animation-delay:.12s} .rise-4{animation-delay:.16s}
+  .rise-5{animation-delay:.2s}
+}
+@keyframes rise{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+
+/* کسی که حرکت را خاموش کرده، باید حالت نهایی را ببیند — نه هیچ */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;scroll-behavior:auto !important;
+  }
+  .rise{animation:none;opacity:1;transform:none}
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+ * حالت تیره
+ *
+ * چرا این بلوک لازم است: ویوها از کلاس‌های ثابت تیلویند استفاده
+ * می‌کنند (مثل text-ink-900). آن‌ها رنگِ روشن‌مود را هاردکد می‌کنند،
+ * پس در حالت تیره متنِ تقریباً سیاه روی پس‌زمینهٔ تقریباً سیاه
+ * می‌نشیند و نامرئی می‌شود.
+ *
+ * به‌جای دست زدن به تک‌تک ویوها (و ریسک جا انداختن یکی)، همان
+ * ابزارها را اینجا در مدیاکوئری تیره بازتعریف می‌کنیم. چون بعد از
+ * ‎@tailwind utilities‎ می‌آیند، با همان ویژگی‌مندی برنده می‌شوند.
+ * ═══════════════════════════════════════════════════════════════ */
+@media (prefers-color-scheme: dark){
+  /*
+   * استثنا: هر چیزی داخل .on-dark همیشه روی زمینهٔ تیره می‌نشیند
+   * (سرصفحهٔ سالن)، پس نباید وارونه شود — وگرنه در حالت تیره
+   * متنِ تیره روی زمینهٔ تیره می‌رود.
+   */
+  .on-dark .text-ink-300{color:#D6D3D1}
+  .on-dark .text-ink-400{color:#A8A29E}
+  .on-dark .text-white{color:#fff}
+
+  /* متن — نردبان روشنایی وارونه می‌شود */
+  .text-ink-950,.text-ink-900{color:#F5F5F4}
+  .text-ink-800{color:#E7E5E4}
+  .text-ink-700{color:#D6D3D1}
+  .text-ink-600,.text-ink-500{color:#A8A29E}
+  .text-ink-400{color:#78716C}
+  .text-ink-300{color:#57534E}
+  .text-white{color:#F5F5F4}
+
+  /* طلایی در زمینهٔ تیره باید روشن‌تر باشد تا کنتراست حفظ شود */
+  .text-gold-700,.text-gold-600{color:#FBBF24}
+
+  /* سطوح */
+  .bg-white{background-color:#1C1917}
+  .bg-ink-50{background-color:#1C1917}
+  .bg-ink-100{background-color:#292524}
+  .bg-ink-900{background-color:#F5F5F4;color:#1C1917}
+  .bg-gold-50,.bg-gold-50\/60{background-color:#292524}
+  .hover\:bg-ink-100:hover{background-color:#292524}
+  .hover\:bg-gold-50:hover{background-color:#292524}
+  .hover\:bg-ink-50:hover{background-color:#1C1917}
+
+  /* خط‌ها */
+  .border-ink-100,.border-ink-200,.border-ink-300{border-color:#292524}
+  .divide-ink-100>*+*{border-color:#292524}
+
+  /* رنگ‌های معنایی — نسخهٔ کم‌اشباع برای زمینهٔ تیره */
+  .bg-green-50{background-color:#14261A} .text-green-700{color:#4ADE80}
+  .bg-red-50{background-color:#2A1416}   .text-red-600,.text-red-700,.text-red-800{color:#F87171}
+  .bg-amber-50{background-color:#292524} .text-amber-700{color:#FBBF24}
+  .border-red-100{border-color:#3F1D1D}
+
+  /* دکمهٔ زغالی در تیره باید روشن شود، وگرنه با زمینه یکی می‌شود */
+  .btn-ink{background:#F5F5F4;color:#1C1917}
+  .btn-ink:hover{background:#E7E5E4}
+
+  /* ورودی‌ها */
+  input,select,textarea{background:#1C1917;color:#F5F5F4;border-color:#292524}
+  input::placeholder,textarea::placeholder{color:#78716C}
+}

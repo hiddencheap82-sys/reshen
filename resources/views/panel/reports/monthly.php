@@ -5,22 +5,22 @@ $monthNames = [1=>'فروردین',2=>'اردیبهشت',3=>'خرداد',4=>'ت�
 $maxDaily = max(array_map(fn($d) => (int)$d['total'], $dailySeries) ?: [1]);
 ?>
 <div class="flex items-center justify-between mb-5">
-  <h1 class="text-lg font-bold text-slate-800">گزارش ماهانه — <?= e($monthNames[$jm]) ?> <?= fa_num($jy) ?></h1>
-  <a href="<?= url('panel/reports') ?>" class="text-xs text-brand-600 hover:underline">گزارش روزانه ←</a>
+  <h1 class="text-lg font-bold text-ink-800">گزارش ماهانه — <?= e($monthNames[$jm]) ?> <?= fa_num($jy) ?></h1>
+  <a href="<?= url('panel/reports') ?>" class="text-xs text-gold-700 hover:underline">گزارش روزانه ←</a>
 </div>
 
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-  <div class="bg-white rounded-2xl border border-slate-100 p-4 text-center">
-    <div class="text-2xl font-extrabold text-brand-700"><?= toman((int)$totals['total']) ?></div>
-    <div class="text-[11px] text-slate-400 mt-1">فروش کل</div>
+  <div class="bg-white rounded-2xl border border-ink-100 p-4 text-center">
+    <div class="text-2xl font-extrabold text-gold-700"><?= toman((int)$totals['total']) ?></div>
+    <div class="text-[11px] text-ink-400 mt-1">فروش کل</div>
   </div>
-  <div class="bg-white rounded-2xl border border-slate-100 p-4 text-center">
-    <div class="text-2xl font-extrabold text-slate-800"><?= fa_num($totals['count']) ?></div>
-    <div class="text-[11px] text-slate-400 mt-1">تعداد نوبت</div>
+  <div class="bg-white rounded-2xl border border-ink-100 p-4 text-center">
+    <div class="text-2xl font-extrabold text-ink-800"><?= fa_num($totals['count']) ?></div>
+    <div class="text-[11px] text-ink-400 mt-1">تعداد نوبت</div>
   </div>
-  <div class="bg-white rounded-2xl border border-slate-100 p-4 text-center">
-    <div class="text-2xl font-extrabold text-slate-800"><?= toman((int)$totals['tips']) ?></div>
-    <div class="text-[11px] text-slate-400 mt-1">انعام</div>
+  <div class="bg-white rounded-2xl border border-ink-100 p-4 text-center">
+    <div class="text-2xl font-extrabold text-ink-800"><?= toman((int)$totals['tips']) ?></div>
+    <div class="text-[11px] text-ink-400 mt-1">انعام</div>
   </div>
   <div class="bg-emerald-50 rounded-2xl border border-emerald-100 p-4 text-center">
     <div class="text-2xl font-extrabold text-emerald-700"><?= fa_num($rescued['count']) ?></div>
@@ -28,22 +28,22 @@ $maxDaily = max(array_map(fn($d) => (int)$d['total'], $dailySeries) ?: [1]);
   </div>
 </div>
 
-<div class="bg-white rounded-2xl border border-slate-100 p-5 mb-5">
-  <h2 class="text-sm font-bold text-slate-700 mb-4">روند فروش روزانه</h2>
+<div class="bg-white rounded-2xl border border-ink-100 p-5 mb-5">
+  <h2 class="text-sm font-bold text-ink-700 mb-4">روند فروش روزانه</h2>
   <div class="flex items-end gap-1 h-32">
     <?php foreach ($dailySeries as $d): $h = max(4, (int)round(((int)$d['total'] / $maxDaily) * 100)); ?>
-    <div class="flex-1 bg-brand-500 rounded-t" style="height:<?= $h ?>%" title="<?= e($d['d']) ?>"></div>
+    <div class="flex-1 bg-gold-500 rounded-t" style="height:<?= $h ?>%" title="<?= e($d['d']) ?>"></div>
     <?php endforeach; ?>
-    <?php if (empty($dailySeries)): ?><p class="text-xs text-slate-400">داده‌ای برای این ماه نیست.</p><?php endif; ?>
+    <?php if (empty($dailySeries)): ?><p class="text-xs text-ink-400">داده‌ای برای این ماه نیست.</p><?php endif; ?>
   </div>
 </div>
 
-<div class="bg-white rounded-2xl border border-slate-100 p-5">
-  <h2 class="text-sm font-bold text-slate-700 mb-3">به تفکیک روش پرداخت</h2>
+<div class="bg-white rounded-2xl border border-ink-100 p-5">
+  <h2 class="text-sm font-bold text-ink-700 mb-3">به تفکیک روش پرداخت</h2>
   <?php foreach ($breakdown as $b): ?>
   <div class="flex items-center justify-between text-sm py-1.5">
-    <span class="text-slate-600"><?= e($methodLabels[$b['method']] ?? $b['method']) ?></span>
-    <span class="font-bold text-slate-800"><?= toman((int)$b['total']) ?></span>
+    <span class="text-ink-600"><?= e($methodLabels[$b['method']] ?? $b['method']) ?></span>
+    <span class="font-bold text-ink-800"><?= toman((int)$b['total']) ?></span>
   </div>
   <?php endforeach; ?>
 </div>

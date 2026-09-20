@@ -31,16 +31,16 @@ $atMin = $minMonth !== null
     && ($cal['year'] < $minMonth['year']
         || ($cal['year'] === $minMonth['year'] && $cal['month'] <= $minMonth['month']));
 ?>
-<div class="bg-white border border-slate-200 rounded-2xl overflow-hidden" role="group"
+<div class="surface rounded-2xl overflow-hidden shadow-card rise rise-1" role="group"
      aria-label="تقویم — <?= e($cal['monthName']) ?> <?= e(fa_num($cal['year'])) ?>">
 
-  <div class="flex items-center justify-between px-2 py-2 border-b border-slate-100">
+  <div class="flex items-center justify-between px-2 py-2 border-b" style="border-color:var(--line)">
     <?php if ($atMin): ?>
       <span class="w-11 h-11" aria-hidden="true"></span>
     <?php else: ?>
       <a href="<?= e($navFor($cal['prev']['year'], $cal['prev']['month'])) ?>"
-         class="w-11 h-11 grid place-items-center rounded-xl text-slate-500 hover:bg-slate-100
-                focus-visible:outline-2 focus-visible:outline-brand-600 transition-colors cursor-pointer"
+         class="w-11 h-11 grid place-items-center rounded-xl text-ink-500 hover:bg-ink-100
+                focus-visible:outline-2 focus-visible:outline-gold-600 transition-colors cursor-pointer"
          aria-label="ماه قبل">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
@@ -48,13 +48,13 @@ $atMin = $minMonth !== null
       </a>
     <?php endif; ?>
 
-    <h2 class="text-sm font-bold text-slate-800">
+    <h2 class="text-[14px] font-extrabold text-ink-900">
       <?= e($cal['monthName']) ?> <?= e(fa_num($cal['year'])) ?>
     </h2>
 
     <a href="<?= e($navFor($cal['next']['year'], $cal['next']['month'])) ?>"
-       class="w-11 h-11 grid place-items-center rounded-xl text-slate-500 hover:bg-slate-100
-              focus-visible:outline-2 focus-visible:outline-brand-600 transition-colors cursor-pointer"
+       class="w-11 h-11 grid place-items-center rounded-xl text-ink-500 hover:bg-ink-100
+              focus-visible:outline-2 focus-visible:outline-gold-600 transition-colors cursor-pointer"
        aria-label="ماه بعد">
       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
@@ -66,7 +66,7 @@ $atMin = $minMonth !== null
     <div class="grid grid-cols-7 gap-1 mb-1" aria-hidden="true">
       <?php foreach (JalaliCalendar::WEEKDAY_INITIALS as $i => $initial): ?>
         <div class="h-7 grid place-items-center text-[11px] font-bold
-                    <?= $i >= 5 ? 'text-rose-400' : 'text-slate-400' ?>">
+                    <?= $i >= 5 ? 'text-gold-700' : 'text-ink-400' ?>">
           <?= e($initial) ?>
         </div>
       <?php endforeach; ?>
@@ -91,7 +91,7 @@ $atMin = $minMonth !== null
             <?php if (!$cell['available']): ?>
               <button type="button" disabled aria-label="<?= e($aria) ?>"
                       class="h-11 rounded-xl text-sm tabular-nums cursor-not-allowed
-                             text-slate-300 <?= $cell['isToday'] ? 'ring-1 ring-slate-200' : '' ?>">
+                             text-ink-300 <?= $cell['isToday'] ? 'ring-1 ring-ink-200' : '' ?>">
                 <?= e(fa_num($cell['jday'])) ?>
               </button>
             <?php else: ?>
@@ -100,15 +100,15 @@ $atMin = $minMonth !== null
                  <?= $isSelected ? 'aria-current="date"' : '' ?>
                  class="h-11 grid place-items-center rounded-xl text-sm tabular-nums font-semibold
                         transition-colors cursor-pointer
-                        focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-600
+                        focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gold-600
                         <?php if ($isSelected): ?>
-                          bg-brand-600 text-white
+                          bg-ink-900 text-white shadow-lift
                         <?php elseif ($cell['isToday']): ?>
-                          ring-2 ring-brand-500 text-brand-700 hover:bg-brand-50
+                          ring-2 ring-gold-600 text-gold-700 font-extrabold hover:bg-gold-50
                         <?php elseif ($cell['isWeekend']): ?>
-                          text-rose-600 hover:bg-rose-50
+                          text-gold-700 hover:bg-gold-50
                         <?php else: ?>
-                          text-slate-700 hover:bg-slate-100
+                          text-ink-700 hover:bg-ink-100
                         <?php endif; ?>">
                 <?= e(fa_num($cell['jday'])) ?>
               </a>

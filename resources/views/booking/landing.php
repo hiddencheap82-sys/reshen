@@ -1,25 +1,168 @@
-<?php /** @var array $salon @var array $services */ ?>
-<h1 class="text-base font-bold text-slate-800 mb-1">رزرو نوبت</h1>
-<p class="text-sm text-slate-500 mb-5">خدمت‌های مورد نظرتان را انتخاب کنید.</p>
+<?php
+/**
+ * @var array $salon
+ * @var array $services
+ * @var array $liveStatus  ['open'=>bool,'waiting'=>int,'freeNow'=>int,'chairs'=>int]
+ */
+?>
 
 <?php if ($error = flash('error')): ?>
-<div class="bg-red-50 text-red-700 text-sm rounded-lg px-3 py-2 mb-4 border border-red-100"><?= e($error) ?></div>
+  <div role="alert"
+       class="flex items-start gap-2 bg-red-50 text-red-800 text-sm rounded-xl px-4 py-3 mb-4 border border-red-100">
+    <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+         stroke-width="2" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <span><?= e($error) ?></span>
+  </div>
 <?php endif; ?>
 
-<?php if (empty($services)): ?>
-  <p class="text-sm text-slate-400">در حال حاضر خدمتی برای رزرو تعریف نشده است.</p>
+<!--
+  وضعیت زندهٔ صف — تمایز اصلی محصول.
+
+  این اولین چیزی است که مشتری می‌بیند، چون جوابِ سؤالی است که واقعاً
+  در ذهنش دارد: «الان برم یا شلوغه؟» رقبا این را ندارند چون دادهٔ
+  لحظه‌ای صف را ندارند.
+-->
+<?php if ($liveStatus['open']): ?>
+  <div class="rise surface rounded-2xl shadow-card overflow-hidden mb-5 hairline-gold">
+    <div class="px-4 py-3.5 flex items-center gap-3">
+      <span class="relative flex w-2.5 h-2.5 shrink-0" aria-hidden="true">
+        <span class="absolute inline-flex w-full h-full rounded-full bg-green-500 opacity-60 animate-ping"></span>
+        <span class="relative inline-flex w-2.5 h-2.5 rounded-full bg-green-600"></span>
+      </span>
+
+      <div class="flex-1 min-w-0">
+        <?php if ($liveStatus['freeNow'] > 0): ?>
+          <p class="text-sm font-bold text-green-700">همین حالا آزاد است</p>
+          <p class="text-[12px] text-ink-500 mt-0.5">
+            <?= e(fa_num($liveStatus['freeNow'])) ?> صندلی خالی — می‌توانی همین الان بیایی
+          </p>
+        <?php elseif ($liveStatus['waiting'] === 0): ?>
+          <p class="text-sm font-bold text-ink-900">باز است</p>
+          <p class="text-[12px] text-ink-500 mt-0.5">کسی در صف نیست</p>
+        <?php else: ?>
+          <p class="text-sm font-bold text-ink-900">
+            <?= e(fa_num($liveStatus['waiting'])) ?> نفر در صف
+          </p>
+          <p class="text-[12px] text-ink-500 mt-0.5">
+            <?= e($liveStatus['waitLabel']) ?>
+          </p>
+        <?php endif; ?>
+      </div>
+
+      <span class="text-[10.5px] font-semibold text-ink-400 shrink-0">زنده</span>
+    </div>
+  </div>
 <?php else: ?>
-<form method="post" action="<?= url('s/' . $salon['slug']) ?>" class="space-y-2">
-  <?= csrf_field() ?>
-  <?php foreach ($services as $s): ?>
-  <label class="flex items-center justify-between border border-slate-200 rounded-xl px-4 py-3 cursor-pointer has-[:checked]:border-brand-400 has-[:checked]:bg-brand-50">
-    <span class="flex items-center gap-2.5">
-      <input type="checkbox" name="service_ids[]" value="<?= (int)$s['id'] ?>" class="w-4 h-4 accent-brand-600">
-      <span class="text-sm font-medium text-slate-800"><?= e($s['name']) ?></span>
-    </span>
-    <span class="text-xs text-slate-400"><?= fa_num($s['duration_minutes']) ?> دقیقه · <?= toman((int)$s['price']) ?></span>
-  </label>
-  <?php endforeach; ?>
-  <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl py-3 mt-4">ادامه</button>
-</form>
+  <div class="rise surface rounded-2xl shadow-card px-4 py-3.5 mb-5 flex items-center gap-3">
+    <span class="w-2.5 h-2.5 rounded-full bg-ink-300 shrink-0" aria-hidden="true"></span>
+    <div>
+      <p class="text-sm font-bold text-ink-700">الان بسته است</p>
+      <p class="text-[12px] text-ink-500 mt-0.5">می‌توانی برای روزهای بعد نوبت بگیری</p>
+    </div>
+  </div>
+<?php endif; ?>
+
+<div class="rise rise-1">
+  <h2 class="text-[15px] font-extrabold text-ink-900 mb-1">چه خدمتی می‌خواهی؟</h2>
+  <p class="text-[13px] text-ink-500 mb-4">می‌توانی چند مورد را با هم انتخاب کنی.</p>
+</div>
+
+<?php if (empty($services)): ?>
+  <div class="surface rounded-2xl py-12 px-5 text-center">
+    <svg class="w-10 h-10 mx-auto text-ink-300 mb-3" fill="none" viewBox="0 0 24 24"
+         stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M6 9a3 3 0 100-6 3 3 0 000 6zm0 12a3 3 0 100-6 3 3 0 000 6zm12-15L6 18M9 9l9 9"/>
+    </svg>
+    <p class="text-sm font-semibold text-ink-600">هنوز خدمتی تعریف نشده</p>
+    <p class="text-[12.5px] text-ink-400 mt-1">با خود آرایشگاه تماس بگیرید.</p>
+  </div>
+
+<?php else: ?>
+  <form method="post" action="<?= e(url('s/' . $salon['slug'])) ?>" id="svc-form">
+    <?= csrf_field() ?>
+
+    <fieldset class="space-y-2.5">
+      <legend class="sr-only">انتخاب خدمت</legend>
+
+      <?php foreach ($services as $i => $s): ?>
+        <label class="pick rise rise-<?= min($i + 2, 5) ?> block relative tap">
+          <input type="checkbox" name="service_ids[]" value="<?= (int) $s['id'] ?>"
+                 class="sr-only" data-price="<?= (int) $s['price'] ?>"
+                 data-minutes="<?= (int) $s['duration_minutes'] ?>">
+
+          <span class="pick-card surface flex items-center gap-3.5 rounded-2xl px-4 py-3.5 shadow-card
+                       transition-all duration-200 ease-out-soft hover:shadow-lift">
+
+            <span class="pick-box w-6 h-6 shrink-0 rounded-lg border-2 border-ink-300 grid place-items-center
+                         transition-colors duration-200" aria-hidden="true">
+              <svg class="pick-tick w-3.5 h-3.5 text-white opacity-0 transition-opacity duration-200"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
+            </span>
+
+            <span class="flex-1 min-w-0">
+              <span class="block text-[14.5px] font-bold text-ink-900 truncate"><?= e($s['name']) ?></span>
+              <span class="block text-[12px] text-ink-500 mt-0.5 tabular-nums">
+                <?= e(fa_num((int) $s['duration_minutes'])) ?> دقیقه
+              </span>
+            </span>
+
+            <span class="text-[13px] font-extrabold text-ink-900 tabular-nums shrink-0">
+              <?= e(toman((int) $s['price'])) ?>
+            </span>
+          </span>
+        </label>
+      <?php endforeach; ?>
+    </fieldset>
+
+    <!-- جمع انتخاب‌ها؛ تا چیزی انتخاب نشده دیده نمی‌شود -->
+    <div id="svc-total" class="hidden surface rounded-2xl px-4 py-3 mt-3 shadow-card">
+      <div class="flex items-center justify-between text-[13px]">
+        <span class="text-ink-500">جمع</span>
+        <span class="font-extrabold text-ink-900 tabular-nums" id="svc-sum"></span>
+      </div>
+      <div class="flex items-center justify-between text-[12px] mt-1">
+        <span class="text-ink-400">مدت تقریبی</span>
+        <span class="text-ink-600 tabular-nums" id="svc-dur"></span>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-gold w-full mt-4">
+      ادامه
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+           stroke-width="2.5" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+      </svg>
+    </button>
+  </form>
+
+  <script>
+  (function () {
+    const form = document.getElementById('svc-form');
+    const box  = document.getElementById('svc-total');
+    const sum  = document.getElementById('svc-sum');
+    const dur  = document.getElementById('svc-dur');
+    const fa   = n => String(n).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+
+    function update() {
+      const picked = [...form.querySelectorAll('input[name="service_ids[]"]:checked')];
+      if (!picked.length) { box.classList.add('hidden'); return; }
+
+      const rials   = picked.reduce((t, i) => t + (+i.dataset.price), 0);
+      const minutes = picked.reduce((t, i) => t + (+i.dataset.minutes), 0);
+
+      sum.textContent = fa(Math.round(rials / 10).toLocaleString('en-US')) + ' تومان';
+      dur.textContent = fa(minutes) + ' دقیقه';
+      box.classList.remove('hidden');
+    }
+
+    form.addEventListener('change', update);
+    update();
+  })();
+  </script>
 <?php endif; ?>

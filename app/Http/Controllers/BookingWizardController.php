@@ -12,6 +12,7 @@ use App\Core\Session;
 use App\Domain\Booking\BookingService;
 use App\Domain\Catalog\ServiceRepository;
 use App\Domain\Identity\OtpService;
+use App\Domain\Queue\QueueService;
 use App\Domain\Staff\StaffRepository;
 use App\Support\IranMobile;
 use App\Support\Jalali;
@@ -41,6 +42,8 @@ final class BookingWizardController extends Controller
             'title' => $salon['name'],
             'salon' => $salon,
             'services' => $services,
+            'step' => 1,
+            'liveStatus' => $this->liveStatus((int) $salon['id']),
         ]);
     }
 
@@ -76,6 +79,7 @@ final class BookingWizardController extends Controller
 
         return $this->page('layouts.booking', 'booking.staff', [
             'title' => 'انتخاب آرایشگر',
+            'step' => 2,
             'salon' => $salon,
             'staff' => $staff,
         ]);
@@ -141,6 +145,7 @@ final class BookingWizardController extends Controller
 
         return $this->page('layouts.booking', 'booking.slots', [
             'title' => 'انتخاب زمان',
+            'step' => 3,
             'salon' => $salon,
             'calendar' => JalaliCalendar::month($viewYear, $viewMonth, $dayStates),
             'minMonth' => ['year' => $todayJy, 'month' => $todayJm],
@@ -148,6 +153,90 @@ final class BookingWizardController extends Controller
             'selectedDateLabel' => JalaliCalendar::relativeDate($date),
             'slots' => array_keys($slotsByTime),
         ]);
+    }
+
+    /**
+     * وضعیت لحظه‌ای سالن برای نمایش در صفحهٔ اول.
+     *
+     * این جواب سؤالی است که مشتری واقعاً در ذهن دارد: «الان برم یا
+     * شلوغه؟» — و چیزی است که رقبا نمی‌توانند داشته باشند، چون دادهٔ
+     * لحظه‌ای صف را ندارند.
+     *
+     * @return array{open:bool,waiting:int,freeNow:int,chairs:int,waitLabel:string}
+     */
+    private function liveStatus(int $salonId): array
+    {
+        $snapshot = (new QueueService())->salonSnapshot($salonId);
+
+        $chairs = count($snapshot);
+        $waiting = 0;
+        $freeNow = 0;
+        $soonest = null;
+
+        foreach ($snapshot as $chair) {
+            $queue = $chair['queue'] ?? [];
+            $waiting += count(array_filter(
+                $queue,
+                static fn (array $a): bool => ($a['status'] ?? '') === 'queued'
+            ));
+
+            if ($queue === []) {
+                $freeNow++;
+                continue;
+            }
+
+            /*
+             * سؤال مشتری این است: «اگر الان بیایم، کِی روی صندلی
+             * می‌نشینم؟» — نه اینکه نفر آخرِ صف کِی شروع می‌کند.
+             *
+             * پس باید زمانِ **پایانِ** کار نفر آخر را حساب کرد، نه
+             * زمان شروعش. (اولین نسخه شروع را گرفت و نتیجه «۰ دقیقه
+             * انتظار» شد درحالی‌که سه نفر در صف بودند.)
+             */
+            $last = end($queue);
+            $startsAt = $last['eta']['start_p50'] ?? null;
+            $duration = (int) ($last['eta']['expected_p50'] ?? 30);
+
+            if ($startsAt instanceof DateTimeImmutable) {
+                $freeAt = $startsAt->modify('+' . $duration . ' minutes');
+                if ($soonest === null || $freeAt < $soonest) {
+                    $soonest = $freeAt;
+                }
+            }
+        }
+
+        $label = 'تخمین انتظار در دسترس نیست';
+        if ($soonest !== null) {
+            $minutes = (int) round(($soonest->getTimestamp() - time()) / 60);
+            $label = $minutes <= 5
+                ? 'تقریباً بدون انتظار'
+                : 'حدود ' . Jalali::toPersianDigits((string) $minutes) . ' دقیقه انتظار';
+        }
+
+        return [
+            'open' => $this->isOpenNow($salonId),
+            'waiting' => $waiting,
+            'freeNow' => $freeNow,
+            'chairs' => $chairs,
+            'waitLabel' => $label,
+        ];
+    }
+
+    /** آیا الان ساعت کاری است؟ */
+    private function isOpenNow(int $salonId): bool
+    {
+        $now = new DateTimeImmutable();
+        $weekday = Jalali::weekday($now);
+
+        $row = DB::selectOne(
+            'SELECT 1 AS ok FROM working_hours
+              WHERE salon_id = ? AND weekday = ? AND is_closed = 0
+                AND ? BETWEEN opens_at AND closes_at
+              LIMIT 1',
+            [$salonId, $weekday, $now->format('H:i:s')]
+        );
+
+        return $row !== null;
     }
 
     /**
@@ -218,6 +307,7 @@ final class BookingWizardController extends Controller
 
         return $this->page('layouts.booking', 'booking.phone', [
             'title' => 'شمارهٔ موبایل',
+            'step' => 4,
             'salon' => $salon,
         ]);
     }

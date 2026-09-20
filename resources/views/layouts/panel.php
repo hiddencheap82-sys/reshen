@@ -39,10 +39,9 @@ $icon = function (string $name, string $class = 'w-5 h-5') {
 <link rel="manifest" href="<?= url('manifest.webmanifest') ?>">
 <link rel="icon" href="<?= asset('icons/icon.svg') ?>" type="image/svg+xml">
 <link rel="apple-touch-icon" href="<?= asset('icons/icon.svg') ?>">
-<meta name="theme-color" content="#2563eb">
+<meta name="theme-color" content="#1C1917">
 <style>
-  body{font-family:'Vazirmatn','Tahoma',sans-serif;}
-  .nav-active{ background:#eff6ff; color:#1d4ed8; font-weight:700; }
+  .nav-active{ background:#FEFCE8; color:#854D0E; font-weight:700; }
 </style>
 <script>
   if ('serviceWorker' in navigator) {
@@ -50,34 +49,34 @@ $icon = function (string $name, string $class = 'w-5 h-5') {
   }
 </script>
 </head>
-<body class="bg-slate-50 text-slate-900 antialiased">
+<body class="antialiased">
 
 <div class="flex min-h-screen">
   <!-- Desktop sidebar -->
-  <aside class="hidden md:flex md:flex-col w-60 shrink-0 border-l border-slate-200 bg-white">
-    <div class="h-16 flex items-center gap-2 px-5 border-b border-slate-100">
-      <div class="w-9 h-9 rounded-xl bg-brand-600 text-white flex items-center justify-center font-bold">ر</div>
+  <aside class="hidden md:flex md:flex-col w-60 shrink-0 border-l border-ink-200 bg-white">
+    <div class="h-16 flex items-center gap-2 px-5 border-b border-ink-100">
+      <div class="w-9 h-9 rounded-xl bg-ink-900 text-white flex items-center justify-center font-bold">ر</div>
       <div>
         <div class="font-bold text-sm leading-tight"><?= e($salonName ?? 'رشن') ?></div>
-        <div class="text-[11px] text-slate-400"><?= e(['owner'=>'صاحب سالن','manager'=>'مدیر','staff'=>'آرایشگر','reception'=>'پذیرش'][$role] ?? '') ?></div>
+        <div class="text-[11px] text-ink-400"><?= e(['owner'=>'صاحب سالن','manager'=>'مدیر','staff'=>'آرایشگر','reception'=>'پذیرش'][$role] ?? '') ?></div>
       </div>
     </div>
     <nav class="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
       <?php foreach ($visibleNav as $item): $active = str_starts_with($currentPath, url($item['href'] === '/panel' ? '/panel' : $item['href'])) && ($item['href']!=='/panel' || $currentPath===rtrim(url('/panel'),'/')); ?>
-      <a href="<?= url($item['href']) ?>" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-600 hover:bg-slate-50 <?= $active ? 'nav-active' : '' ?>">
+      <a href="<?= url($item['href']) ?>" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-ink-600 hover:bg-ink-50 <?= $active ? 'nav-active' : '' ?>">
         <?= $icon($item['icon']) ?>
         <span><?= e($item['label']) ?></span>
       </a>
       <?php endforeach; ?>
     </nav>
-    <div class="p-3 border-t border-slate-100">
+    <div class="p-3 border-t border-ink-100">
       <?php if (Auth::isPlatformAdmin()): ?>
       <a href="<?= url('platform') ?>" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-amber-600 hover:bg-amber-50">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         پنل پلتفرم
       </a>
       <?php endif; ?>
-      <a href="<?= url('logout') ?>" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-500 hover:bg-slate-50">
+      <a href="<?= url('logout') ?>" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-ink-500 hover:bg-ink-50">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
         خروج
       </a>
@@ -87,12 +86,19 @@ $icon = function (string $name, string $class = 'w-5 h-5') {
   <!-- Main column -->
   <div class="flex-1 flex flex-col min-w-0">
     <!-- Mobile top bar -->
-    <header class="md:hidden sticky top-0 z-20 h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4">
+    <header class="md:hidden sticky top-0 z-20 h-14 bg-white border-b border-ink-200 flex items-center justify-between px-4">
       <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center font-bold text-sm">ر</div>
+        <div class="w-8 h-8 rounded-lg bg-ink-900 text-white flex items-center justify-center font-bold text-sm">ر</div>
         <span class="font-bold text-sm"><?= e($salonName ?? 'رشن') ?></span>
       </div>
-      <a href="<?= url('logout') ?>" class="text-slate-400">
+      <!--
+        خروج: پیش از این یک آیکون ۲۰×۲۰ بدون نام دسترس‌پذیر بود — صفحه‌خوان
+        فقط «لینک» می‌خواند و انگشت هم به‌سختی می‌گرفتش.
+      -->
+      <a href="<?= e(url('logout')) ?>" aria-label="خروج از حساب" title="خروج"
+         class="w-11 h-11 grid place-items-center rounded-xl text-ink-500
+                hover:bg-ink-100 transition-colors cursor-pointer
+                focus-visible:outline-2 focus-visible:outline-ink-400">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
       </a>
     </header>
@@ -110,16 +116,19 @@ $icon = function (string $name, string $class = 'w-5 h-5') {
       <div class="bg-red-50 text-red-700 text-sm px-4 py-2.5 border-b border-red-100"><?= e($error) ?></div>
     <?php endif; ?>
 
-    <main class="flex-1 p-4 md:p-6 pb-24 md:pb-6">
+    <main class="flex-1 p-4 md:p-6 md:pb-6"
+          style="padding-bottom:calc(5.5rem + env(safe-area-inset-bottom,0px))">
       <?= $content ?>
     </main>
   </div>
 </div>
 
 <!-- Mobile bottom nav -->
-<nav class="md:hidden fixed bottom-0 inset-x-0 z-20 bg-white border-t border-slate-200 flex items-stretch h-16 px-1">
+<nav class="md:hidden fixed bottom-0 inset-x-0 z-20 flex items-stretch h-16 px-1 border-t"
+     style="background:var(--surface);border-color:var(--line);padding-bottom:env(safe-area-inset-bottom,0px)"
+     aria-label="ناوبری اصلی">
   <?php foreach (array_slice($visibleNav, 0, 5) as $item): $active = $currentPath===rtrim(url($item['href']),'/') || ($item['href']==='/panel' && $currentPath===rtrim(url('/panel'),'/')); ?>
-  <a href="<?= url($item['href']) ?>" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] <?= $active ? 'text-brand-600' : 'text-slate-400' ?>">
+  <a href="<?= url($item['href']) ?>" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] <?= $active ? 'text-gold-700' : 'text-ink-400' ?>">
     <?= $icon($item['icon'], 'w-5 h-5') ?>
     <span><?= e($item['label']) ?></span>
   </a>
