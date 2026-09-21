@@ -1,21 +1,65 @@
-<?php /** @var array $salon */ ?>
-<h1 class="text-[15px] font-extrabold text-ink-900 mb-1">شمارهٔ موبایل</h1>
-<p class="text-sm text-ink-500 mb-5">برای تأیید نهایی نوبت، شماره‌تان را وارد کنید. نیاز به نصب یا رمز نیست.</p>
+<?php
+/**
+ * آخرین گام رزرو.
+ *
+ * @var array $salon
+ * @var bool $needsVerification
+ * @var ?array $summary  خلاصهٔ انتخاب‌ها
+ */
+?>
+<h1 class="text-[15px] font-extrabold text-ink-900 mb-1">شمارهٔ تماست را بگو</h1>
+<p class="text-[13px] text-ink-500 mb-4 leading-relaxed">
+  <?php if ($needsVerification): ?>
+    یک کد برایت پیامک می‌شود تا نوبت قطعی شود.
+  <?php else: ?>
+    همین یک قدم مانده. نه ثبت‌نام لازم است، نه رمز.
+  <?php endif; ?>
+</p>
 
 <?php if ($error = flash('error')): ?>
-<div class="bg-red-50 text-red-700 text-sm rounded-lg px-3 py-2 mb-4 border border-red-100"><?= e($error) ?></div>
+  <div role="alert"
+       class="flex items-start gap-2 bg-red-50 text-red-800 text-[13px] rounded-xl px-4 py-3 mb-4 border border-red-100">
+    <?= icon('alert', 'w-4 h-4 mt-0.5 shrink-0') ?>
+    <span><?= e($error) ?></span>
+  </div>
 <?php endif; ?>
 
-<form method="post" action="<?= url('s/' . $salon['slug'] . '/phone') ?>" class="space-y-4">
+<?php if (!empty($summary)): ?>
+  <!-- خلاصهٔ انتخاب‌ها: مشتری پیش از دادن شماره باید ببیند چه چیزی را
+       تأیید می‌کند، نه اینکه از حافظه‌اش یاد بیاورد. -->
+  <div class="glass rounded-2xl p-4 mb-4 space-y-2">
+    <?php foreach ($summary as $label => $value): ?>
+      <div class="flex items-baseline justify-between gap-3 text-[12.5px]">
+        <span class="text-ink-400 shrink-0"><?= e($label) ?></span>
+        <span class="font-bold text-ink-800 text-left"><?= e($value) ?></span>
+      </div>
+    <?php endforeach; ?>
+  </div>
+<?php endif; ?>
+
+<form method="post" action="<?= e(url('s/' . $salon['slug'] . '/phone')) ?>" class="space-y-3">
   <?= csrf_field() ?>
+
   <div>
-    <label class="block text-sm text-ink-600 mb-1.5">نام (اختیاری)</label>
-    <input type="text" name="name" class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent">
+    <label for="bk-phone" class="block text-[12px] font-bold text-ink-600 mb-1.5">شمارهٔ موبایل</label>
+    <input type="tel" name="phone" id="bk-phone" required dir="ltr" autofocus
+           inputmode="numeric" autocomplete="tel" placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+           class="w-full h-12 rounded-xl border border-ink-200 bg-transparent px-4 text-left text-[17px]
+                  tracking-wider tabular-nums focus:outline-none focus:ring-2 focus:ring-accent">
+    <p class="text-[11px] text-ink-400 mt-1.5">برای یادآوری نوبت و خبر دادن وقتی نوبتت نزدیک شد.</p>
   </div>
+
   <div>
-    <label class="block text-sm text-ink-600 mb-1.5">شمارهٔ موبایل</label>
-    <input type="tel" name="phone" required dir="ltr" placeholder="۰۹۱۲۳۴۵۶۷۸۹" autofocus
-      class="w-full rounded-xl border border-ink-200 px-4 py-3 text-left text-lg tracking-wider focus:outline-none focus:ring-2 focus:ring-accent">
+    <label for="bk-name" class="block text-[12px] font-bold text-ink-600 mb-1.5">
+      نام <span class="font-normal text-ink-400">(اختیاری)</span>
+    </label>
+    <input type="text" name="name" id="bk-name" autocomplete="name"
+           class="w-full h-12 rounded-xl border border-ink-200 bg-transparent px-4 text-[14px]
+                  focus:outline-none focus:ring-2 focus:ring-accent">
   </div>
-  <button type="submit" class="btn-ink w-full">ارسال کد تأیید</button>
+
+  <button type="submit" class="btn-accent metal w-full mt-1">
+    <?= $needsVerification ? 'ارسال کد تأیید' : 'ثبت نوبت' ?>
+    <?= icon('chevron-end', 'w-4 h-4') ?>
+  </button>
 </form>

@@ -18,37 +18,91 @@ use App\Core\DB;
  */
 final class DurationEstimator
 {
+    /*
+     * حافظهٔ درون‌درخواستی.
+     *
+     * آبشار تخمین تا سه کوئری برای هر جفتِ (آرایشگر، خدمت) می‌زند. در
+     * یک صف، همان چند خدمت بارها تکرار می‌شوند — ده نفر با «اصلاح مو»
+     * یعنی سی کوئریِ یکسان. نتیجه در طول یک درخواست عوض نمی‌شود.
+     *
+     * @var array<string,array{p50:float,p80:float,source:string}>
+     */
+    private static array $memo = [];
+
     /** @return array{p50:float,p80:float,source:string} minutes */
     public function forStaffService(int $staffId, int $serviceId): array
     {
-        $minSamples = (int) Config::get('reshen.estimation.min_samples_for_learning', 8);
-
-        $stats = DB::selectOne(
-            'SELECT sample_count, p50_minutes, p80_minutes FROM duration_stats WHERE staff_id = ? AND service_id = ?',
-            [$staffId, $serviceId]
-        );
-
-        if ($stats !== null && (int) $stats['sample_count'] >= $minSamples) {
-            return ['p50' => (float) $stats['p50_minutes'], 'p80' => (float) $stats['p80_minutes'], 'source' => 'learned'];
+        $key = $staffId . ':' . $serviceId;
+        if (isset(self::$memo[$key])) {
+            return self::$memo[$key];
         }
 
-        $override = DB::selectOne(
-            'SELECT duration_minutes FROM staff_service WHERE staff_id = ? AND service_id = ? AND duration_minutes IS NOT NULL',
-            [$staffId, $serviceId]
+        return self::$memo[$key] = $this->resolve($staffId, $serviceId);
+    }
+
+    /** کشِ درون‌درخواستی را خالی می‌کند — برای تست، که چند سناریو پشت سر هم دارد. */
+    public static function flushCache(): void
+    {
+        self::$memo = [];
+    }
+
+    /** @return array{p50:float,p80:float,source:string} */
+    /**
+     * آبشار تخمین، در یک کوئری.
+     *
+     * سه پرسش پشت سر هم بود (آمار یادگرفته‌شده، عدد اختصاصی آرایشگر،
+     * عدد اسمی خدمت) و هر کدام یک رفت‌وبرگشت. صفحهٔ صف که هر ۱۵ ثانیه
+     * تازه می‌شود، همین را برای هر جفتِ آرایشگر-خدمت تکرار می‌کرد.
+     *
+     * ترتیب اولویت همان است؛ فقط به‌جای سه پرسشِ متوالی، یک LEFT JOIN
+     * هر سه را می‌آورد و تصمیم در PHP گرفته می‌شود.
+     *
+     * @return array{p50:float,p80:float,source:string}
+     */
+    private function resolve(int $staffId, int $serviceId): array
+    {
+        $minSamples = (int) Config::get('reshen.estimation.min_samples_for_learning', 8);
+
+        $row = DB::selectOne(
+            'SELECT sv.duration_minutes          AS nominal,
+                    ss.duration_minutes          AS staff_override,
+                    ds.sample_count              AS samples,
+                    ds.p50_minutes               AS learned_p50,
+                    ds.p80_minutes               AS learned_p80
+             FROM services sv
+             LEFT JOIN staff_service ss
+                    ON ss.service_id = sv.id AND ss.staff_id = ?
+             LEFT JOIN duration_stats ds
+                    ON ds.service_id = sv.id AND ds.staff_id = ?
+             WHERE sv.id = ?',
+            [$staffId, $staffId, $serviceId]
         );
-        if ($override !== null) {
-            $m = (float) $override['duration_minutes'];
+
+        // ۱. آنچه از مدت‌های واقعی یاد گرفته‌ایم — وقتی نمونهٔ کافی هست
+        if ($row !== null && $row['samples'] !== null && (int) $row['samples'] >= $minSamples
+            && $row['learned_p50'] !== null) {
+            return [
+                'p50' => (float) $row['learned_p50'],
+                'p80' => (float) $row['learned_p80'],
+                'source' => 'learned',
+            ];
+        }
+
+        // ۲. عددی که خود آرایشگر برای این خدمت گذاشته
+        if ($row !== null && $row['staff_override'] !== null) {
+            $m = (float) $row['staff_override'];
 
             return ['p50' => $m, 'p80' => $m * 1.3, 'source' => 'staff_override'];
         }
 
-        $service = DB::selectOne('SELECT duration_minutes FROM services WHERE id = ?', [$serviceId]);
-        if ($service !== null) {
-            $m = (float) $service['duration_minutes'];
+        // ۳. عدد اسمی خدمت
+        if ($row !== null && $row['nominal'] !== null) {
+            $m = (float) $row['nominal'];
 
             return ['p50' => $m, 'p80' => $m * 1.3, 'source' => 'nominal'];
         }
 
+        // ۴. آخرین پناه
         $fallback = (float) Config::get('reshen.estimation.fallback_minutes', 30);
 
         return ['p50' => $fallback, 'p80' => $fallback * 1.3, 'source' => 'fallback'];

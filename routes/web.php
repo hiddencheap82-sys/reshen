@@ -23,6 +23,12 @@ $router->get('/login', [AuthController::class, 'showLogin']);
 $router->get('/login/verify', [AuthController::class, 'showVerify']);
 $router->get('/logout', [AuthController::class, 'logout']);
 
+/*
+ * ورود با لینک یک‌بارمصرف (ت-۳۶). فقط توکنی که از روی سرور ساخته شده
+ * کار می‌کند؛ هیچ راهی برای درخواستِ لینک از وب نیست.
+ */
+$router->get('/login/link/{token}', [AuthController::class, 'loginWithLink']);
+
 $router->group(['middleware' => [VerifyCsrf::class]], function ($router) {
     $router->post('/login', [AuthController::class, 'sendOtp']);
     $router->post('/login/verify', [AuthController::class, 'verify']);

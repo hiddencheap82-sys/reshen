@@ -112,6 +112,38 @@ final class AppointmentRepository
         );
     }
 
+    /**
+     * خدمت‌های چند نوبت، در یک کوئری.
+     *
+     * صفحهٔ صف هر ۱۵ ثانیه تازه می‌شود و برای هر نفرِ صف یک بار
+     * itemsFor() صدا می‌زد. با ۳۰ نفر یعنی ۳۰ کوئریِ اضافه در هر
+     * تازه‌سازی.
+     *
+     * @param int[] $appointmentIds
+     * @return array<int,array<int,array>> کلید: شناسهٔ نوبت
+     */
+    public function itemsForMany(int $salonId, array $appointmentIds): array
+    {
+        if ($appointmentIds === []) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($appointmentIds), '?'));
+        $rows = DB::select(
+            "SELECT ai.*, sv.name AS service_name FROM appointment_items ai
+             JOIN services sv ON sv.id = ai.service_id
+             WHERE ai.salon_id = ? AND ai.appointment_id IN ({$placeholders})",
+            array_merge([$salonId], $appointmentIds)
+        );
+
+        $byAppointment = [];
+        foreach ($rows as $row) {
+            $byAppointment[(int) $row['appointment_id']][] = $row;
+        }
+
+        return $byAppointment;
+    }
+
     public function create(int $salonId, array $data): int
     {
         $data['salon_id'] = $salonId;

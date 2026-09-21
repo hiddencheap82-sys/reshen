@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Core\DB;
 use App\Core\Config;
+use App\Core\DB;
 use App\Core\Request;
 use App\Core\Response;
 use App\Core\Session;
+use App\Domain\Booking\BookingGuard;
 use App\Domain\Booking\BookingService;
 use App\Domain\Catalog\ServiceRepository;
 use App\Domain\Identity\OtpService;
 use App\Domain\Queue\QueueService;
 use App\Domain\Staff\StaffRepository;
+use App\Support\Clock;
 use App\Support\IranMobile;
 use App\Support\Jalali;
 use App\Support\JalaliCalendar;
@@ -323,6 +325,17 @@ final class BookingWizardController extends Controller
             $name = trim((string) $request->input('name', ''));
             $this->setWizard($salon['slug'], ['phone' => $phone->e164, 'name' => $name ?: null]);
 
+            /*
+             * پیش‌فرض: بدون کد تأیید، نوبت همین‌جا ثبت می‌شود (ت-۳۵).
+             *
+             * هر گام اضافه بخشی از مشتری‌ها را می‌ریزد، و کد تأیید یعنی
+             * از برنامه بیرون برو و برگرد. جای آن را BookingGuard
+             * می‌گیرد.
+             */
+            if (!Config::get('reshen.booking.verify_phone', false)) {
+                return $this->finishBooking($salon, $request);
+            }
+
             $result = (new OtpService())->request($phone, 'booking');
             if (!$result['ok']) {
                 return $this->withError($result['error'] ?? 'خطا در ارسال پیامک', '/s/' . $salon['slug'] . '/phone');
@@ -335,6 +348,8 @@ final class BookingWizardController extends Controller
             'title' => 'شمارهٔ موبایل',
             'step' => 4,
             'salon' => $salon,
+            'needsVerification' => (bool) Config::get('reshen.booking.verify_phone', false),
+            'summary' => $this->wizardSummary($salon, $wizard),
         ]);
     }
 
@@ -354,23 +369,7 @@ final class BookingWizardController extends Controller
                 return $this->withError($result['error'] ?? 'کد نامعتبر است.', '/s/' . $salon['slug'] . '/verify');
             }
 
-            try {
-                $appointment = (new BookingService())->createBooking(
-                    (int) $salon['id'],
-                    $wizard['staff_id'] ?? null,
-                    $wizard['service_ids'],
-                    new DateTimeImmutable($wizard['date']),
-                    $wizard['time'],
-                    $wizard['phone'],
-                    $wizard['name'] ?? null,
-                );
-            } catch (RuntimeException $e) {
-                return $this->withError($e->getMessage(), '/s/' . $salon['slug'] . '/slots');
-            }
-
-            Session::forget($this->wizardKey($salon['slug']));
-
-            return $this->redirect('/q/' . $appointment['public_token']);
+            return $this->finishBooking($salon, $request);
         }
 
         return $this->page('layouts.booking', 'booking.verify', [
@@ -379,6 +378,96 @@ final class BookingWizardController extends Controller
             'phone' => $wizard['phone'],
             'debugLine' => OtpService::devHint($wizard['phone']),
         ]);
+    }
+
+    /**
+     * ثبت نهایی نوبت — مسیر مشترکِ با و بدون کد تأیید.
+     *
+     * هر دو راه به اینجا می‌رسند تا منطقِ ساخت نوبت یک جا بماند. اگر
+     * دو نسخه می‌داشت، روزی یکی‌شان اصلاح می‌شد و دیگری نه.
+     */
+    /**
+     * خلاصهٔ انتخاب‌ها برای آخرین گام.
+     *
+     * مشتری پیش از دادن شماره باید ببیند چه چیزی را تأیید می‌کند. سه
+     * صفحه قبل خدمت را انتخاب کرده و یادش نیست — و اگر اشتباه باشد،
+     * پس از ثبت می‌فهمد که دیرِ کار است.
+     *
+     * @return array<string,string>
+     */
+    private function wizardSummary(array $salon, array $wizard): array
+    {
+        if (empty($wizard['date']) || empty($wizard['time'])) {
+            return [];
+        }
+
+        $summary = [];
+
+        if (!empty($wizard['service_ids'])) {
+            $repo = new ServiceRepository();
+            $names = [];
+            $total = 0;
+            foreach ($wizard['service_ids'] as $id) {
+                $service = $repo->find((int) $salon['id'], (int) $id);
+                if ($service !== null) {
+                    $names[] = $service['name'];
+                    $total += (int) $service['price'];
+                }
+            }
+            if ($names !== []) {
+                $summary['خدمت'] = implode('، ', $names);
+                $summary['هزینه'] = toman($total);
+            }
+        }
+
+        if (!empty($wizard['staff_id'])) {
+            $staff = DB::selectOne('SELECT name FROM staff WHERE id = ? AND salon_id = ?', [$wizard['staff_id'], $salon['id']]);
+            if ($staff !== null) {
+                $summary['آرایشگر'] = $staff['name'];
+            }
+        }
+
+        $date = new DateTimeImmutable($wizard['date']);
+        $summary['زمان'] = JalaliCalendar::relativeDate($date) . '، ساعت ' . Clock::hm($wizard['time']);
+
+        return $summary;
+    }
+
+    private function finishBooking(array $salon, Request $request): Response
+    {
+        $slug = $salon['slug'];
+        $wizard = $this->wizard($slug);
+
+        if (empty($wizard['phone']) || empty($wizard['date']) || empty($wizard['time'])) {
+            return $this->redirect('/s/' . $slug);
+        }
+
+        // حفاظ ضدِ سوءاستفاده — جای کاری که کد تأیید می‌کرد
+        $guard = (new BookingGuard())->check((int) $salon['id'], $wizard['phone'], $request->ip());
+        if (!$guard['ok']) {
+            return $this->withError($guard['error'], '/s/' . $slug . '/phone');
+        }
+
+        try {
+            $appointment = (new BookingService())->createBooking(
+                (int) $salon['id'],
+                $wizard['staff_id'] ?? null,
+                $wizard['service_ids'],
+                new DateTimeImmutable($wizard['date']),
+                $wizard['time'],
+                $wizard['phone'],
+                $wizard['name'] ?? null,
+                $request->ip(),
+            );
+        } catch (RuntimeException $e) {
+            // سانس بین انتخاب و ثبت پر شده — به مرحلهٔ زمان برگرد،
+            // نه به اول، تا انتخاب خدمت از دست نرود.
+            return $this->withError($e->getMessage(), '/s/' . $slug . '/slots');
+        }
+
+        Session::forget($this->wizardKey($slug));
+
+        return $this->redirect('/q/' . $appointment['public_token']);
     }
 
     private function salonOrFail(string $slug): ?array

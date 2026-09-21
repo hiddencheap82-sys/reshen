@@ -44,11 +44,19 @@ final class EtaEngine
         $cursorP80 = $now;
         $position = 0;
 
+        /*
+         * خدمت‌ها و مشتری‌ها را **یک‌جا** می‌گیریم، نه به‌ازای هر نوبت.
+         *
+         * صفحهٔ صف هر ۱۵ ثانیه تازه می‌شود. با کوئری به‌ازای نوبت، یک
+         * سالن شلوغ با ۳۰ نفر در صف، هر ۱۵ ثانیه بیش از صد کوئری
+         * می‌زد — روی هاست اشتراکی همین کافی است که صفحه کند شود.
+         */
+        [$itemsByAppointment, $customersById] = $this->preload($orderedAppointments);
+
         foreach ($orderedAppointments as $appt) {
-            $items = DB::select('SELECT service_id FROM appointment_items WHERE appointment_id = ?', [$appt['id']]);
-            $serviceIds = array_map(static fn ($r) => (int) $r['service_id'], $items);
+            $serviceIds = $itemsByAppointment[(int) $appt['id']] ?? [];
             $customer = $appt['staff_id'] !== null
-                ? DB::selectOne('SELECT id, duration_factor FROM customers WHERE id = ?', [$appt['customer_id']])
+                ? ($customersById[(int) $appt['customer_id']] ?? null)
                 : null;
 
             $expected = $serviceIds !== [] && $appt['staff_id'] !== null
@@ -91,6 +99,46 @@ final class EtaEngine
         }
 
         return $results;
+    }
+
+    /**
+     * خدمت‌های هر نوبت و مشتری‌های صف، در دو کوئری.
+     *
+     * @param array<int,array> $appointments
+     * @return array{0:array<int,int[]>,1:array<int,array>}
+     */
+    private function preload(array $appointments): array
+    {
+        if ($appointments === []) {
+            return [[], []];
+        }
+
+        $appointmentIds = array_map(static fn ($a) => (int) $a['id'], $appointments);
+        $customerIds = array_values(array_unique(array_filter(
+            array_map(static fn ($a) => (int) $a['customer_id'], $appointments)
+        )));
+
+        $items = [];
+        $placeholders = implode(',', array_fill(0, count($appointmentIds), '?'));
+        foreach (DB::select(
+            "SELECT appointment_id, service_id FROM appointment_items WHERE appointment_id IN ({$placeholders})",
+            $appointmentIds
+        ) as $row) {
+            $items[(int) $row['appointment_id']][] = (int) $row['service_id'];
+        }
+
+        $customers = [];
+        if ($customerIds !== []) {
+            $placeholders = implode(',', array_fill(0, count($customerIds), '?'));
+            foreach (DB::select(
+                "SELECT id, duration_factor FROM customers WHERE id IN ({$placeholders})",
+                $customerIds
+            ) as $row) {
+                $customers[(int) $row['id']] = $row;
+            }
+        }
+
+        return [$items, $customers];
     }
 
     /** Human display text per doc 8.6 "قواعد نمایش". */

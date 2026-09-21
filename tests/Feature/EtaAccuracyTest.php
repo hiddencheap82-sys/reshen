@@ -260,6 +260,17 @@ final class EtaAccuracyTest extends TestCase
      */
     private function runDay(array $plan, float $turnoverMinutes = 3.0, bool $resetQueue = true): array
     {
+        /*
+         * کشِ درون‌درخواستی را خالی کن.
+         *
+         * در یک درخواست واقعی، ساعت کاری و آمار مدت وسط کار عوض
+         * نمی‌شوند و کش درست است. ولی این تست دو «روز» پشت سر هم
+         * می‌سازد و بینشان به موتور چیزی یاد می‌دهد — بدون این خط،
+         * روز دوم با حافظهٔ روز اول کار می‌کند و یادگیری دیده نمی‌شود.
+         */
+        \App\Domain\Queue\DurationEstimator::flushCache();
+        \App\Domain\Booking\BookingService::flushCache();
+
         if ($resetQueue) {
             DB::statement('SET FOREIGN_KEY_CHECKS=0');
             DB::statement('DELETE FROM appointment_items WHERE 1');

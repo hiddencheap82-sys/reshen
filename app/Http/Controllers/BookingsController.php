@@ -149,6 +149,7 @@ final class BookingsController extends Controller
                 $time,
                 $phone,
                 $name !== '' ? $name : null,
+                $request->ip(),
             );
         } catch (RuntimeException $e) {
             return $this->withError($e->getMessage(), '/panel/bookings/new');

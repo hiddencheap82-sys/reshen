@@ -97,6 +97,39 @@ final class Request
         return $_FILES[$key] ?? null;
     }
 
+    /**
+     * IP مشتری.
+     *
+     * روی cPanel، سایت معمولاً پشت یک پراکسی یا CDN (آروان، ابرآروان)
+     * است و REMOTE_ADDR آدرسِ خودِ پراکسی را می‌دهد — یعنی همهٔ
+     * بازدیدکننده‌ها یک IP می‌شوند و محدودیت نرخ، همه را با هم می‌بندد.
+     *
+     * پس سرآیندهای پراکسی هم خوانده می‌شوند. اولین مقدارِ
+     * X-Forwarded-For، IP واقعی کاربر است.
+     *
+     * نکته: این سرآیندها جعل‌شدنی‌اند. برای محدودیت نرخ کافی است (بدترین
+     * حالت، مهاجم سقف خودش را دور می‌زند که با شمارش بر اساس شماره هم
+     * گرفته می‌شود)، ولی هرگز نباید مبنای **مجوز دسترسی** شود.
+     */
+    public function ip(): ?string
+    {
+        foreach (['HTTP_CF_CONNECTING_IP', 'HTTP_X_REAL_IP', 'HTTP_X_FORWARDED_FOR'] as $header) {
+            $value = $_SERVER[$header] ?? '';
+            if ($value === '') {
+                continue;
+            }
+
+            $first = trim(explode(',', (string) $value)[0]);
+            if (filter_var($first, FILTER_VALIDATE_IP) !== false) {
+                return $first;
+            }
+        }
+
+        $remote = $_SERVER['REMOTE_ADDR'] ?? '';
+
+        return filter_var($remote, FILTER_VALIDATE_IP) !== false ? $remote : null;
+    }
+
     public function header(string $key): ?string
     {
         $normalized = 'HTTP_' . strtoupper(str_replace('-', '_', $key));

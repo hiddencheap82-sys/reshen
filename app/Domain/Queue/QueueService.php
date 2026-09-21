@@ -180,6 +180,11 @@ final class QueueService
             $ordered = $this->ordering->order($appts, $now);
             $etas = $this->eta->computeForStaffQueue($ordered, $now);
 
+            $itemsByAppointment = $this->appointments->itemsForMany(
+                $salonId,
+                array_map(static fn ($a) => (int) $a['id'], $ordered)
+            );
+
             $rows = [];
             foreach ($ordered as $appt) {
                 $e = $etas[(int) $appt['id']] ?? null;
@@ -187,7 +192,7 @@ final class QueueService
                 $rows[] = array_merge($appt, [
                     'eta' => $e,
                     'display' => $display,
-                    'items' => $this->appointments->itemsFor($salonId, (int) $appt['id']),
+                    'items' => $itemsByAppointment[(int) $appt['id']] ?? [],
                 ]);
             }
 

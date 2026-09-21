@@ -15,6 +15,11 @@ final class DB
 {
     private static ?PDO $pdo = null;
 
+    private static bool $profiling = false;
+
+    /** @var array<int,array{sql:string,ms:float}> */
+    private static array $queryLog = [];
+
     public static function connection(): PDO
     {
         if (self::$pdo === null) {
@@ -38,10 +43,45 @@ final class DB
 
     public static function statement(string $sql, array $bindings = []): PDOStatement
     {
+        if (!self::$profiling) {
+            $stmt = self::connection()->prepare($sql);
+            $stmt->execute($bindings);
+
+            return $stmt;
+        }
+
+        $started = microtime(true);
         $stmt = self::connection()->prepare($sql);
         $stmt->execute($bindings);
+        self::$queryLog[] = [
+            'sql' => preg_replace('/\s+/', ' ', trim($sql)),
+            'ms' => (microtime(true) - $started) * 1000,
+        ];
 
         return $stmt;
+    }
+
+    /**
+     * ثبت کوئری‌ها برای پیدا کردن کوئریِ تکراری (N+1).
+     *
+     * پیش‌فرض خاموش است و در مسیر داغ حتی یک شرط بیشتر هزینه ندارد.
+     * فقط با ابزار سنجش روشن می‌شود، نه در تولید.
+     */
+    public static function startProfiling(): void
+    {
+        self::$profiling = true;
+        self::$queryLog = [];
+    }
+
+    /** @return array<int,array{sql:string,ms:float}> */
+    public static function queryLog(): array
+    {
+        return self::$queryLog;
+    }
+
+    public static function stopProfiling(): void
+    {
+        self::$profiling = false;
     }
 
     public static function select(string $sql, array $bindings = []): array

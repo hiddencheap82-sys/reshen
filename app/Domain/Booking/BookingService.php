@@ -28,9 +28,9 @@ final class BookingService
     /** @return array<string,int[]> "H:i" => staff_ids free at that time, for the "any barber" option */
     public function freeSlots(int $salonId, ?int $staffId, DateTimeImmutable $date, int $durationMinutes): array
     {
-        $staffIds = $staffId !== null
-            ? [$staffId]
-            : array_column(DB::select('SELECT id FROM staff WHERE salon_id = ? AND is_active = 1', [$salonId]), 'id');
+        // تقویم برای هر روزِ ماه یک بار اینجا می‌آید؛ فهرست آرایشگرها
+        // در طول یک درخواست عوض نمی‌شود.
+        $staffIds = $staffId !== null ? [$staffId] : $this->activeStaffIds($salonId);
 
         $byTime = [];
         foreach ($staffIds as $sid) {
@@ -43,6 +43,29 @@ final class BookingService
         return $byTime;
     }
 
+    /** @var array<int,int[]> */
+    private static array $staffCache = [];
+
+    /** @return int[] */
+    private function activeStaffIds(int $salonId): array
+    {
+        if (!isset(self::$staffCache[$salonId])) {
+            self::$staffCache[$salonId] = array_map('intval', array_column(
+                DB::select('SELECT id FROM staff WHERE salon_id = ? AND is_active = 1 ORDER BY sort_order, id', [$salonId]),
+                'id'
+            ));
+        }
+
+        return self::$staffCache[$salonId];
+    }
+
+    /** کشِ درون‌درخواستی را خالی می‌کند — برای تست. */
+    public static function flushCache(): void
+    {
+        self::$staffCache = [];
+        SlotFinder::flushCache();
+    }
+
     /** @param int[] $serviceIds */
     public function createBooking(
         int $salonId,
@@ -52,6 +75,7 @@ final class BookingService
         string $time,
         string $phoneRaw,
         ?string $name,
+        ?string $ip = null,
     ): array {
         if ($serviceIds === []) {
             throw new RuntimeException('حداقل یک خدمت را انتخاب کنید.');
@@ -80,6 +104,8 @@ final class BookingService
             'kind' => 'booked',
             'status' => 'confirmed',
             'scheduled_at' => $scheduledAt->format('Y-m-d H:i:s'),
+            // برای محدودیت نرخ (ت-۳۵) — نه برای چیز دیگری
+            'created_ip' => $ip,
         ]);
 
         foreach ($serviceIds as $serviceId) {
