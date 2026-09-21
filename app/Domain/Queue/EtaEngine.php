@@ -114,6 +114,17 @@ final class EtaEngine
         }
 
         $appointmentIds = array_map(static fn ($a) => (int) $a['id'], $appointments);
+
+        /*
+         * سالن از خودِ نوبت‌ها گرفته می‌شود تا کوئریِ مشتری‌ها هم
+         * محدود به همان سالن باشد.
+         *
+         * تا الان امن بود ولی **به‌طور ضمنی**: شناسه‌ها از فهرستی
+         * می‌آمدند که خودش با salon_id فیلتر شده بود. اگر روزی کسی
+         * این متد را از جای دیگری صدا بزند، آن فرض بی‌صدا می‌شکند —
+         * و انزوای مستأجر چیزی نیست که به فرض بسپاریم.
+         */
+        $salonId = (int) ($appointments[array_key_first($appointments)]['salon_id'] ?? 0);
         $customerIds = array_values(array_unique(array_filter(
             array_map(static fn ($a) => (int) $a['customer_id'], $appointments)
         )));
@@ -128,11 +139,11 @@ final class EtaEngine
         }
 
         $customers = [];
-        if ($customerIds !== []) {
+        if ($customerIds !== [] && $salonId > 0) {
             $placeholders = implode(',', array_fill(0, count($customerIds), '?'));
             foreach (DB::select(
-                "SELECT id, duration_factor FROM customers WHERE id IN ({$placeholders})",
-                $customerIds
+                "SELECT id, duration_factor FROM customers WHERE salon_id = ? AND id IN ({$placeholders})",
+                array_merge([$salonId], $customerIds)
             ) as $row) {
                 $customers[(int) $row['id']] = $row;
             }
