@@ -23,13 +23,21 @@ use DateTimeImmutable;
 use RuntimeException;
 
 /**
- * The public, no-install booking wizard (doc 5.5): link -> service ->
- * staff (or "any") -> free slot on a Jalali calendar -> phone -> OTP ->
- * confirm -> SMS with the "my appointment" link. Target: under 60 seconds,
- * five taps, nothing to install.
+ * مسیر رزرو عمومی، بدون نصب و بدون حساب کاربری.
+ *
+ * ترتیب گام‌ها: روز -> سانس آزاد -> خدمت -> آرایشگر -> نام و شماره.
+ *
+ * چرا وقت اول می‌آید: چیزی که مشتری را سر دوراهی می‌گذارد «کِی
+ * می‌توانم بیایم؟» است، نه «چه خدمتی می‌خواهم» — آن را از قبل
+ * می‌داند. پس اول وقت قفل می‌شود، بعد جزئیات.
+ *
+ * سانس‌ها از طول سانسِ خود سالن ساخته می‌شوند، نه از مدت خدمت، چون
+ * موقع نمایششان هنوز خدمتی انتخاب نشده. جا شدن خدمت در سانس را پنل
+ * آرایشگاه بررسی می‌کند.
  */
 final class BookingWizardController extends Controller
 {
+    /** گام ۱ — روز و سانس. */
     public function landing(Request $request): Response
     {
         $salon = $this->salonOrFail((string) $request->param('slug'));
@@ -37,16 +45,33 @@ final class BookingWizardController extends Controller
             return Response::html('سالن یافت نشد.', 404);
         }
 
-        $services = (new ServiceRepository())->all((int) $salon['id'], true);
-        Session::forget($this->wizardKey($salon['slug']));
+        /*
+         * ورود تازه به صفحهٔ اول یعنی «از نو». ولی وقتی مشتری از گام
+         * بعد با دکمهٔ بازگشت برمی‌گردد تا روز را عوض کند، انتخاب
+         * خدمتش نباید بپرد — پس فقط روز و ساعت پاک می‌شوند.
+         */
+        $this->forgetWizard($salon['slug'], ['date', 'time']);
 
-        return $this->page('layouts.booking', 'booking.landing', [
-            'title' => $salon['name'],
-            'salon' => $salon,
-            'services' => $services,
-            'step' => 1,
-            'liveStatus' => $this->liveStatus((int) $salon['id']),
-        ]);
+        return $this->slotPicker($salon, $request, 1);
+    }
+
+    /** ثبت روز و سانسِ انتخاب‌شده و رفتن به گام خدمت. */
+    public function chooseSlot(Request $request): Response
+    {
+        $salon = $this->salonOrFail((string) $request->param('slug'));
+        if ($salon === null) {
+            return Response::html('سالن یافت نشد.', 404);
+        }
+
+        $date = (string) $request->input('date', '');
+        $time = (string) $request->input('time', '');
+        if ($date === '' || $time === '') {
+            return $this->withError('روز و ساعت را انتخاب کنید.', '/s/' . $salon['slug']);
+        }
+
+        $this->setWizard($salon['slug'], ['date' => $date, 'time' => $time]);
+
+        return $this->redirect('/s/' . $salon['slug'] . '/services');
     }
 
     /**
@@ -60,14 +85,14 @@ final class BookingWizardController extends Controller
      *
      * لینکِ جدا یعنی سالن می‌تواند همین را در بیو بگذارد.
      */
-    public function services(Request $request): Response
+    public function menu(Request $request): Response
     {
         $salon = $this->salonOrFail((string) $request->param('slug'));
         if ($salon === null) {
             return Response::html('سالن یافت نشد.', 404);
         }
 
-        return $this->page('layouts.booking', 'booking.services', [
+        return $this->page('layouts.booking', 'booking.menu', [
             'title' => 'خدمات ' . $salon['name'],
             'salon' => $salon,
             'services' => (new ServiceRepository())->all((int) $salon['id'], true),
@@ -75,71 +100,142 @@ final class BookingWizardController extends Controller
         ]);
     }
 
-    public function chooseServices(Request $request): Response
+    /** گام ۲ — خدمت. روز و سانس از قبل انتخاب شده‌اند. */
+    public function servicesStep(Request $request): Response
     {
         $salon = $this->salonOrFail((string) $request->param('slug'));
-        $serviceIds = array_values(array_filter(array_map('intval', (array) $request->input('service_ids', []))));
-        if ($serviceIds === []) {
-            return $this->withError('حداقل یک خدمت انتخاب کنید.', '/s/' . $salon['slug']);
+        if ($salon === null) {
+            return Response::html('سالن یافت نشد.', 404);
         }
 
-        $this->setWizard($salon['slug'], ['service_ids' => $serviceIds]);
-
-        return $this->redirect('/s/' . $salon['slug'] . '/staff');
-    }
-
-    public function staffStep(Request $request): Response
-    {
-        $salon = $this->salonOrFail((string) $request->param('slug'));
         $wizard = $this->wizard($salon['slug']);
-        if (empty($wizard['service_ids'])) {
+        if (empty($wizard['date']) || empty($wizard['time'])) {
             return $this->redirect('/s/' . $salon['slug']);
         }
 
         if ($request->method === 'POST') {
-            $staffId = $request->input('staff_id');
-            $this->setWizard($salon['slug'], ['staff_id' => $staffId !== '' ? (int) $staffId : null]);
+            $serviceIds = array_values(array_filter(array_map('intval', (array) $request->input('service_ids', []))));
+            if ($serviceIds === []) {
+                return $this->withError('حداقل یک خدمت انتخاب کنید.', '/s/' . $salon['slug'] . '/services');
+            }
+            $this->setWizard($salon['slug'], ['service_ids' => $serviceIds]);
 
-            return $this->redirect('/s/' . $salon['slug'] . '/slots');
+            return $this->redirect('/s/' . $salon['slug'] . '/staff');
         }
 
-        $staff = (new StaffRepository())->all((int) $salon['id'], true);
-
-        return $this->page('layouts.booking', 'booking.staff', [
-            'title' => 'انتخاب آرایشگر',
+        return $this->page('layouts.booking', 'booking.services', [
+            'title' => 'انتخاب خدمت',
             'step' => 2,
             'salon' => $salon,
-            'staff' => $staff,
+            'services' => (new ServiceRepository())->all((int) $salon['id'], true),
+            'slotLabel' => $this->slotLabel($wizard),
+            'selected' => $wizard['service_ids'] ?? [],
         ]);
     }
 
-    public function slotsStep(Request $request): Response
+    /** گام ۳ — آرایشگر، فقط آن‌هایی که همان سانس آزادند. */
+    public function staffStep(Request $request): Response
     {
         $salon = $this->salonOrFail((string) $request->param('slug'));
+        if ($salon === null) {
+            return Response::html('سالن یافت نشد.', 404);
+        }
+
         $wizard = $this->wizard($salon['slug']);
-        if (empty($wizard['service_ids'])) {
+        if (empty($wizard['service_ids']) || empty($wizard['date']) || empty($wizard['time'])) {
             return $this->redirect('/s/' . $salon['slug']);
         }
 
+        $free = $this->staffFreeAtSlot($salon, $wizard);
+
         if ($request->method === 'POST') {
-            $date = (string) $request->input('date');
-            $time = (string) $request->input('time');
-            $this->setWizard($salon['slug'], ['date' => $date, 'time' => $time]);
+            $raw = (string) $request->input('staff_id', '');
+            $staffId = $raw === '' ? null : (int) $raw;
+
+            /*
+             * انتخاب کاربر دوباره سنجیده می‌شود. فهرست را سرور ساخته،
+             * ولی بین نمایش و ارسال ممکن است همان آرایشگر پر شده باشد
+             * — و فرمِ دستکاری‌شده هم نباید آرایشگرِ اشغال را جا بیندازد.
+             */
+            if ($staffId !== null && !isset($free[$staffId])) {
+                return $this->withError(
+                    'این آرایشگر دیگر در آن ساعت آزاد نیست.',
+                    '/s/' . $salon['slug'] . '/staff'
+                );
+            }
+
+            $this->setWizard($salon['slug'], ['staff_id' => $staffId]);
 
             return $this->redirect('/s/' . $salon['slug'] . '/phone');
         }
 
+        /*
+         * هیچ آرایشگری آزاد نیست یعنی سانس بین گام اول و اینجا پر شده.
+         * فرستادن به گام خدمت فایده ندارد؛ باید وقت دیگری بگیرد.
+         */
+        if ($free === []) {
+            return $this->withError(
+                'این ساعت همین الان پر شد. لطفاً ساعت دیگری انتخاب کنید.',
+                '/s/' . $salon['slug']
+            );
+        }
+
+        return $this->page('layouts.booking', 'booking.staff', [
+            'title' => 'انتخاب آرایشگر',
+            'step' => 3,
+            'salon' => $salon,
+            'staff' => array_values($free),
+            'slotLabel' => $this->slotLabel($wizard),
+        ]);
+    }
+
+    /**
+     * آرایشگرهایی که در سانس انتخاب‌شده آزادند.
+     *
+     * @return array<int,array> کلید: شناسهٔ آرایشگر
+     */
+    private function staffFreeAtSlot(array $salon, array $wizard): array
+    {
+        $booking = new BookingService();
+        $salonId = (int) $salon['id'];
+        $byTime = $booking->freeSlots(
+            $salonId,
+            null,
+            new DateTimeImmutable($wizard['date']),
+            $booking->sessionMinutes($salonId)
+        );
+
+        $ids = $byTime[$wizard['time']] ?? [];
+        if ($ids === []) {
+            return [];
+        }
+
+        $free = [];
+        foreach ((new StaffRepository())->all($salonId, true) as $st) {
+            if (in_array((int) $st['id'], $ids, true)) {
+                $free[(int) $st['id']] = $st;
+            }
+        }
+
+        return $free;
+    }
+
+    /**
+     * تقویم و سانس‌های آزاد — هم صفحهٔ اول است، هم صفحهٔ «عوض کردن وقت».
+     *
+     * سانس‌ها با طول سانسِ سالن ساخته می‌شوند، نه با مدت خدمت، چون در
+     * این گام هنوز خدمتی انتخاب نشده.
+     */
+    private function slotPicker(array $salon, Request $request, int $step): Response
+    {
+        $salonId = (int) $salon['id'];
+        $booking = new BookingService();
+        $session = $booking->sessionMinutes($salonId);
+
         $dateParam = (string) $request->query('date', date('Y-m-d'));
         $date = new DateTimeImmutable($dateParam);
 
-        $serviceRepo = new ServiceRepository();
-        $duration = array_sum(array_map(
-            static fn (int $id) => $serviceRepo->find((int) $salon['id'], $id)['duration_minutes'] ?? 30,
-            $wizard['service_ids']
-        ));
-
-        $booking = new BookingService();
-        $slotsByTime = $booking->freeSlots((int) $salon['id'], $wizard['staff_id'] ?? null, $date, $duration);
+        $slotsByTime = $booking->freeSlots($salonId, null, $date, $session);
 
         /*
          * ماهی که تقویم نشان می‌دهد. پیش‌فرض ماهِ تاریخ انتخاب‌شده است،
@@ -163,24 +259,30 @@ final class BookingWizardController extends Controller
          * تعطیل است یا همهٔ نوبت‌هایش پر شده — و مشتری بعد از دو کلیک
          * به صفحهٔ خالی می‌رسد. بهتر است همان اول ببیند کدام روزها باز است.
          */
-        $dayStates = $this->monthAvailability(
-            (int) $salon['id'],
-            $wizard['staff_id'] ?? null,
-            $duration,
-            $viewYear,
-            $viewMonth
-        );
+        $dayStates = $this->monthAvailability($salonId, null, $session, $viewYear, $viewMonth);
 
         return $this->page('layouts.booking', 'booking.slots', [
-            'title' => 'انتخاب زمان',
-            'step' => 3,
+            'title' => $salon['name'],
+            'step' => $step,
             'salon' => $salon,
             'calendar' => JalaliCalendar::month($viewYear, $viewMonth, $dayStates),
             'minMonth' => ['year' => $todayJy, 'month' => $todayJm],
             'selectedDate' => $dateParam,
             'selectedDateLabel' => JalaliCalendar::relativeDate($date),
             'slots' => array_keys($slotsByTime),
+            'liveStatus' => $this->liveStatus($salonId),
         ]);
+    }
+
+    /** برچسب «روز، ساعت» برای نشان دادن وقتِ قفل‌شده در گام‌های بعد. */
+    private function slotLabel(array $wizard): ?string
+    {
+        if (empty($wizard['date']) || empty($wizard['time'])) {
+            return null;
+        }
+
+        return JalaliCalendar::relativeDate(new DateTimeImmutable($wizard['date']))
+            . '، ساعت ' . Clock::hm($wizard['time']);
     }
 
     /**
@@ -309,12 +411,20 @@ final class BookingWizardController extends Controller
         return $states;
     }
 
+    /** گام ۴ — نام و شماره، و ثبت نهایی. */
     public function phoneStep(Request $request): Response
     {
         $salon = $this->salonOrFail((string) $request->param('slug'));
+        if ($salon === null) {
+            return Response::html('سالن یافت نشد.', 404);
+        }
+
         $wizard = $this->wizard($salon['slug']);
         if (empty($wizard['date']) || empty($wizard['time'])) {
             return $this->redirect('/s/' . $salon['slug']);
+        }
+        if (empty($wizard['service_ids'])) {
+            return $this->redirect('/s/' . $salon['slug'] . '/services');
         }
 
         if ($request->method === 'POST') {
@@ -460,9 +570,12 @@ final class BookingWizardController extends Controller
                 $request->ip(),
             );
         } catch (RuntimeException $e) {
-            // سانس بین انتخاب و ثبت پر شده — به مرحلهٔ زمان برگرد،
-            // نه به اول، تا انتخاب خدمت از دست نرود.
-            return $this->withError($e->getMessage(), '/s/' . $slug . '/slots');
+            /*
+             * سانس بین انتخاب و ثبت پر شده. مشتری باید وقت دیگری
+             * بگیرد، ولی خدمت و آرایشگرش در نشست می‌ماند تا دوباره
+             * انتخابشان نکند.
+             */
+            return $this->withError($e->getMessage(), '/s/' . $slug);
         }
 
         Session::forget($this->wizardKey($slug));
@@ -483,6 +596,16 @@ final class BookingWizardController extends Controller
     private function wizard(string $slug): array
     {
         return Session::get($this->wizardKey($slug), []);
+    }
+
+    /** @param string[] $keys */
+    private function forgetWizard(string $slug, array $keys): void
+    {
+        $wizard = $this->wizard($slug);
+        foreach ($keys as $k) {
+            unset($wizard[$k]);
+        }
+        Session::put($this->wizardKey($slug), $wizard);
     }
 
     private function setWizard(string $slug, array $data): void

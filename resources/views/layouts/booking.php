@@ -12,7 +12,7 @@
  * منتظر یک گام دیگر می‌ماند که نمی‌آید.
  */
 $lastStep = App\Core\Config::get('reshen.booking.verify_phone', false) ? 'تأیید' : 'ثبت';
-$stepTitles = ['خدمت', 'آرایشگر', 'زمان', $lastStep];
+$stepTitles = ['زمان', 'خدمت', 'آرایشگر', $lastStep];
 $step = $step ?? null;
 ?>
 <!doctype html>
@@ -99,7 +99,7 @@ $step = $step ?? null;
             فقط می‌خواهند بدانند «چی دارید و چند؟» — بدون این دکمه،
             جوابِ آن سؤال پشتِ جریان رزرو پنهان می‌ماند.
           -->
-          <a href="<?= e(url('s/' . $salon['slug'] . '/services')) ?>"
+          <a href="<?= e(url('s/' . $salon['slug'] . '/menu')) ?>"
              class="inline-flex items-center gap-1.5 h-11 px-3.5 rounded-xl text-[12px] font-semibold
                     bg-white/10 hover:bg-white/15 text-white transition-colors tap
                     focus-visible:outline-2 focus-visible:outline-accent">

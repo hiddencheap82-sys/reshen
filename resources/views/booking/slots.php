@@ -6,14 +6,70 @@
  * @var string $selectedDate
  * @var string $selectedDateLabel
  * @var array $slots
+ * @var array $liveStatus
  */
 
-$base = 's/' . $salon['slug'] . '/slots';
+$base = 's/' . $salon['slug'];
 ?>
 
-<div class="rise mb-4">
+<?php if ($error = flash('error')): ?>
+  <div role="alert"
+       class="flex items-start gap-2 bg-red-50 text-red-800 text-sm rounded-xl px-4 py-3 mb-4 border border-red-100">
+    <?= icon('alert', 'w-4 h-4 mt-0.5 shrink-0') ?>
+    <span><?= e($error) ?></span>
+  </div>
+<?php endif; ?>
+
+<!--
+  وضعیت زندهٔ صف — تمایز اصلی محصول.
+
+  این اولین چیزی است که مشتری می‌بیند، چون جوابِ سؤالی است که واقعاً
+  در ذهنش دارد: «الان برم یا شلوغه؟» رقبا این را ندارند چون دادهٔ
+  لحظه‌ای صف را ندارند.
+-->
+<?php if ($liveStatus['open']): ?>
+  <div class="rise glass rounded-2xl overflow-hidden mb-5 hairline-accent">
+    <div class="px-4 py-3.5 flex items-center gap-3">
+      <span class="relative flex w-2.5 h-2.5 shrink-0" aria-hidden="true">
+        <span class="absolute inline-flex w-full h-full rounded-full bg-green-500 opacity-60 animate-ping"></span>
+        <span class="relative inline-flex w-2.5 h-2.5 rounded-full bg-green-600"></span>
+      </span>
+
+      <div class="flex-1 min-w-0">
+        <?php if ($liveStatus['freeNow'] > 0): ?>
+          <p class="text-sm font-bold text-green-700">همین حالا آزاد است</p>
+          <p class="text-[12px] text-ink-500 mt-0.5">
+            <?= e(fa_num($liveStatus['freeNow'])) ?> صندلی خالی — می‌توانی همین الان بیایی
+          </p>
+        <?php elseif ($liveStatus['waiting'] === 0): ?>
+          <p class="text-sm font-bold text-ink-900">باز است</p>
+          <p class="text-[12px] text-ink-500 mt-0.5">کسی در صف نیست</p>
+        <?php else: ?>
+          <p class="text-sm font-bold text-ink-900">
+            <?= e(fa_num($liveStatus['waiting'])) ?> نفر در صف
+          </p>
+          <p class="text-[12px] text-ink-500 mt-0.5">
+            <?= e($liveStatus['waitLabel']) ?>
+          </p>
+        <?php endif; ?>
+      </div>
+
+      <span class="text-[11px] font-semibold text-ink-400 shrink-0">زنده</span>
+    </div>
+  </div>
+<?php else: ?>
+  <div class="rise glass rounded-2xl px-4 py-3.5 mb-5 flex items-center gap-3">
+    <span class="w-2.5 h-2.5 rounded-full bg-ink-300 shrink-0" aria-hidden="true"></span>
+    <div>
+      <p class="text-sm font-bold text-ink-700">الان بسته است</p>
+      <p class="text-[12px] text-ink-500 mt-0.5">می‌توانی برای روزهای بعد نوبت بگیری</p>
+    </div>
+  </div>
+<?php endif; ?>
+
+<div class="rise rise-1 mb-4">
   <h1 class="text-[15px] font-extrabold text-ink-900 mb-1">کِی می‌آیی؟</h1>
-  <p class="text-[13px] text-ink-500">اول روز را از تقویم انتخاب کن، بعد ساعت.</p>
+  <p class="text-[13px] text-ink-500">اول روز را انتخاب کن، بعد ساعت. خدمت را در گام بعد می‌پرسیم.</p>
 </div>
 
 <?php
@@ -34,17 +90,17 @@ echo App\Core\View::render('components.jalali-calendar', [
 <div class="mt-5 rise rise-2">
   <div class="flex items-baseline justify-between mb-2">
     <h2 class="card-title">
-      ساعت‌های آزاد — <?= e($selectedDateLabel) ?>
+      سانس‌های آزاد — <?= e($selectedDateLabel) ?>
     </h2>
     <?php if (!empty($slots)): ?>
-      <span class="text-[11px] text-ink-400 tabular-nums"><?= e(fa_num(count($slots))) ?> وقت</span>
+      <span class="text-[11px] text-ink-400 tabular-nums"><?= e(fa_num(count($slots))) ?> سانس</span>
     <?php endif; ?>
   </div>
 
   <?php if (empty($slots)): ?>
     <div class="glass rounded-2xl py-12 px-5 text-center">
       <?= icon('calendar-x', 'w-10 h-10 mx-auto text-ink-300 mb-3') ?>
-      <p class="text-sm font-semibold text-ink-600 mb-1">این روز وقت آزادی ندارد</p>
+      <p class="text-sm font-semibold text-ink-600 mb-1">این روز سانس آزادی ندارد</p>
       <p class="text-[12px] text-ink-400">روز دیگری را از تقویم بالا انتخاب کنید.</p>
     </div>
   <?php else: ?>

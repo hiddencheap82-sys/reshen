@@ -43,6 +43,19 @@ final class BookingService
         return $byTime;
     }
 
+    /**
+     * طول یک سانس سالن، مستقل از خدمتی که مشتری انتخاب می‌کند.
+     *
+     * مسیر رزرو اول روز و سانس را می‌گیرد و بعد خدمت را می‌پرسد، پس
+     * موقع ساختن سانس‌ها هنوز مدت خدمت معلوم نیست. مبنا همان طول
+     * سانسِ خود سالن است؛ جا شدن خدمت در سانس را پنل آرایشگاه
+     * بررسی می‌کند.
+     */
+    public function sessionMinutes(int $salonId): int
+    {
+        return $this->slots->stepMinutes($salonId);
+    }
+
     /** @var array<int,int[]> */
     private static array $staffCache = [];
 

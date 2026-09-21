@@ -132,8 +132,11 @@ final class SlotFinder
      *
      * صفر یا منفی، حلقهٔ بالا را بی‌نهایت می‌کند؛ عدد خیلی بزرگ هم عملاً
      * رزرو را غیرممکن. پس بین ۵ تا ۱۲۰ دقیقه بریده می‌شود.
+     *
+     * عمومی است چون ویزارد رزرو، سانس‌ها را پیش از انتخاب خدمت
+     * می‌سازد و باید طول سانس را بداند.
      */
-    private function stepMinutes(int $salonId): int
+    public function stepMinutes(int $salonId): int
     {
         if (!isset(self::$stepCache[$salonId])) {
             $row = DB::selectOne('SELECT slot_step_minutes FROM salons WHERE id = ?', [$salonId]);
