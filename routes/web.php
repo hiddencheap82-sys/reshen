@@ -42,4 +42,5 @@ $router->group(['middleware' => [AuthRequired::class]], function ($router) {
 require __DIR__ . '/onboarding.php';
 require __DIR__ . '/panel.php';
 require __DIR__ . '/booking.php';
+require __DIR__ . '/customer.php';
 require __DIR__ . '/platform.php';

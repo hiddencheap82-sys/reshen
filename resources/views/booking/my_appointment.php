@@ -48,3 +48,15 @@ $live = in_array($appointment['status'], ['confirmed','queued','in_chair'], true
   <button type="submit" class="w-full text-sm text-red-500 hover:text-red-600 border border-red-100 rounded-xl py-2.5">لغو نوبت</button>
 </form>
 <?php endif; ?>
+
+<!--
+  راه رسیدن به «نوبت‌های من».
+
+  بدون این، مشتری فقط همین یک نوبت را دارد و راهی نیست که بفهمد
+  صفحه‌ای هم هست که همهٔ نوبت‌هایش را نشان می‌دهد.
+-->
+<a href="<?= e(url('me')) ?>"
+   class="flex items-center justify-center gap-2 text-[12px] font-semibold text-ink-500 mt-5 py-3 tap">
+  <?= icon('calendar-days', 'w-4 h-4') ?>
+  همهٔ نوبت‌های من
+</a>
