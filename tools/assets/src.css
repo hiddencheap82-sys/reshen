@@ -30,12 +30,12 @@
    * می‌شود — زمینه مشکیِ خالص و سطح‌ها خاکستریِ بالاآمده.
    */
   :root{
-    --bg:#F2F2F7; --surface:#FFFFFF; --line:#D1D1D6;
-    --separator:rgb(60 60 67 / .29);
-    --text:#1C1C1E; --text-dim:#6C6C70;
+    --bg:#FAFAF9; --surface:#FFFFFF; --line:#E7E5E4;
+    --separator:rgb(28 25 23 / .12);
+    --text:#1C1917; --text-dim:#57534E;
     --font-sans:'Vazirmatn','Tahoma',sans-serif;
-    --accent:#0040DD; --accent-hi:#0033B3;
-    --on-accent:#FFFFFF; --accent-soft:#E8F0FE;
+    --accent:#A16207; --accent-hi:#B45309;
+    --on-accent:#FFFFFF; --accent-soft:#FEFCE8;
     --radius-control:10px; --radius-button:14px; --radius-group:16px;
     /* fillهای سیستمی iOS — برای دکمهٔ خاکستری، چیپ، و نوار جداکننده */
     --fill-primary:rgb(120 120 128 / .20);
@@ -43,11 +43,11 @@
     --fill-tertiary:rgb(118 118 128 / .08);
   }
   html.dark{
-      --bg:#000000; --surface:#1C1C1E; --line:#38383A;
-      --separator:rgb(84 84 88 / .65);
-      --text:#FFFFFF; --text-dim:#AEAEB2;
-      --accent:#409CFF; --accent-hi:#6AB0FF;
-      --on-accent:#000000; --accent-soft:#0A2540;
+      --bg:#0A151E; --surface:#102431; --line:#1C3446;
+      --separator:rgb(148 174 190 / .22);
+      --text:#E9F1F6; --text-dim:#94AEBE;
+      --accent:#FBBF24; --accent-hi:#FCD34D;
+      --on-accent:#0A151E; --accent-soft:#283430;
       --fill-primary:rgb(120 120 128 / .36);
       --fill-secondary:rgb(120 120 128 / .32);
       --fill-tertiary:rgb(118 118 128 / .24);
@@ -97,15 +97,14 @@
            transition-all duration-200 ease-ios;
     border-radius:var(--radius-button);
     /*
-     * systemGreen روی متن سفید ۲٫۲۲ است و خوانده نمی‌شود. این نسخهٔ
-     * accessible همان سبز است (۴٫۷۵) — سطحِ تخت، بدون گرادیان، چون
-     * دکمهٔ پرشدهٔ iOS یک رنگ است و بس.
+     * سبزِ زمردی، سطحِ تخت بدون گرادیان. با متن سفید ۵٫۴۸ می‌شود،
+     * و در هیچ پالتی عوض نمی‌شود — «تمام شد» همیشه یک رنگ دارد.
      */
-    background:#1C7A32;
+    background:#047857;
   }
-  .btn-done:hover{background:#155E26}
+  .btn-done:hover{background:#065F46}
   .btn-done:active{transform:scale(.97)}
-  .btn-done:focus-visible{outline:2px solid #1C7A32;outline-offset:2px}
+  .btn-done:focus-visible{outline:2px solid #047857;outline-offset:2px}
 
   /* ═══════════════════════════════════════════════════════════════
    * مقیاس متن — پنج پله، نه نوزده تا
@@ -160,8 +159,8 @@
     word-break:break-word;
   }
   /* در زمینهٔ مشکی، سبزِ روشنِ سیستمی با متن تیره (۱۱٫۴) */
-  html.dark .btn-done{background:#30DB5B;color:#00210B}
-  html.dark .btn-done:hover{background:#28C04E}
+  html.dark .btn-done{background:#34D399;color:#052E22}
+  html.dark .btn-done:hover{background:#10B981}
 
   .btn-ink:active{transform:scale(.97)}
   .btn-ink:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -390,31 +389,31 @@ html.dark[data-theme="ruby"]{
 :root{
   --glass-bg:rgb(255 255 255/.80);
   --glass-solid:#FFFFFF;
-  --glass-line:rgb(60 60 67/.13);
-  --glass-bar-bg:rgb(249 249 249/.94);
+  --glass-line:rgb(28 25 23/.10);
+  --glass-bar-bg:rgb(250 250 249/.94);
 }
 html.dark{
-    --glass-bg:rgb(28 28 30/.80);
-    --glass-solid:#1C1C1E;
-    --glass-line:rgb(84 84 88/.45);
-    --glass-bar-bg:rgb(22 22 24/.94);
+    --glass-bg:rgb(16 36 49/.80);
+    --glass-solid:#102431;
+    --glass-line:rgb(148 174 190/.18);
+    --glass-bar-bg:rgb(10 21 30/.94);
   }
 
 /*
  * سرصفحهٔ صفحهٔ سالن.
  *
- * حالا رنگِ تِینتِ خودِ سالن است، تخت — مثل نوار ناوبریِ رنگیِ iOS.
- * پیش از این یک گرادیانِ زغالی بود که هیچ ربطی به پالت انتخابیِ سالن
- * نداشت؛ سالنی که آبی انتخاب کرده بود، سرصفحهٔ قهوه‌ای می‌گرفت.
+ * زغالیِ تخت — رنگِ انتخاب‌شدهٔ خودِ طرح، نه گرادیان.
+ *
+ * تِینتِ سالن روی دکمه‌ها و تأکیدها دیده می‌شود؛ سرصفحه خنثی می‌ماند
+ * تا لوگو و نام سالن روی آن بنشیند بدون اینکه با رنگ پالت بجنگد.
  *
  * چرا متغیر و نه استایل درون‌خطی: استایل درون‌خطی را هیچ قاعده‌ای در
  * حالت تیره نمی‌تواند کنار بزند.
  *
- * متن سفید روی هر شش تِینت از ۴٫۵:۱ رد می‌شود، چون همه از جدول
- * accessible اپل آمده‌اند.
+ * متن سفید روی زغالی ۱۵:۱ است، پس هر شش پالت روی آن می‌نشینند.
  */
-:root{ --hero:var(--accent); }
-html.dark{ --hero:#1C1C1E; }
+:root{ --hero:#1C1917; }
+html.dark{ --hero:#0A151E; }
 
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -434,42 +433,42 @@ html.dark{ --hero:#1C1C1E; }
    * (سرصفحهٔ سالن)، پس نباید وارونه شود — وگرنه در حالت تیره
    * متنِ تیره روی زمینهٔ تیره می‌رود.
    */
-  html.dark .on-dark .text-ink-300{color:rgb(235 235 245/.6)}
-html.dark .on-dark .text-ink-400{color:rgb(235 235 245/.6)}
+  html.dark .on-dark .text-ink-300{color:#B9CCD8}
+html.dark .on-dark .text-ink-400{color:#94AEBE}
 html.dark .on-dark .text-white{color:#fff}
 /* متن — نردبان روشنایی وارونه می‌شود */
-  html.dark .text-ink-950, html.dark .text-ink-900{color:#FFFFFF}
-html.dark .text-ink-800{color:rgb(235 235 245/.92)}
-html.dark .text-ink-700{color:rgb(235 235 245/.78)}
-html.dark .text-ink-600, html.dark .text-ink-500{color:rgb(235 235 245/.6)}
-html.dark .text-ink-400{color:rgb(235 235 245/.45)}
-html.dark .text-ink-300{color:rgb(235 235 245/.3)}
-html.dark .text-white{color:#FFFFFF}
+  html.dark .text-ink-950, html.dark .text-ink-900{color:#E9F1F6}
+html.dark .text-ink-800{color:#D4E2EA}
+html.dark .text-ink-700{color:#B9CCD8}
+html.dark .text-ink-600, html.dark .text-ink-500{color:#A8C0CE}
+html.dark .text-ink-400{color:#94AEBE}
+html.dark .text-ink-300{color:#4E6C80}
+html.dark .text-white{color:#E9F1F6}
 /* طلایی در زمینهٔ تیره باید روشن‌تر باشد تا کنتراست حفظ شود */
-  html.dark .text-gold-700, html.dark .text-gold-600{color:#FFD426}
+  html.dark .text-gold-700, html.dark .text-gold-600{color:#FBBF24}
 /* سطوح */
-  html.dark .bg-white{background-color:#1C1C1E}
-html.dark .bg-ink-50{background-color:#1C1C1E}
-html.dark .bg-ink-100{background-color:#2C2C2E}
-html.dark .bg-ink-900{background-color:#FFFFFF;color:#000000}
+  html.dark .bg-white{background-color:#102431}
+html.dark .bg-ink-50{background-color:#102431}
+html.dark .bg-ink-100{background-color:#1C3446}
+html.dark .bg-ink-900{background-color:#E9F1F6;color:#102431}
 html.dark .bg-accent-soft{background-color:var(--accent-soft)}
-html.dark .hover\:bg-ink-100:hover{background-color:#2C2C2E}
-html.dark .hover\:bg-gold-50:hover{background-color:#2C2C2E}
-html.dark .hover\:bg-ink-50:hover{background-color:#1C1C1E}
+html.dark .hover\:bg-ink-100:hover{background-color:#1C3446}
+html.dark .hover\:bg-gold-50:hover{background-color:#1C3446}
+html.dark .hover\:bg-ink-50:hover{background-color:#102431}
 /* خط‌ها */
-  html.dark .border-ink-100, html.dark .border-ink-200, html.dark .border-ink-300{border-color:#38383A}
-html.dark .divide-ink-100>*+*{border-color:#38383A}
+  html.dark .border-ink-100, html.dark .border-ink-200, html.dark .border-ink-300{border-color:#1C3446}
+html.dark .divide-ink-100>*+*{border-color:#1C3446}
 /* رنگ‌های معنایی — نسخهٔ کم‌اشباع برای زمینهٔ تیره */
-  html.dark .bg-green-50{background-color:#0D2A16}
+  html.dark .bg-green-50{background-color:#14261A}
 html.dark .text-green-700,
 html.dark .text-green-800,
-html.dark .text-green-900{color:#30DB5B}
-html.dark .bg-red-50{background-color:#3A0F12}
+html.dark .text-green-900{color:#4ADE80}
+html.dark .bg-red-50{background-color:#2A1416}
 html.dark .text-red-600, html.dark .text-red-700,
-html.dark .text-red-800, html.dark .text-red-900{color:#FF6961}
-html.dark .bg-amber-50{background-color:#3A2208}
-html.dark .text-amber-700{color:#FFD426}
-html.dark .border-red-100{border-color:#5A1A1E}
+html.dark .text-red-800, html.dark .text-red-900{color:#F87171}
+html.dark .bg-amber-50{background-color:#1C3446}
+html.dark .text-amber-700{color:#FBBF24}
+html.dark .border-red-100{border-color:#3F1D1D}
 /*
  * دکمهٔ ثانویه در حالت تیره.
  *
@@ -483,8 +482,8 @@ html.dark .metal-ink{
   }
 html.dark .btn-ink:hover{background:var(--fill-primary)}
 /* ورودی‌ها */
-  html.dark input, html.dark select, html.dark textarea{background:#1C1C1E;color:#FFFFFF;border-color:#38383A}
-html.dark input::placeholder, html.dark textarea::placeholder{color:rgb(235 235 245/.3)}
+  html.dark input, html.dark select, html.dark textarea{background:#102431;color:#E9F1F6;border-color:#1C3446}
+html.dark input::placeholder, html.dark textarea::placeholder{color:#7793A6}
 
 /*
  * ابزارهایی که در بازنویسی اول جا مانده بودند.
@@ -498,9 +497,9 @@ html.dark input::placeholder, html.dark textarea::placeholder{color:rgb(235 235 
  *                 رویش. عملاً ناخوانا.
  */
 html.dark .bg-ink-200,
-html.dark .hover\:bg-ink-200:hover{background-color:#2C2C2E}
-html.dark .bg-ink-300{background-color:#3A3A3C}
-html.dark .hover\:bg-ink-800:hover{background-color:#E5E5EA;color:#000000}
+html.dark .hover\:bg-ink-200:hover{background-color:#1C3446}
+html.dark .bg-ink-300{background-color:#2A4257}
+html.dark .hover\:bg-ink-800:hover{background-color:#D4E2EA;color:#102431}
 html.dark .bg-gold-50,
 html.dark .bg-gold-50\/50,
 html.dark .hover\:bg-gold-50:hover,

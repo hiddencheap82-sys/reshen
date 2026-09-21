@@ -20,43 +20,34 @@ namespace App\Support;
  */
 final class Theme
 {
-    public const DEFAULT = 'blue';
+    public const DEFAULT = 'gold';
 
-    /**
-     * رنگ‌های سیستمی iOS.
-     *
-     * مقدارها از جدول «Increase Contrast» اپل گرفته شده‌اند، نه از
-     * رنگ‌های پیش‌فرض: systemBlue روی متن سفید ۴٫۰۲ است و از WCAG AA
-     * رد نمی‌شود. سبز کمی از نسخهٔ اپل هم تیره‌تر شد تا روی زمینهٔ
-     * خاکستریِ صفحه (نه فقط روی سفید) از ۴٫۵ بگذرد.
-     *
-     * @var array<string,array{name:string,swatch:string}>
-     */
+    /** @var array<string,array{name:string,swatch:string}> */
     private const PALETTES = [
-        'blue'   => ['name' => 'آبی',     'swatch' => '#0040DD'],
-        'green'  => ['name' => 'سبز',     'swatch' => '#1C7A32'],
-        'indigo' => ['name' => 'نیلی',    'swatch' => '#3634A3'],
-        'orange' => ['name' => 'نارنجی',  'swatch' => '#C93400'],
-        'pink'   => ['name' => 'صورتی',   'swatch' => '#D30F45'],
-        'purple' => ['name' => 'بنفش',    'swatch' => '#8944AB'],
+        'gold'    => ['name' => 'طلایی',     'swatch' => '#A16207'],
+        'emerald' => ['name' => 'زمردی',     'swatch' => '#047857'],
+        'indigo'  => ['name' => 'نیلی',      'swatch' => '#4338CA'],
+        'copper'  => ['name' => 'مسی',       'swatch' => '#9A3412'],
+        'teal'    => ['name' => 'فیروزه‌ای', 'swatch' => '#0F766E'],
+        'ruby'    => ['name' => 'یاقوتی',    'swatch' => '#BE123C'],
     ];
 
     /**
-     * پالت‌های قبلی به نزدیک‌ترین رنگ سیستمی.
+     * کلیدهایی که دیگر پالت نیستند، به نزدیک‌ترین رنگ.
      *
-     * سالن‌هایی که از قبل رنگ انتخاب کرده‌اند در دیتابیس کلید قدیمی
-     * دارند. بدون این نگاشت، resolve آن‌ها را «ناشناخته» می‌دید و
-     * همه‌شان یک‌شبه آبی می‌شدند — یعنی سالنی که زمردی انتخاب کرده
-     * بود، بی‌آنکه کسی چیزی عوض کند، رنگش را از دست می‌داد.
+     * یک نسخه با رنگ‌های سیستمی iOS منتشر شد و سالن‌هایی که در آن
+     * فاصله رنگ انتخاب کردند، کلیدهای آن نسخه را در دیتابیس دارند.
+     * بدون این نگاشت، resolve آن‌ها را «ناشناخته» می‌دید و همه‌شان
+     * یک‌شبه طلایی می‌شدند.
      *
      * @var array<string,string>
      */
     private const LEGACY = [
-        'gold'    => 'orange',
-        'emerald' => 'green',
-        'copper'  => 'orange',
-        'teal'    => 'blue',
-        'ruby'    => 'pink',
+        'blue'   => 'indigo',
+        'green'  => 'emerald',
+        'orange' => 'copper',
+        'pink'   => 'ruby',
+        'purple' => 'indigo',
     ];
 
     /** @return array<string,array{name:string,swatch:string}> */

@@ -25,10 +25,9 @@ def ratio(a, b):
 # اگر آنجا عوض شد، اینجا هم باید عوض شود وگرنه این اسکریپت رنگی را
 # می‌سنجد که اصلاً منتشر نمی‌شود. یک بار همین اتفاق افتاد و «همهٔ
 # پالت‌ها قبول شدند» دربارهٔ رنگ‌هایی گفته شد که در مرورگر نبودند.
-LIGHT_BG, LIGHT_SURFACE, LIGHT_TEXT = '#F2F2F7', '#FFFFFF', '#1C1C1E'
-DARK_BG,  DARK_SURFACE,  DARK_TEXT  = '#000000', '#1C1C1E', '#FFFFFF'
-# secondaryLabel اپل روی سطح تیره: rgb(235,235,245,.6) روی #1C1C1E
-DARK_DIM = '#98989E'
+LIGHT_BG, LIGHT_SURFACE, LIGHT_TEXT = '#FAFAF9', '#FFFFFF', '#1C1917'
+DARK_BG,  DARK_SURFACE,  DARK_TEXT  = '#0A151E', '#102431', '#E9F1F6'
+DARK_DIM = '#94AEBE'
 
 palettes = json.loads(pathlib.Path(__file__).with_name('palettes.json').read_text('utf-8'))
 
@@ -62,12 +61,12 @@ for key, p in palettes.items():
 # systemGreen استاندارد با متن سفید ۲٫۲۲ می‌شود و اینجا رد می‌شد؛
 # نسخهٔ accessible اپل کمی تیره‌تر شد تا از ۴٫۵ بگذرد.
 for label, fg, bg in [
-    ('«تمام شد» روشن',  '#FFFFFF', '#1C7A32'),
-    ('«تمام شد» هاور',  '#FFFFFF', '#155E26'),
-    ('«تمام شد» تیره',  '#00210B', '#30DB5B'),
-    ('«تمام شد» تیره هاور', '#00210B', '#28C04E'),
-    ('قرمزِ سیستمی روشن', '#FFFFFF', '#D70015'),
-    ('قرمزِ سیستمی تیره', '#FF6961', '#1C1C1E'),
+    ('«تمام شد» روشن',  '#FFFFFF', '#047857'),
+    ('«تمام شد» هاور',  '#FFFFFF', '#065F46'),
+    ('«تمام شد» تیره',  '#052E22', '#34D399'),
+    ('«تمام شد» تیره هاور', '#052E22', '#10B981'),
+    ('قرمزِ هشدار روشن', '#FFFFFF', '#B91C1C'),
+    ('قرمزِ هشدار تیره', '#F87171', '#102431'),
     ('متن تیره روی زمینهٔ تیره', DARK_TEXT, DARK_BG),
     ('متن تیره روی سطح تیره',   DARK_TEXT, DARK_SURFACE),
     ('متن کم‌رنگ روی سطح تیره', DARK_DIM,  DARK_SURFACE),

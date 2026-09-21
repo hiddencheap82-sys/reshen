@@ -1,56 +1,56 @@
 {
-  "blue": {
-    "name": "آبی",
-    "accent": "#0040DD",
-    "accentHi": "#0033B3",
+  "gold": {
+    "name": "طلایی",
+    "accent": "#A16207",
+    "accentHi": "#B45309",
     "onAccent": "#FFFFFF",
-    "soft": "#E8F0FE",
-    "darkAccent": "#409CFF",
-    "darkSoft": "#0A2540"
+    "soft": "#FEFCE8",
+    "darkAccent": "#FBBF24",
+    "darkSoft": "#283430"
   },
-  "green": {
-    "name": "سبز",
-    "accent": "#1C7A32",
-    "accentHi": "#155E26",
+  "emerald": {
+    "name": "زمردی",
+    "accent": "#047857",
+    "accentHi": "#065F46",
     "onAccent": "#FFFFFF",
-    "soft": "#E6F5E9",
-    "darkAccent": "#30DB5B",
-    "darkSoft": "#0D2A16"
+    "soft": "#ECFDF5",
+    "darkAccent": "#34D399",
+    "darkSoft": "#14363B"
   },
   "indigo": {
     "name": "نیلی",
-    "accent": "#3634A3",
-    "accentHi": "#2C2A84",
+    "accent": "#4338CA",
+    "accentHi": "#4F46E5",
     "onAccent": "#FFFFFF",
-    "soft": "#ECECFB",
-    "darkAccent": "#7D7AFF",
-    "darkSoft": "#1B1A3D"
+    "soft": "#EEF2FF",
+    "darkAccent": "#A5B4FC",
+    "darkSoft": "#1F3245"
   },
-  "orange": {
-    "name": "نارنجی",
-    "accent": "#C93400",
-    "accentHi": "#A62B00",
+  "copper": {
+    "name": "مسی",
+    "accent": "#9A3412",
+    "accentHi": "#C2410C",
     "onAccent": "#FFFFFF",
-    "soft": "#FDECE6",
-    "darkAccent": "#FFB340",
-    "darkSoft": "#3A2208"
+    "soft": "#FFF7ED",
+    "darkAccent": "#FB923C",
+    "darkSoft": "#282F32"
   },
-  "pink": {
-    "name": "صورتی",
-    "accent": "#D30F45",
-    "accentHi": "#AD0C38",
+  "teal": {
+    "name": "فیروزه‌ای",
+    "accent": "#0F766E",
+    "accentHi": "#115E59",
     "onAccent": "#FFFFFF",
-    "soft": "#FCE8ED",
-    "darkAccent": "#FF6482",
-    "darkSoft": "#3A0F1C"
+    "soft": "#F0FDFA",
+    "darkAccent": "#5EEAD4",
+    "darkSoft": "#183841"
   },
-  "purple": {
-    "name": "بنفش",
-    "accent": "#8944AB",
-    "accentHi": "#70378C",
+  "ruby": {
+    "name": "یاقوتی",
+    "accent": "#BE123C",
+    "accentHi": "#E11D48",
     "onAccent": "#FFFFFF",
-    "soft": "#F4EAF8",
-    "darkAccent": "#DA8FFF",
-    "darkSoft": "#2C1436"
+    "soft": "#FFF1F2",
+    "darkAccent": "#FDA4AF",
+    "darkSoft": "#28313E"
   }
 }
