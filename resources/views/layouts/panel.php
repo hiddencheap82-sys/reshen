@@ -1,22 +1,35 @@
 <?php
 use App\Core\Auth;
+use App\Domain\Access\Access;
 $role = Auth::role();
 $salonName = App\Core\Session::get('_salon_name');
 if (Auth::isImpersonating()) {
     $salonName = App\Core\DB::selectOne('SELECT name FROM salons WHERE id = ?', [Auth::salonId()])['name'] ?? $salonName;
 }
+/*
+ * منو از همان سیاستی می‌خواند که مسیرها را می‌بندد.
+ *
+ * پیش از این فهرست نقش‌ها اینجا دوباره نوشته شده بود و با مسیرها فرق
+ * کرده بود: «مشتریان» به آرایشگر نشان داده می‌شد. لینکی که بزنی و
+ * ۴۰۳ بگیری، خودش یک ایراد است.
+ *
+ * ability برابر null یعنی هر کسی که عضو سالن است.
+ */
 $navItems = [
-    ['href' => '/panel', 'label' => 'صف زنده', 'icon' => 'queue', 'roles' => ['owner','manager','staff','reception']],
-    ['href' => '/panel/customers', 'label' => 'مشتریان', 'icon' => 'users', 'roles' => ['owner','manager','staff','reception']],
-    ['href' => '/panel/bookings', 'label' => 'رزروها', 'icon' => 'calendar', 'roles' => ['owner','manager','reception']],
-    ['href' => '/panel/reports', 'label' => 'گزارش‌ها', 'icon' => 'chart', 'roles' => ['owner','manager']],
-    ['href' => '/panel/staff', 'label' => 'آرایشگرها', 'icon' => 'scissors', 'roles' => ['owner','manager']],
-    ['href' => '/panel/services', 'label' => 'خدمات', 'icon' => 'tag', 'roles' => ['owner','manager']],
-    ['href' => '/panel/qr', 'label' => 'کد QR', 'icon' => 'qr', 'roles' => ['owner','manager','reception']],
-    ['href' => '/panel/sms', 'label' => 'الگوی پیامک', 'icon' => 'message', 'roles' => ['owner','manager']],
-    ['href' => '/panel/settings', 'label' => 'تنظیمات سالن', 'icon' => 'cog', 'roles' => ['owner','manager']],
+    ['href' => '/panel',          'label' => 'صف زنده',       'icon' => 'queue',    'ability' => null],
+    ['href' => '/panel/bookings', 'label' => 'رزروها',        'icon' => 'calendar', 'ability' => null],
+    ['href' => '/panel/customers','label' => 'مشتریان',       'icon' => 'users',    'ability' => Access::VIEW_CUSTOMERS],
+    ['href' => '/panel/reports',  'label' => 'گزارش‌ها',       'icon' => 'chart',    'ability' => Access::MANAGE_SALON],
+    ['href' => '/panel/staff',    'label' => 'آرایشگرها',     'icon' => 'scissors', 'ability' => Access::MANAGE_SALON],
+    ['href' => '/panel/services', 'label' => 'خدمات',         'icon' => 'tag',      'ability' => Access::MANAGE_SALON],
+    ['href' => '/panel/qr',       'label' => 'کد QR',         'icon' => 'qr',       'ability' => null],
+    ['href' => '/panel/sms',      'label' => 'الگوی پیامک',   'icon' => 'message',  'ability' => Access::MANAGE_SALON],
+    ['href' => '/panel/settings', 'label' => 'تنظیمات سالن',  'icon' => 'cog',      'ability' => Access::MANAGE_SALON],
 ];
-$visibleNav = array_values(array_filter($navItems, fn($i) => in_array($role, $i['roles'], true)));
+$visibleNav = array_values(array_filter(
+    $navItems,
+    static fn ($i) => $i['ability'] === null || Access::allows($i['ability'])
+));
 $currentPath = '/' . trim($_SERVER['REQUEST_URI'] ?? '', '/');
 ?>
 <!doctype html>

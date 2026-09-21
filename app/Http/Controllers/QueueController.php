@@ -8,8 +8,10 @@ use App\Core\Auth;
 use App\Core\DB;
 use App\Core\Request;
 use App\Core\Response;
+use App\Domain\Access\Access;
 use App\Domain\Catalog\ServiceRepository;
 use App\Domain\Customer\CustomerRepository;
+use App\Domain\Queue\AppointmentRepository;
 use App\Domain\Queue\QueueService;
 use App\Domain\Staff\StaffRepository;
 use RuntimeException;
@@ -38,7 +40,7 @@ final class QueueController extends Controller
             'todaySummary' => (new \App\Domain\Queue\AppointmentRepository())->todaySummary($salonId),
             // درآمد کل سالن فقط برای صاحب و مدیر — آرایشگر نباید درآمد
             // بقیه را ببیند، وگرنه در سالن دعوا می‌شود (سند امنیت، بخش ۴).
-            'salonEarnings' => in_array(Auth::role(), ['owner', 'manager'], true)
+            'salonEarnings' => Access::allows(Access::VIEW_SALON_EARNINGS)
                 ? (new \App\Domain\Payment\PaymentRepository())->dailyTotal($salonId, date('Y-m-d'), null)
                 : null,
         ]);
@@ -81,8 +83,34 @@ final class QueueController extends Controller
         return $this->withSuccess('مشتری به صف اضافه شد.', '/panel');
     }
 
+    /**
+     * دروازهٔ اکشن‌های صف.
+     *
+     * آرایشگر فقط روی نوبت خودش کار می‌کند. پیش از این هر عضو سالن
+     * می‌توانست نوبتِ آرایشگر دیگری را کامل یا لغو کند — و چون همه‌چیز
+     * درست ثبت می‌شد، هیچ ردی از اشتباه نمی‌ماند جز شاکی شدن مشتری.
+     */
+    private function denyForeignAppointment(int $appointmentId): ?Response
+    {
+        $appointment = (new AppointmentRepository())->find(Auth::salonId(), $appointmentId);
+
+        if ($appointment === null) {
+            return $this->withError('نوبت یافت نشد.', '/panel');
+        }
+
+        if (!Access::canActOnAppointment($appointment)) {
+            return $this->withError('این نوبت برای شما نیست.', '/panel');
+        }
+
+        return null;
+    }
+
     public function start(Request $request): Response
     {
+        if ($deny = $this->denyForeignAppointment((int) $request->param('id'))) {
+            return $deny;
+        }
+
         try {
             (new QueueService())->startService(Auth::salonId(), (int) $request->param('id'));
         } catch (RuntimeException $e) {
@@ -97,6 +125,10 @@ final class QueueController extends Controller
         $salonId = Auth::salonId();
         $appointmentId = (int) $request->param('id');
 
+        if ($deny = $this->denyForeignAppointment($appointmentId)) {
+            return $deny;
+        }
+
         try {
             $result = (new QueueService())->completeService($salonId, $appointmentId);
         } catch (RuntimeException $e) {
@@ -110,6 +142,10 @@ final class QueueController extends Controller
 
     public function noShow(Request $request): Response
     {
+        if ($deny = $this->denyForeignAppointment((int) $request->param('id'))) {
+            return $deny;
+        }
+
         (new QueueService())->markNoShow(Auth::salonId(), (int) $request->param('id'));
 
         return $this->withSuccess('به‌عنوان غایب ثبت شد.', '/panel');
@@ -117,6 +153,10 @@ final class QueueController extends Controller
 
     public function cancel(Request $request): Response
     {
+        if ($deny = $this->denyForeignAppointment((int) $request->param('id'))) {
+            return $deny;
+        }
+
         (new QueueService())->cancel(Auth::salonId(), (int) $request->param('id'), (string) $request->input('reason', ''));
 
         return $this->withSuccess('نوبت لغو شد.', '/panel');

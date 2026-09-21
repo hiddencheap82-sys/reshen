@@ -85,7 +85,20 @@ final class Router
 
             $next = $core;
             foreach ($pipeline as $middlewareClass) {
-                $middleware = new $middlewareClass();
+                /*
+                 * «کلاس:پارامتر» — مثل AbilityRequired::class . ':manage_salon'.
+                 *
+                 * بدون این، برای هر سطح دسترسی باید یک کلاس میدل‌ور جدا
+                 * می‌ساختیم و فهرست اجازه‌ها در چند فایل پخش می‌شد.
+                 */
+                $argument = null;
+                if (str_contains($middlewareClass, ':')) {
+                    [$middlewareClass, $argument] = explode(':', $middlewareClass, 2);
+                }
+
+                $middleware = $argument === null
+                    ? new $middlewareClass()
+                    : new $middlewareClass($argument);
                 $next = function (Request $req) use ($middleware, $next): Response {
                     return $middleware->handle($req, $next);
                 };

@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Core\Auth;
 use App\Core\Request;
 use App\Core\Response;
+use App\Domain\Access\Access;
 use App\Domain\Booking\BookingService;
 use App\Domain\Catalog\ServiceRepository;
 use App\Domain\Queue\AppointmentRepository;
@@ -44,7 +45,7 @@ final class BookingsController extends Controller
 
         // آرایشگر فقط رزروهای خودش را می‌بیند؛ صاحب و مدیر، همه را.
         // همان قاعدهٔ صفحهٔ صف (سند امنیت، بخش ۴).
-        $onlyMine = !in_array(Auth::role(), ['owner', 'manager', 'reception'], true);
+        $onlyMine = !Access::allows(Access::BOOK_FOR_OTHERS);
         $staffFilter = $onlyMine ? Auth::staffId() : null;
 
         $rows = $repo->scheduledBetween(

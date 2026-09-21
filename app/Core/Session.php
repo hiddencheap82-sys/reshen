@@ -88,14 +88,25 @@ final class Session
         return is_string($token) && hash_equals(self::csrfToken(), $token);
     }
 
+    /*
+     * هر دو تابع زیر روی نشستِ فعال کار می‌کنند و بیرون از آن هشدار
+     * می‌دهند. در CLI — تست، کرون، ابزارهای خط فرمان — نشستی باز
+     * نیست، ولی ورود و خروج همان‌جا هم صدا زده می‌شود. حالت حافظه‌ای
+     * ($_SESSION) کار خودش را می‌کند؛ فقط توابع نشستِ PHP رد می‌شوند.
+     */
     public static function regenerate(): void
     {
-        session_regenerate_id(true);
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_regenerate_id(true);
+        }
     }
 
     public static function destroy(): void
     {
         $_SESSION = [];
-        session_destroy();
+
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_destroy();
+        }
     }
 }
