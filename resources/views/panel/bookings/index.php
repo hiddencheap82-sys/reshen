@@ -71,6 +71,27 @@ $totalRows = array_sum(array_map(static fn ($d) => count($d['rows']), $days));
   <?php endforeach; ?>
 </dl>
 
+<?php
+/*
+ * لغوهای خودِ آرایشگاه جدا نوشته می‌شود.
+ *
+ * وقتی با لغو مشتری در یک عدد جمع شود، بدترین خبر — «ما داریم به
+ * مشتری بدقولی می‌کنیم» — زیر همان عدد پنهان می‌ماند.
+ *
+ * فقط وقتی نشان داده می‌شود که چیزی برای نشان دادن باشد؛ آرایشگاهی که
+ * لغو ندارد نباید یک خط خالی ببیند.
+ */
+$bySalon = (int) ($counts['cancelled_by']['salon'] ?? 0);
+$byCustomer = (int) ($counts['cancelled_by']['customer'] ?? 0);
+?>
+<?php if ($bySalon > 0 || $byCustomer > 0): ?>
+  <p class="text-[11.5px] text-ink-500 -mt-3 mb-5 leading-relaxed">
+    از لغوها،
+    <span class="font-bold text-ink-700"><?= e(fa_num($bySalon)) ?></span> مورد را آرایشگاه لغو کرده
+    و <span class="font-bold text-ink-700"><?= e(fa_num($byCustomer)) ?></span> مورد را مشتری.
+  </p>
+<?php endif; ?>
+
 <?php if ($totalRows === 0): ?>
   <div class="glass rounded-2xl p-10 text-center">
     <span class="inline-grid place-items-center w-14 h-14 rounded-2xl mb-3"

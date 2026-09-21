@@ -11,6 +11,8 @@ use App\Core\Request;
 use App\Core\Response;
 use App\Domain\Salon\HolidayRepository;
 use App\Domain\Salon\WorkingHoursRepository;
+use App\Domain\Staff\StaffRepository;
+use App\Domain\Staff\TimeOffRepository;
 use App\Support\Clock;
 use App\Support\ImageUpload;
 use App\Support\Jalali;
@@ -33,7 +35,66 @@ final class SalonSettingsController extends Controller
             'weekdayNames' => ['شنبه', 'یک‌شنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه'],
             'holidays' => $upcomingHolidays,
             'currentJalaliYear' => Jalali::fromDateTime(new \DateTimeImmutable())[0],
+            'timeOffs' => (new TimeOffRepository())->upcoming($salonId),
+            'staffList' => (new StaffRepository())->all($salonId, true),
         ]);
+    }
+
+    /**
+     * ثبت مرخصی یا بستنِ یک بازه.
+     *
+     * تاریخ و ساعت از کامپوننت‌های شمسیِ خودمان می‌آید، نه از ورودی
+     * تاریخِ مرورگر.
+     */
+    public function addTimeOff(Request $request): Response
+    {
+        $salonId = Auth::salonId();
+
+        // رشتهٔ Y-m-d برمی‌گرداند، نه شیء تاریخ
+        $date = jalali_date_from_request($request, 'off_date');
+        if ($date === null) {
+            return $this->withError('تاریخ را کامل انتخاب کنید.', '/panel/settings');
+        }
+
+        $from = Clock::fromParts($request->input('off_from_h'), $request->input('off_from_m'));
+        $to = Clock::fromParts($request->input('off_to_h'), $request->input('off_to_m'));
+
+        /*
+         * ساعت خالی یعنی «کل روز». روزِ کامل را با ۰۰:۰۰ تا ۲۴:۰۰
+         * می‌بندیم، نه ۰۰:۰۰ تا ۲۳:۵۹ — وگرنه نوبتِ ۲۳:۵۹ از تورِ
+         * مرخصی رد می‌شد.
+         */
+        $start = new \DateTimeImmutable($date . ' ' . ($from ?? '00:00') . ':00');
+        $end = $to !== null
+            ? new \DateTimeImmutable($date . ' ' . $to . ':00')
+            : (new \DateTimeImmutable($date . ' 00:00:00'))->modify('+1 day');
+
+        $rawStaff = (string) $request->input('off_staff_id', '');
+        $staffId = $rawStaff === '' ? null : (int) $rawStaff;
+
+        $repo = new TimeOffRepository();
+        $error = $repo->add($salonId, $staffId, $start, $end, trim((string) $request->input('off_reason', '')));
+        if ($error !== null) {
+            return $this->withError($error, '/panel/settings');
+        }
+
+        $clashes = $repo->clashingAppointments($salonId, $staffId, $start, $end);
+        if ($clashes !== []) {
+            return $this->withSuccess(
+                'ثبت شد. توجه: ' . Jalali::toPersianDigits((string) count($clashes))
+                    . ' نوبت در این بازه ثبت شده که باید خبرشان کنید.',
+                '/panel/settings'
+            );
+        }
+
+        return $this->withSuccess('بازه بسته شد.', '/panel/settings');
+    }
+
+    public function removeTimeOff(Request $request): Response
+    {
+        (new TimeOffRepository())->remove(Auth::salonId(), (int) $request->param('id'));
+
+        return $this->withSuccess('بازه باز شد.', '/panel/settings');
     }
 
     public function updateProfile(Request $request): Response

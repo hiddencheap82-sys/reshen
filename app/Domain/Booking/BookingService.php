@@ -139,7 +139,12 @@ final class BookingService
         if ($appt === null || !in_array($appt['status'], ['confirmed', 'queued'], true)) {
             return false;
         }
-        $appointments->update((int) $appt['salon_id'], (int) $appt['id'], ['status' => 'cancelled', 'cancel_reason' => $reason ?: 'لغو توسط مشتری']);
+        $appointments->update((int) $appt['salon_id'], (int) $appt['id'], [
+            'status' => 'cancelled',
+            'cancel_reason' => $reason ?: 'لغو توسط مشتری',
+            // این مسیر فقط از دست مشتری می‌آید (کارت نوبت یا «نوبت‌های من»)
+            'cancelled_by' => 'customer',
+        ]);
 
         return true;
     }

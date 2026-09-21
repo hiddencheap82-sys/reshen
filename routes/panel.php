@@ -117,6 +117,8 @@ $router->group(['middleware' => [AuthRequired::class, TenantRequired::class]], f
             $router->post('/panel/settings/holidays/seed', [SalonSettingsController::class, 'seedHolidays']);
             $router->post('/panel/settings/holidays', [SalonSettingsController::class, 'addHoliday']);
             $router->post('/panel/settings/holidays/{id}/remove', [SalonSettingsController::class, 'removeHoliday']);
+        $router->post('/panel/settings/timeoff', [SalonSettingsController::class, 'addTimeOff']);
+        $router->post('/panel/settings/timeoff/{id}/remove', [SalonSettingsController::class, 'removeTimeOff']);
         });
     });
 });

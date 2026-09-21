@@ -125,7 +125,12 @@ final class QueueService
     public function cancel(int $salonId, int $appointmentId, string $reason = ''): void
     {
         $appt = $this->appointments->find($salonId, $appointmentId);
-        $this->appointments->update($salonId, $appointmentId, ['status' => 'cancelled', 'cancel_reason' => $reason ?: null]);
+        $this->appointments->update($salonId, $appointmentId, [
+            'status' => 'cancelled',
+            'cancel_reason' => $reason ?: null,
+            // از پنل لغو شده، یعنی کار خود آرایشگاه
+            'cancelled_by' => 'salon',
+        ]);
         if ($appt !== null && $appt['staff_id'] !== null) {
             (new QueueNotificationService())->syncStaffQueue($salonId, (int) $appt['staff_id']);
         }

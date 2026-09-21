@@ -263,4 +263,97 @@
     </form>
     <p class="text-[11px] text-ink-400 mt-2">تعطیلات قمری (مثل عید فطر، تاسوعا و عاشورا) هر سال جابه‌جا می‌شوند و باید دستی اضافه شوند.</p>
   </div>
+
+<!--
+  مرخصی و بستنِ موردیِ بازه.
+
+  با ساعت کاری فرق دارد: آن قاعدهٔ هر هفته است، این استثنای یک روز.
+  «پنجشنبه بعدازظهر عروسی دعوتم» را نباید با عوض کردن ساعت کاریِ همهٔ
+  پنجشنبه‌ها حل کرد.
+-->
+<div class="glass rounded-2xl p-5 mt-5">
+  <div class="flex items-baseline justify-between mb-1">
+    <h2 class="card-title">مرخصی و بستن سانس</h2>
+    <?php if (!empty($timeOffs)): ?>
+      <span class="text-[11px] text-ink-400 tabular-nums"><?= e(fa_num(count($timeOffs))) ?> بازه</span>
+    <?php endif; ?>
+  </div>
+  <p class="text-[12px] text-ink-500 mb-4 leading-relaxed">
+    یک روز یا چند ساعت را ببند بدون اینکه ساعت کاری همیشگی عوض شود.
+    ساعت را خالی بگذار تا کل روز بسته شود.
+  </p>
+
+  <?php if (!empty($timeOffs)): ?>
+    <ul class="space-y-2 mb-4">
+      <?php foreach ($timeOffs as $off):
+        $start = new DateTimeImmutable($off['starts_at']);
+        $end = new DateTimeImmutable($off['ends_at']);
+        $wholeDay = $start->format('H:i') === '00:00' && $end > $start->modify('+23 hours');
+      ?>
+        <li class="flex items-center gap-3 bg-ink-50 rounded-xl px-3 py-2.5">
+          <div class="flex-1 min-w-0">
+            <p class="text-[13px] font-bold text-ink-800">
+              <?= e(App\Support\JalaliCalendar::relativeDate($start)) ?>
+              <?php if (!$wholeDay): ?>
+                <span class="font-normal text-ink-600">— <?= e(fa_time($start->format('H:i'))) ?> تا <?= e(fa_time($end->format('H:i'))) ?></span>
+              <?php else: ?>
+                <span class="font-normal text-ink-600">— تمام روز</span>
+              <?php endif; ?>
+            </p>
+            <p class="text-[11px] text-ink-500 mt-0.5">
+              <?= $off['staff_name'] !== null ? e($off['staff_name']) : 'کل آرایشگاه' ?>
+              <?php if (!empty($off['reason'])): ?> · <?= e($off['reason']) ?><?php endif; ?>
+            </p>
+          </div>
+          <form method="post" action="<?= e(url('panel/settings/timeoff/' . (int) $off['id'] . '/remove')) ?>">
+            <?= csrf_field() ?>
+            <button type="submit" class="w-11 h-11 grid place-items-center rounded-xl text-ink-400 hover:text-red-700 tap"
+                    aria-label="باز کردن این بازه">
+              <?= icon('x', 'w-4 h-4') ?>
+            </button>
+          </form>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+  <?php endif; ?>
+
+  <form method="post" action="<?= e(url('panel/settings/timeoff')) ?>" class="space-y-3">
+    <?= csrf_field() ?>
+
+    <div>
+      <label class="block text-xs text-ink-500 mb-1">روز</label>
+      <?= App\Core\View::render('components.jalali-date-input', ['name' => 'off_date', 'value' => null]) ?>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="block text-xs text-ink-500 mb-1">از ساعت</label>
+        <?= App\Core\View::render('components.time-input', ['name' => 'off_from', 'value' => null, 'minuteStep' => 15]) ?>
+      </div>
+      <div>
+        <label class="block text-xs text-ink-500 mb-1">تا ساعت</label>
+        <?= App\Core\View::render('components.time-input', ['name' => 'off_to', 'value' => null, 'minuteStep' => 15]) ?>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-xs text-ink-500 mb-1">برای چه کسی</label>
+      <select name="off_staff_id" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
+        <option value="">کل آرایشگاه</option>
+        <?php foreach ($staffList as $st): ?>
+          <option value="<?= (int) $st['id'] ?>"><?= e($st['name']) ?></option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+
+    <div>
+      <label class="block text-xs text-ink-500 mb-1">دلیل (اختیاری)</label>
+      <input type="text" name="off_reason" maxlength="150" placeholder="مثلاً: عروسی"
+             class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
+    </div>
+
+    <button type="submit" class="btn-ink w-full">بستن این بازه</button>
+  </form>
+</div>
+
 </div>

@@ -68,16 +68,30 @@ final class AppointmentRepository
     public function scheduledCounts(int $salonId, string $fromDate, string $toDate): array
     {
         $rows = DB::select(
-            'SELECT status, COUNT(*) AS n FROM appointments
+            "SELECT status, cancelled_by, COUNT(*) AS n FROM appointments
              WHERE salon_id = ? AND scheduled_at IS NOT NULL
                AND DATE(scheduled_at) BETWEEN ? AND ?
-             GROUP BY status',
+             GROUP BY status, cancelled_by",
             [$salonId, $fromDate, $toDate]
         );
 
         $out = [];
         foreach ($rows as $r) {
-            $out[$r['status']] = (int) $r['n'];
+            $status = (string) $r['status'];
+            $out[$status] = ($out[$status] ?? 0) + (int) $r['n'];
+
+            /*
+             * لغوها را جدا هم می‌شماریم.
+             *
+             * «۵ لغو» چیزی نمی‌گوید؛ «۴ تا را خودمان لغو کردیم» یعنی
+             * مشکل از ماست، و «۴ تا را مشتری لغو کرد» یعنی بحث بیعانه.
+             * قاطی کردنشان در یک عدد، همان چیزی را پنهان می‌کند که
+             * صاحب سالن باید ببیند.
+             */
+            if ($status === 'cancelled') {
+                $by = $r['cancelled_by'] ?? 'unknown';
+                $out['cancelled_by'][$by] = ($out['cancelled_by'][$by] ?? 0) + (int) $r['n'];
+            }
         }
 
         return $out;
