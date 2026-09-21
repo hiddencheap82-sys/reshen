@@ -22,7 +22,7 @@ $statusMeta = [
     'queued'    => ['در صف',           'text-ink-700',   'bg-ink-100'],
     'in_chair'  => ['روی صندلی',       'text-ink-900',   'bg-ink-100'],
     'completed' => ['انجام‌شده',        'text-green-700', 'bg-green-50'],
-    'cancelled' => ['لغوشده',          'text-red-600',   'bg-red-50'],
+    'cancelled' => ['لغوشده',          'text-red-700',   'bg-red-50'],
     'no_show'   => ['غیبت',            'text-ink-500',   'bg-ink-50'],
 ];
 

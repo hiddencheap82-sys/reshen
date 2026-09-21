@@ -22,23 +22,45 @@
         <span class="block text-[12px] font-bold text-ink-600 mb-2">لوگو</span>
         <div class="flex items-center gap-3">
           <span class="w-16 h-16 shrink-0 rounded-2xl grid place-items-center overflow-hidden
-                       <?= $logoUrl === null ? 'metal metal-ink' : '' ?>"
+                       <?= $logoUrl === null ? 'metal' : '' ?>"
                 style="<?= $logoUrl === null ? '' : 'background:var(--accent-soft)' ?>">
             <?php if ($logoUrl !== null): ?>
               <img src="<?= e($logoUrl) ?>" alt="لوگوی <?= e($salon['name']) ?>"
                    class="w-full h-full object-contain" width="64" height="64">
             <?php else: ?>
-              <span class="text-2xl font-extrabold text-white" aria-hidden="true">ر</span>
+              <span class="text-2xl font-extrabold" style="color:var(--on-accent)" aria-hidden="true">ر</span>
             <?php endif; ?>
           </span>
 
           <div class="flex-1 min-w-0">
-            <input type="file" name="logo" accept="image/png,image/jpeg,image/webp"
-                   aria-label="انتخاب فایل لوگو"
-                   class="block w-full text-[11px] text-ink-500
-                          file:me-2 file:h-10 file:px-3 file:rounded-lg file:border-0
-                          file:text-[12px] file:font-bold file:cursor-pointer
-                          file:bg-ink-100 file:text-ink-700">
+            <!--
+              دکمهٔ انتخاب فایلِ خود مرورگر «Choose File» و «No file chosen»
+              را به انگلیسی می‌نویسد و هیچ CSSای آن متن را عوض نمی‌کند.
+              پس ورودی پنهان می‌شود و یک برچسب فارسی جایش می‌نشیند؛
+              برچسب، کلیکش را به همان ورودی می‌دهد، پس بدون جاوااسکریپت
+              هم کار می‌کند و فقط نمایشِ نام فایل به JS نیاز دارد.
+            -->
+            <input type="file" name="logo" id="logo-input" class="sr-only"
+                   accept="image/png,image/jpeg,image/webp">
+            <label for="logo-input"
+                   class="inline-flex items-center gap-1.5 h-10 px-3.5 rounded-xl cursor-pointer
+                          text-[12px] font-bold text-ink-700 bg-ink-100 tap">
+              <?= icon('plus', 'w-4 h-4') ?>
+              انتخاب تصویر
+            </label>
+            <span id="logo-name" class="block text-[11px] text-ink-500 mt-1.5">فایلی انتخاب نشده</span>
+            <script>
+            (function () {
+              var input = document.getElementById('logo-input');
+              var name = document.getElementById('logo-name');
+              if (!input || !name) return;
+              input.addEventListener('change', function () {
+                name.textContent = input.files && input.files.length
+                  ? input.files[0].name
+                  : 'فایلی انتخاب نشده';
+              });
+            })();
+            </script>
             <p class="text-[10.5px] text-ink-400 mt-1.5 leading-relaxed">
               PNG یا JPG، تا ۳ مگابایت. به‌طور خودکار کوچک می‌شود.
             </p>

@@ -35,9 +35,9 @@ $methodLabels = ['cash'=>'نقدی','card_to_card'=>'کارت‌به‌کارت'
     <div class="text-2xl font-extrabold text-ink-800"><?= toman((int)$totals['tips']) ?></div>
     <div class="text-[11px] text-ink-400 mt-1">انعام</div>
   </div>
-  <div class="bg-emerald-50 rounded-2xl border border-emerald-100 p-4 text-center">
-    <div class="text-2xl font-extrabold text-emerald-700"><?= fa_num($rescued['count']) ?></div>
-    <div class="text-[11px] text-emerald-600 mt-1">نجات‌یافته با یادآور</div>
+  <div class="bg-green-50 rounded-2xl border border-green-100 p-4 text-center">
+    <div class="text-2xl font-extrabold text-green-800"><?= fa_num($rescued['count']) ?></div>
+    <div class="text-[11px] text-green-800 mt-1">نجات‌یافته با یادآور</div>
   </div>
 </div>
 
@@ -64,7 +64,7 @@ $methodLabels = ['cash'=>'نقدی','card_to_card'=>'کارت‌به‌کارت'
 </div>
 
 <?php if ($rescued['count'] > 0): ?>
-<div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-5 mt-5 text-sm text-emerald-800">
+<div class="bg-green-50 border border-green-100 rounded-2xl p-5 mt-5 text-sm text-green-900">
   <?= fa_num($rescued['count']) ?> نوبتی که با پیامک یادآور نجات پیدا کرد ≈ <?= toman((int)$rescued['value']) ?>
 </div>
 <?php endif; ?>

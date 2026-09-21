@@ -24,18 +24,33 @@
 @tailwind utilities;
 
 @layer base {
+  /*
+   * زمینه و سطح، به سبک grouped iOS: زمینهٔ صفحه خاکستریِ روشن است و
+   * بلوک‌های محتوا سفیدِ خالص روی آن می‌نشینند. در حالت تیره وارونه
+   * می‌شود — زمینه مشکیِ خالص و سطح‌ها خاکستریِ بالاآمده.
+   */
   :root{
-    --bg:#FAFAF9; --surface:#FFFFFF; --line:#E7E5E4;
-    --text:#1C1917; --text-dim:#78716C;
+    --bg:#F2F2F7; --surface:#FFFFFF; --line:#D1D1D6;
+    --separator:rgb(60 60 67 / .29);
+    --text:#1C1C1E; --text-dim:#6C6C70;
     --font-sans:'Vazirmatn','Tahoma',sans-serif;
-    --accent:#A16207; --accent-hi:#B45309;
-    --on-accent:#FFFFFF; --accent-soft:#FEFCE8;
+    --accent:#0040DD; --accent-hi:#0033B3;
+    --on-accent:#FFFFFF; --accent-soft:#E8F0FE;
+    --radius-control:10px; --radius-button:14px; --radius-group:16px;
+    /* fillهای سیستمی iOS — برای دکمهٔ خاکستری، چیپ، و نوار جداکننده */
+    --fill-primary:rgb(120 120 128 / .20);
+    --fill-secondary:rgb(120 120 128 / .12);
+    --fill-tertiary:rgb(118 118 128 / .08);
   }
   html.dark{
-      --bg:#0A151E; --surface:#102431; --line:#1C3446;
-      --text:#E9F1F6; --text-dim:#94AEBE;
-      --accent:#FBBF24; --accent-hi:#FBBF24;
-      --on-accent:#0A151E; --accent-soft:#283430;
+      --bg:#000000; --surface:#1C1C1E; --line:#38383A;
+      --separator:rgb(84 84 88 / .65);
+      --text:#FFFFFF; --text-dim:#AEAEB2;
+      --accent:#409CFF; --accent-hi:#6AB0FF;
+      --on-accent:#000000; --accent-soft:#0A2540;
+      --fill-primary:rgb(120 120 128 / .36);
+      --fill-secondary:rgb(120 120 128 / .32);
+      --fill-tertiary:rgb(118 118 128 / .24);
     }
   body{
     font-family:var(--font-sans);
@@ -52,15 +67,22 @@
   .surface{background:var(--surface);border:1px solid var(--line)}
 
 
+  /*
+   * کنش ثانویه — دکمهٔ «خاکستریِ پرشده»ی iOS.
+   *
+   * اپل دکمهٔ ثانویه را با گرادیان و سایه نمی‌سازد؛ یک سطحِ خاکستریِ
+   * کم‌رنگ است با متنِ رنگِ تِینت. حجم و براقی، زبانِ نسخه‌های قدیمیِ
+   * iOS بود و امروز فقط شلوغ به نظر می‌رسد.
+   */
   .btn-ink{
-    @apply inline-flex items-center justify-center gap-2 h-12 px-5 rounded-xl
-           font-bold text-white cursor-pointer
-           transition-all duration-200 ease-out-soft;
-    /* همان پرداختِ فلزیِ .metal-ink — کنش ثانویه هم نباید تخت باشد */
-    background:linear-gradient(180deg,#44403C 0%,#292524 40%,#1C1917 100%);
-    box-shadow:inset 0 1px 0 rgb(255 255 255/.16),0 1px 2px rgb(12 10 9/.24);
+    @apply inline-flex items-center justify-center gap-2 h-[50px] px-5
+           font-bold cursor-pointer select-none
+           transition-all duration-200 ease-ios;
+    border-radius:var(--radius-button);
+    background:var(--fill-secondary);
+    color:var(--text);
   }
-  .btn-ink:hover{filter:brightness(1.12)}
+  .btn-ink:hover{background:var(--fill-primary)}
 
   /*
    * «تمام شد» — تنها دکمهٔ سبز برنامه.
@@ -70,17 +92,20 @@
    * سبزِ ثابت است نه پالتی — در هر شش پالت همین سبز می‌ماند.
    */
   .btn-done{
-    @apply inline-flex items-center justify-center gap-2 px-5 rounded-xl
-           font-bold text-white cursor-pointer
-           transition-all duration-200 ease-out-soft;
-    /* هر سه توقفِ گرادیان باید با متن سفید از ۴٫۵:۱ رد شوند، نه فقط
-       تیره‌ترینشان — متن روی وسطِ دکمه هم خوانده می‌شود. */
-    background:linear-gradient(180deg,#047857 0%,#065F46 45%,#064E3B 100%);
-    box-shadow:inset 0 1px 0 rgb(255 255 255/.28),0 1px 3px rgb(6 95 70/.4);
+    @apply inline-flex items-center justify-center gap-2 px-5
+           font-bold text-white cursor-pointer select-none
+           transition-all duration-200 ease-ios;
+    border-radius:var(--radius-button);
+    /*
+     * systemGreen روی متن سفید ۲٫۲۲ است و خوانده نمی‌شود. این نسخهٔ
+     * accessible همان سبز است (۴٫۷۵) — سطحِ تخت، بدون گرادیان، چون
+     * دکمهٔ پرشدهٔ iOS یک رنگ است و بس.
+     */
+    background:#1C7A32;
   }
-  .btn-done:hover{filter:brightness(1.08)}
-  .btn-done:active{transform:translateY(1px)}
-  .btn-done:focus-visible{outline:2px solid #059669;outline-offset:2px}
+  .btn-done:hover{background:#155E26}
+  .btn-done:active{transform:scale(.97)}
+  .btn-done:focus-visible{outline:2px solid #1C7A32;outline-offset:2px}
 
   /* ═══════════════════════════════════════════════════════════════
    * مقیاس متن — پنج پله، نه نوزده تا
@@ -134,12 +159,12 @@
     overflow-wrap:anywhere;
     word-break:break-word;
   }
-  html.dark .btn-done{
-    background:linear-gradient(180deg,#6EE7B7 0%,#34D399 45%,#10B981 100%);
-    color:#052E22;
-  }
-  .btn-ink:active{transform:translateY(1px)}
-  .btn-ink:focus-visible{outline:2px solid #1C1917;outline-offset:2px}
+  /* در زمینهٔ مشکی، سبزِ روشنِ سیستمی با متن تیره (۱۱٫۴) */
+  html.dark .btn-done{background:#30DB5B;color:#00210B}
+  html.dark .btn-done:hover{background:#28C04E}
+
+  .btn-ink:active{transform:scale(.97)}
+  .btn-ink:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
   /* کارتی که با لمس واکنش نشان می‌دهد */
   .tap{@apply transition-all duration-200 ease-out-soft cursor-pointer}
@@ -282,20 +307,18 @@ html.dark[data-theme="ruby"]{
  *     (prefers-reduced-transparency)، کلاً مات می‌شود.
  * ═══════════════════════════════════════════════════════════════ */
 @layer components {
+  /*
+   * بلوکِ grouped iOS: سطحِ مات روی زمینهٔ خاکستری، بدون سایه.
+   * اپل این بلوک‌ها را با اختلافِ رنگِ سطح از زمینه جدا می‌کند، نه با
+   * سایه — سایه را برای چیزی نگه می‌دارد که واقعاً شناور است.
+   */
   .glass{
     background:var(--glass-solid);
     border:1px solid var(--glass-line);
-    box-shadow:0 1px 2px rgb(12 10 9/.05), 0 8px 24px -12px rgb(12 10 9/.12);
-  }
-  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)){
-    .glass{
-      background:var(--glass-bg);
-      -webkit-backdrop-filter:saturate(180%) blur(16px);
-      backdrop-filter:saturate(180%) blur(16px);
-    }
+    border-radius:var(--radius-group);
   }
   @media (prefers-reduced-transparency: reduce){
-    .glass{background:var(--glass-solid);backdrop-filter:none;-webkit-backdrop-filter:none}
+    .glass{background:var(--glass-solid)}
   }
 
   /* نوار شناور پایین — همان حسِ تب‌بار iOS */
@@ -312,51 +335,40 @@ html.dark[data-theme="ruby"]{
   }
 
   /*
-   * فلزِ روان — گرادیان چندمرحله‌ای با یک خطِ نوری در بالا.
-   * برخلاف گرادیان دومرحله‌ای ساده، اینجا نور از یک لبه می‌تابد و
-   * در میانه کمی تیره می‌شود؛ همان چیزی که سطح فلز صیقلی را
-   * باورپذیر می‌کند.
+   * .metal پیش از این یک گرادیانِ چندمرحله‌ای با بازتابِ نور بود —
+   * زبانِ اسکیومورفیکِ iOS 6، نه iOS امروز. کلاس را نگه داشتیم تا
+   * ویوها نشکنند، ولی حالا همان دکمهٔ پرشدهٔ تخت است: یک رنگ، بدون
+   * گرادیان، بدون درخشش، با فشردگیِ کوچکِ لمس.
    */
   .metal{
-    position:relative; overflow:hidden;
-    background:
-      linear-gradient(180deg,
-        color-mix(in srgb, var(--accent) 88%, white) 0%,
-        var(--accent) 38%,
-        color-mix(in srgb, var(--accent) 88%, black) 72%,
-        var(--accent) 100%);
+    background:var(--accent);
     color:var(--on-accent);
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255/.28),
-      inset 0 -1px 0 rgb(0 0 0/.18),
-      0 1px 2px rgb(12 10 9/.22);
   }
-  /* بازتاب نور که با لمس حرکت می‌کند */
-  .metal::after{
-    content:''; position:absolute; inset:0;
-    background:linear-gradient(105deg,transparent 30%,rgb(255 255 255/.22) 47%,transparent 62%);
-    transform:translateX(-120%);
-    transition:transform .7s cubic-bezier(.22,1,.36,1);
-    pointer-events:none;
-  }
-  .metal:hover::after,.metal:focus-visible::after{transform:translateX(120%)}
-  .metal:active{filter:brightness(.95)}
+  .metal:hover{background:var(--accent-hi)}
+  .metal:active{transform:scale(.97)}
   .metal:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
   /* نسخهٔ خنثی برای کنش‌های ثانویه */
   .metal-ink{
-    background:linear-gradient(180deg,#44403C 0%,#292524 40%,#1C1917 100%);
-    color:#fff;
-    box-shadow:inset 0 1px 0 rgb(255 255 255/.16),0 1px 2px rgb(12 10 9/.24);
+    background:var(--fill-secondary);
+    color:var(--text);
   }
+  .metal-ink:hover{background:var(--fill-primary)}
 
   /* دکمهٔ اصلی — حالا از متغیر پالت رنگ می‌گیرد */
+  /*
+   * کنش اصلی — دکمهٔ پرشدهٔ iOS.
+   *
+   * قد ۵۰ پیکسل (اندازهٔ دکمهٔ اصلی در iOS، و بالاتر از کفِ ۴۴ پیکسلیِ
+   * هدفِ لمس)، گردیِ ۱۴، یک رنگِ تخت.
+   */
   .btn-accent{
-    @apply inline-flex items-center justify-center gap-2 h-12 px-5 rounded-2xl
+    @apply inline-flex items-center justify-center gap-2 h-[50px] px-5
            font-bold cursor-pointer select-none
-           transition-all duration-200 ease-out-soft;
+           transition-all duration-200 ease-ios;
+    border-radius:var(--radius-button);
   }
-  .btn-accent:active{transform:translateY(1px)}
+  .btn-accent:active{transform:scale(.97)}
 
   .chip-accent{
     background:var(--accent-soft); color:var(--accent);
@@ -376,29 +388,33 @@ html.dark[data-theme="ruby"]{
 }
 
 :root{
-  --glass-bg:rgb(255 255 255/.72);
+  --glass-bg:rgb(255 255 255/.80);
   --glass-solid:#FFFFFF;
-  --glass-line:rgb(12 10 9/.08);
-  --glass-bar-bg:rgb(255 255 255/.82);
+  --glass-line:rgb(60 60 67/.13);
+  --glass-bar-bg:rgb(249 249 249/.94);
 }
 html.dark{
-    --glass-bg:rgb(16 36 49/.68);
-    --glass-solid:#102431;
-    --glass-line:rgb(148 174 190/.16);
-    --glass-bar-bg:rgb(10 21 30/.82);
+    --glass-bg:rgb(28 28 30/.80);
+    --glass-solid:#1C1C1E;
+    --glass-line:rgb(84 84 88/.45);
+    --glass-bar-bg:rgb(22 22 24/.94);
   }
 
 /*
  * سرصفحهٔ صفحهٔ سالن.
  *
- * چرا متغیر و نه استایل درون‌خطی: استایل درون‌خطی را هیچ قاعده‌ای در
- * حالت تیره نمی‌تواند کنار بزند. نتیجه‌اش سرصفحهٔ قهوه‌ای روی بدنهٔ
- * نفتی بود — دو رنگِ بی‌ربط زیر هم.
+ * حالا رنگِ تِینتِ خودِ سالن است، تخت — مثل نوار ناوبریِ رنگیِ iOS.
+ * پیش از این یک گرادیانِ زغالی بود که هیچ ربطی به پالت انتخابیِ سالن
+ * نداشت؛ سالنی که آبی انتخاب کرده بود، سرصفحهٔ قهوه‌ای می‌گرفت.
  *
- * در حالت تیره از سطحِ صفحه تیره‌تر است تا هنوز «بالاتر» به نظر برسد.
+ * چرا متغیر و نه استایل درون‌خطی: استایل درون‌خطی را هیچ قاعده‌ای در
+ * حالت تیره نمی‌تواند کنار بزند.
+ *
+ * متن سفید روی هر شش تِینت از ۴٫۵:۱ رد می‌شود، چون همه از جدول
+ * accessible اپل آمده‌اند.
  */
-:root{ --hero:linear-gradient(145deg,#1C1917 0%,#292524 55%,#1C1917 100%); }
-html.dark{ --hero:linear-gradient(145deg,#071019 0%,#14303F 55%,#071019 100%); }
+:root{ --hero:var(--accent); }
+html.dark{ --hero:#1C1C1E; }
 
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -418,56 +434,57 @@ html.dark{ --hero:linear-gradient(145deg,#071019 0%,#14303F 55%,#071019 100%); }
    * (سرصفحهٔ سالن)، پس نباید وارونه شود — وگرنه در حالت تیره
    * متنِ تیره روی زمینهٔ تیره می‌رود.
    */
-  html.dark .on-dark .text-ink-300{color:#B9CCD8}
-html.dark .on-dark .text-ink-400{color:#94AEBE}
+  html.dark .on-dark .text-ink-300{color:rgb(235 235 245/.6)}
+html.dark .on-dark .text-ink-400{color:rgb(235 235 245/.6)}
 html.dark .on-dark .text-white{color:#fff}
 /* متن — نردبان روشنایی وارونه می‌شود */
-  html.dark .text-ink-950, html.dark .text-ink-900{color:#E9F1F6}
-html.dark .text-ink-800{color:#D4E2EA}
-html.dark .text-ink-700{color:#B9CCD8}
-html.dark .text-ink-600, html.dark .text-ink-500{color:#94AEBE}
-html.dark .text-ink-400{color:#7793A6}
-html.dark .text-ink-300{color:#4E6C80}
-html.dark .text-white{color:#E9F1F6}
+  html.dark .text-ink-950, html.dark .text-ink-900{color:#FFFFFF}
+html.dark .text-ink-800{color:rgb(235 235 245/.92)}
+html.dark .text-ink-700{color:rgb(235 235 245/.78)}
+html.dark .text-ink-600, html.dark .text-ink-500{color:rgb(235 235 245/.6)}
+html.dark .text-ink-400{color:rgb(235 235 245/.45)}
+html.dark .text-ink-300{color:rgb(235 235 245/.3)}
+html.dark .text-white{color:#FFFFFF}
 /* طلایی در زمینهٔ تیره باید روشن‌تر باشد تا کنتراست حفظ شود */
-  html.dark .text-gold-700, html.dark .text-gold-600{color:#FBBF24}
+  html.dark .text-gold-700, html.dark .text-gold-600{color:#FFD426}
 /* سطوح */
-  html.dark .bg-white{background-color:#102431}
-html.dark .bg-ink-50{background-color:#102431}
-html.dark .bg-ink-100{background-color:#1C3446}
-html.dark .bg-ink-900{background-color:#E9F1F6;color:#102431}
+  html.dark .bg-white{background-color:#1C1C1E}
+html.dark .bg-ink-50{background-color:#1C1C1E}
+html.dark .bg-ink-100{background-color:#2C2C2E}
+html.dark .bg-ink-900{background-color:#FFFFFF;color:#000000}
 html.dark .bg-accent-soft{background-color:var(--accent-soft)}
-html.dark .hover\:bg-ink-100:hover{background-color:#1C3446}
-html.dark .hover\:bg-gold-50:hover{background-color:#1C3446}
-html.dark .hover\:bg-ink-50:hover{background-color:#102431}
+html.dark .hover\:bg-ink-100:hover{background-color:#2C2C2E}
+html.dark .hover\:bg-gold-50:hover{background-color:#2C2C2E}
+html.dark .hover\:bg-ink-50:hover{background-color:#1C1C1E}
 /* خط‌ها */
-  html.dark .border-ink-100, html.dark .border-ink-200, html.dark .border-ink-300{border-color:#1C3446}
-html.dark .divide-ink-100>*+*{border-color:#1C3446}
+  html.dark .border-ink-100, html.dark .border-ink-200, html.dark .border-ink-300{border-color:#38383A}
+html.dark .divide-ink-100>*+*{border-color:#38383A}
 /* رنگ‌های معنایی — نسخهٔ کم‌اشباع برای زمینهٔ تیره */
-  html.dark .bg-green-50{background-color:#14261A}
-html.dark .text-green-700{color:#4ADE80}
-html.dark .bg-red-50{background-color:#2A1416}
-html.dark .text-red-600, html.dark .text-red-700, html.dark .text-red-800{color:#F87171}
-html.dark .bg-amber-50{background-color:#1C3446}
-html.dark .text-amber-700{color:#FBBF24}
-html.dark .border-red-100{border-color:#3F1D1D}
+  html.dark .bg-green-50{background-color:#0D2A16}
+html.dark .text-green-700,
+html.dark .text-green-800,
+html.dark .text-green-900{color:#30DB5B}
+html.dark .bg-red-50{background-color:#3A0F12}
+html.dark .text-red-600, html.dark .text-red-700,
+html.dark .text-red-800, html.dark .text-red-900{color:#FF6961}
+html.dark .bg-amber-50{background-color:#3A2208}
+html.dark .text-amber-700{color:#FFD426}
+html.dark .border-red-100{border-color:#5A1A1E}
 /*
- * فلزِ خنثی در حالت تیره.
+ * دکمهٔ ثانویه در حالت تیره.
  *
- * گرادیان زغالیِ .metal-ink روی زمینهٔ نفتی تقریباً ناپدید می‌شود، پس
- * وارونه می‌شود: فولادِ صیقلی. هم دیده می‌شود، هم همان حسِ «متال» را
- * می‌دهد و تخت نیست.
+ * همان fillِ سیستمی است، فقط پررنگ‌تر — اپل در زمینهٔ تیره شفافیتِ
+ * fill را بالا می‌برد تا از سطح جدا بماند.
  */
-  html.dark .btn-ink,
+html.dark .btn-ink,
 html.dark .metal-ink{
-    background:linear-gradient(180deg,#F4F9FC 0%,#DCE8EF 45%,#BFD2DE 100%);
-    color:#102431;
-    box-shadow:inset 0 1px 0 rgb(255 255 255/.7),0 1px 3px rgb(0 0 0/.38);
+    background:var(--fill-secondary);
+    color:#FFFFFF;
   }
-html.dark .btn-ink:hover{filter:brightness(1.04)}
+html.dark .btn-ink:hover{background:var(--fill-primary)}
 /* ورودی‌ها */
-  html.dark input, html.dark select, html.dark textarea{background:#102431;color:#E9F1F6;border-color:#1C3446}
-html.dark input::placeholder, html.dark textarea::placeholder{color:#7793A6}
+  html.dark input, html.dark select, html.dark textarea{background:#1C1C1E;color:#FFFFFF;border-color:#38383A}
+html.dark input::placeholder, html.dark textarea::placeholder{color:rgb(235 235 245/.3)}
 
 /*
  * ابزارهایی که در بازنویسی اول جا مانده بودند.
@@ -481,9 +498,9 @@ html.dark input::placeholder, html.dark textarea::placeholder{color:#7793A6}
  *                 رویش. عملاً ناخوانا.
  */
 html.dark .bg-ink-200,
-html.dark .hover\:bg-ink-200:hover{background-color:#1C3446}
-html.dark .bg-ink-300{background-color:#2A4257}
-html.dark .hover\:bg-ink-800:hover{background-color:#D4E2EA;color:#102431}
+html.dark .hover\:bg-ink-200:hover{background-color:#2C2C2E}
+html.dark .bg-ink-300{background-color:#3A3A3C}
+html.dark .hover\:bg-ink-800:hover{background-color:#E5E5EA;color:#000000}
 html.dark .bg-gold-50,
 html.dark .bg-gold-50\/50,
 html.dark .hover\:bg-gold-50:hover,

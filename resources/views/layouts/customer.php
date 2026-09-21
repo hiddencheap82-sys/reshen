@@ -57,7 +57,7 @@
   </main>
 
   <footer class="text-center pb-5 pt-2">
-    <span class="text-[11px] text-ink-300">رشن — زمانِ راست می‌گوید</span>
+    <span class="text-[11px] text-ink-400">رشن — زمانِ راست می‌گوید</span>
   </footer>
 </div>
 

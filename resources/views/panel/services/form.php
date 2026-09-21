@@ -10,7 +10,7 @@ foreach ($overrides as $o) { $overrideMap[(int)$o['staff_id']] = $o; }
 ?>
 <div class="max-w-lg">
 <div class="flex items-center gap-3 mb-5">
-  <a href="<?= url('panel/services') ?>" class="text-ink-400">←</a>
+  <a href="<?= url('panel/services') ?>" class="w-11 h-11 -ms-2 grid place-items-center rounded-xl text-ink-400 tap">←</a>
   <h1 class="page-title"><?= $service ? 'ویرایش خدمت' : 'خدمت جدید' ?></h1>
 </div>
 

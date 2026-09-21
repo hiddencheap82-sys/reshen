@@ -1,6 +1,6 @@
 <?php /** @var array $salon @var array $owners @var array $auditLogs */ ?>
 <div class="flex items-center gap-3 mb-5">
-  <a href="<?= url('platform') ?>" class="text-ink-400">←</a>
+  <a href="<?= url('platform') ?>" class="w-11 h-11 -ms-2 grid place-items-center rounded-xl text-ink-400 tap">←</a>
   <h1 class="page-title"><?= e($salon['name']) ?></h1>
 </div>
 

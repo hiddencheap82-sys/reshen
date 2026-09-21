@@ -215,7 +215,13 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
             <?php else: ?>
               <form method="post" action="<?= e(url('panel/queue/' . $row['id'] . '/complete')) ?>" class="flex-1">
                 <?= csrf_field() ?>
-                <button class="btn-accent metal w-full h-11 text-[13px]">تمام شد و تسویه</button>
+                <!--
+                  سبز، نه رنگِ پالت: «تمام شد» تنها کنشی است که آرایشگر
+                  وسط کار و بدون خواندن باید پیدایش کند، پس هرجا بیاید
+                  یک رنگ دارد. پیش از این نسخهٔ بزرگش سبز بود و همین
+                  نسخهٔ فهرستی آبی — یک کار با دو رنگ.
+                -->
+                <button class="btn-done w-full h-11 text-[13px]">تمام شد و تسویه</button>
               </form>
             <?php endif; ?>
 

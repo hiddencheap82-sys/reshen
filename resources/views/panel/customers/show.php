@@ -3,7 +3,7 @@
 $p = $preferences ?? [];
 ?>
 <div class="flex items-center gap-3 mb-5">
-  <a href="<?= url('panel/customers') ?>" class="text-ink-400">←</a>
+  <a href="<?= url('panel/customers') ?>" class="w-11 h-11 -ms-2 grid place-items-center rounded-xl text-ink-400 tap">←</a>
   <h1 class="page-title"><?= e($customer['name'] ?: 'بدون نام') ?></h1>
 </div>
 

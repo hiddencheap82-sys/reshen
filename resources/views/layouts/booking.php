@@ -46,16 +46,14 @@ $step = $step ?? null;
     <header class="on-dark relative overflow-hidden text-white px-5 pt-7 pb-6"
             style="background:var(--hero)">
 
-      <div class="absolute inset-0 opacity-[0.07]" aria-hidden="true"
-           style="background-image:repeating-linear-gradient(135deg,#fff 0 1px,transparent 1px 9px)"></div>
       <div class="absolute -top-16 -left-10 w-48 h-48 rounded-full blur-3xl opacity-25" aria-hidden="true"
            style="background:radial-gradient(circle,var(--accent) 0%,transparent 70%)"></div>
 
       <div class="relative">
         <div class="flex items-center gap-2 mb-3">
-          <span class="w-7 h-7 rounded-lg grid place-items-center text-[13px] font-extrabold text-ink-950"
-                style="background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 55%,white),var(--accent))" aria-hidden="true">ر</span>
-          <span class="text-[11px] tracking-wide text-ink-300">رشن</span>
+          <span class="w-7 h-7 rounded-lg grid place-items-center text-[13px] font-extrabold"
+                style="background:rgb(255 255 255/.22);color:#fff" aria-hidden="true">ر</span>
+          <span class="text-[11px] tracking-wide" style="color:rgb(255 255 255/.85)">رشن</span>
 
           <!-- کلید روشن/تیره در انتهای همان ردیف، دور از دکمه‌های رزرو -->
           <span class="ms-auto -my-2 -me-2">
@@ -77,7 +75,7 @@ $step = $step ?? null;
         </div>
 
         <?php if (!empty($salon['address']) || !empty($salon['city'])): ?>
-          <p class="flex items-start gap-1.5 text-[12px] text-ink-300 mt-2 leading-relaxed">
+          <p class="flex items-start gap-1.5 text-[12px] mt-2 leading-relaxed" style="color:rgb(255 255 255/.85)">
             <?= icon('map-pin', 'w-3.5 h-3.5 mt-0.5 shrink-0 opacity-80') ?>
             <span><?= e(trim(($salon['city'] ?? '') . ' · ' . ($salon['address'] ?? ''), ' ·')) ?></span>
           </p>
@@ -140,7 +138,7 @@ $step = $step ?? null;
   </main>
 
   <footer class="text-center pb-5 pt-2">
-    <span class="text-[11px] text-ink-300">رشن — زمانِ راست می‌گوید</span>
+    <span class="text-[11px] text-ink-400">رشن — زمانِ راست می‌گوید</span>
   </footer>
 </div>
 
