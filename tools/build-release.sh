@@ -43,6 +43,19 @@ echo "→ حذف چیزهایی که مشتری لازم ندارد"
 rm -rf "$STAGE/tools/assets/node_modules" "$STAGE/tools/assets" "$STAGE/tools/build-release.sh"
 find "$STAGE" -name '.DS_Store' -delete 2>/dev/null || true
 
+# هرس vendor.
+#
+# اگر کامپوزر پکیجی را از سورس گرفته باشد، پوشهٔ .git آن هم می‌آید —
+# برای یک کتابخانهٔ QR این یعنی ۱۵ مگابایت پکِ گیت در بسته‌ای که باید
+# روی هاست اشتراکی آپلود شود. تستِ خودِ کتابخانه‌ها هم روی هاست
+# مشتری کاری نمی‌کند.
+find "$STAGE/vendor" -type d \( -name '.git' -o -name '.github' -o -name 'tests' \
+    -o -name 'test' -o -name 'doc' -o -name 'docs' -o -name 'examples' \) \
+    -prune -exec rm -rf {} + 2>/dev/null || true
+find "$STAGE/vendor" -type f \( -name '.gitignore' -o -name '.gitattributes' \
+    -o -name 'phpunit.xml*' -o -name '*.dist' -o -name 'Makefile' \) \
+    -delete 2>/dev/null || true
+
 # راهنمای کوتاه کنار بسته
 cp docs/40-deploy/01-cpanel.md "$STAGE/نصب.md" 2>/dev/null || true
 
