@@ -214,7 +214,117 @@ function environment_checks(): array
         ]],
         'افزونه‌های PHP' => $extensions,
         'پوشه‌ها و دسترسی‌ها' => $paths,
+        'امنیت' => exposure_checks(),
     ];
+}
+
+
+/**
+ * آیا فایل‌های حساس از وب قابل دانلود هستند؟
+ *
+ * چرا این بررسی لازم است: وقتی کل پروژه داخل ریشهٔ سایت (یا ریشهٔ یک
+ * زیردامنه) باز می‌شود، تنها چیزی که بین اینترنت و رمز دیتابیس شما
+ * می‌ایستد همان .htaccess ریشه است. اگر باز نشده باشد — و چون
+ * File Manager فایل‌های نقطه‌دار را پنهان می‌کند، راحت جا می‌ماند —
+ * سایت درست بالا می‌آید و هیچ خطایی نمی‌دهد، ولی .env با یک آدرس
+ * ساده دانلود می‌شود.
+ *
+ * دو لایه: اول یک بررسی محلی که همیشه جواب می‌دهد، بعد اگر شد یک
+ * درخواست واقعی به خودمان. درخواستِ به خود روی بعضی هاست‌ها به
+ * بن‌بست می‌خورد (وب‌سرور تک‌کارگر)، پس هرگز تنها تکیه‌گاه نیست.
+ *
+ * @return array<int,array{label:string,status:string,value:string,hint:string}>
+ */
+function exposure_checks(): array
+{
+    $root = realpath(RESHEN_ROOT) ?: RESHEN_ROOT;
+    $docRoot = realpath($_SERVER['DOCUMENT_ROOT'] ?? '') ?: '';
+
+    /*
+     * ریشهٔ سایت روی public/ تنظیم شده؟ آن‌وقت کد و .env اصلاً بیرون
+     * از پوشه‌ای هستند که وب‌سرور سرو می‌کند و هیچ قاعده‌ای لازم نیست.
+     */
+    $insideDocroot = $docRoot !== '' && str_starts_with($root . DIRECTORY_SEPARATOR, $docRoot . DIRECTORY_SEPARATOR);
+
+    if (!$insideDocroot) {
+        return [[
+            'label' => 'جای فایل‌های حساس',
+            'status' => 'ok',
+            'value' => 'بیرون از ریشهٔ سایت',
+            'hint' => 'ریشهٔ سایت روی پوشهٔ public/ است، پس کد و فایل تنظیمات اصلاً از وب دیده نمی‌شوند. امن‌ترین حالت.',
+        ]];
+    }
+
+    $htaccess = $root . '/.htaccess';
+    if (!is_file($htaccess)) {
+        return [[
+            'label' => 'فایل .htaccess ریشه',
+            'status' => 'fail',
+            'value' => 'نیست',
+            'hint' => 'کل پروژه داخل ریشهٔ سایت است و تنها محافظش همین فایل بود. بدون آن، .env و کل کد از اینترنت قابل دانلود است. '
+                . 'در File Manager گزینهٔ نمایش فایل‌های مخفی (Show Hidden Files) را روشن کنید؛ اگر .htaccess واقعاً نیست، دوباره از داخل zip بیرونش بکشید.',
+        ]];
+    }
+
+    $out = [[
+        'label' => 'فایل .htaccess ریشه',
+        'status' => 'ok',
+        'value' => 'هست',
+        'hint' => '',
+    ]];
+
+    // تأیید عملی: اگر شد، واقعاً یک فایل حساس را از بیرون صدا می‌زنیم.
+    $url = detected_url() . '/.env.example';
+    $reachable = null;
+
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 4,
+            CURLOPT_CONNECTTIMEOUT => 2,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_FOLLOWLOCATION => false,
+        ]);
+        $body = curl_exec($ch);
+        $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($code !== 0) {
+            /*
+             * فقط کد ۲۰۰ کافی نیست: بعضی هاست‌ها صفحهٔ خطای خودشان را
+             * با کد ۲۰۰ برمی‌گردانند. پس دنبال نشانهٔ خودِ فایل می‌گردیم.
+             */
+            $reachable = $code === 200 && is_string($body) && str_contains($body, 'APP_KEY');
+        }
+    }
+
+    if ($reachable === true) {
+        $out[] = [
+            'label' => 'دسترسی وب به .env',
+            'status' => 'fail',
+            'value' => 'قابل دانلود است',
+            'hint' => '.htaccess هست ولی وب‌سرور نادیده‌اش می‌گیرد (AllowOverride خاموش است). از پشتیبانی هاست بخواهید روشنش کند، '
+                . 'یا ریشهٔ سایت را روی پوشهٔ public/ بگذارید — آن راه به هیچ تنظیمی وابسته نیست.',
+        ];
+    } elseif ($reachable === false) {
+        $out[] = [
+            'label' => 'دسترسی وب به .env',
+            'status' => 'ok',
+            'value' => 'بسته',
+            'hint' => '',
+        ];
+    } else {
+        $out[] = [
+            'label' => 'دسترسی وب به .env',
+            'status' => 'warn',
+            'value' => 'بررسی نشد',
+            'hint' => 'نصاب نتوانست خودش را صدا بزند (روی بعضی هاست‌ها عادی است). دستی امتحان کنید: ' . $url
+                . ' — باید خطای دسترسی بدهد، نه متن فایل.',
+        ];
+    }
+
+    return $out;
 }
 
 /** @return true|string true یعنی موفق، وگرنه پیام خطا */
