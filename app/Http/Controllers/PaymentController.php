@@ -9,7 +9,7 @@ use App\Core\DB;
 use App\Core\Request;
 use App\Core\Response;
 use App\Domain\Payment\PaymentRepository;
-use App\Domain\Queue\AppointmentRepository;
+use App\Domain\Appointment\AppointmentRepository;
 use App\Support\Money;
 
 /** D01/D02 — one-tap settlement, glued to "تمام شد" so it can't be skipped. */

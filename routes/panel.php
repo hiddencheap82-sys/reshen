@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Core\Response;
 use App\Http\Controllers\BookingsController;
-use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\SalonCustomersController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\QrController;
 use App\Http\Controllers\QueueController;
@@ -53,11 +53,11 @@ $router->group(['middleware' => [AuthRequired::class, TenantRequired::class]], f
      * می‌دیدش. برای پذیرش لازم است، برای آرایشگر نه.
      */
     $router->group(['middleware' => [AbilityRequired::class . ':' . Access::VIEW_CUSTOMERS]], function ($router) {
-        $router->get('/panel/customers', [CustomerController::class, 'index']);
-        $router->get('/panel/customers/{id}', [CustomerController::class, 'show']);
+        $router->get('/panel/customers', [SalonCustomersController::class, 'index']);
+        $router->get('/panel/customers/{id}', [SalonCustomersController::class, 'show']);
 
         $router->group(['middleware' => [VerifyCsrf::class]], function ($router) {
-            $router->post('/panel/customers/{id}', [CustomerController::class, 'update']);
+            $router->post('/panel/customers/{id}', [SalonCustomersController::class, 'update']);
         });
     });
 
@@ -80,7 +80,7 @@ $router->group(['middleware' => [AuthRequired::class, TenantRequired::class]], f
         });
     });
 
-    // --- Staff (owner/manager only) ---------------------------------------
+    // ─── آرایشگرها (فقط صاحب و مدیر) ──────────────────────────────────────
     $router->group(['middleware' => [OwnerManagerRequired::class]], function ($router) {
         $router->get('/panel/staff', [StaffController::class, 'index']);
         $router->get('/panel/staff/create', [StaffController::class, 'create']);
@@ -92,7 +92,7 @@ $router->group(['middleware' => [AuthRequired::class, TenantRequired::class]], f
             $router->post('/panel/staff/{id}/toggle', [StaffController::class, 'toggle']);
         });
 
-        // --- Services --------------------------------------------------------
+        // ─── خدمات ───────────────────────────────────────────────────────────
         $router->get('/panel/services', [ServiceController::class, 'index']);
         $router->get('/panel/services/create', [ServiceController::class, 'create']);
         $router->get('/panel/services/{id}/edit', [ServiceController::class, 'edit']);
@@ -104,11 +104,11 @@ $router->group(['middleware' => [AuthRequired::class, TenantRequired::class]], f
             $router->post('/panel/services/{id}/toggle', [ServiceController::class, 'toggle']);
         });
 
-        // --- Reports -------------------------------------------------------
+        // ─── گزارش‌ها ─────────────────────────────────────────────────────────
         $router->get('/panel/reports', [ReportController::class, 'daily']);
         $router->get('/panel/reports/monthly', [ReportController::class, 'monthly']);
 
-        // --- Salon settings ----------------------------------------------
+        // ─── تنظیمات سالن ────────────────────────────────────────────────────
         $router->get('/panel/sms', [SmsPatternController::class, 'index']);
         $router->get('/panel/settings', [SalonSettingsController::class, 'show']);
         $router->group(['middleware' => [VerifyCsrf::class]], function ($router) {

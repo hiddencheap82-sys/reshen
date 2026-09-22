@@ -10,12 +10,13 @@ use DateTimeZone;
 use InvalidArgumentException;
 
 /**
- * Gregorian <-> Jalali (Shamsi) conversion via the standard 33-year-cycle
- * astronomical algorithm (the same one behind jalaali-js), ported to PHP.
+ * تبدیل میلادی ↔ شمسی، با همان الگوریتم نجومیِ چرخهٔ ۳۳ ساله.
  *
- * Not just a display detail: the weekend is Thu/Fri, the week starts on
- * Saturday, Esfand is a 30-day leap month in some years, and holidays are
- * looked up against the Jalali calendar. See product doc 8.7.
+ * این فقط یک جزئیات نمایشی نیست. تقویم شمسی روی منطق برنامه اثر دارد:
+ * آخر هفته پنج‌شنبه و جمعه است، هفته از شنبه شروع می‌شود، اسفند در
+ * بعضی سال‌ها ۳۰ روز است، و تعطیلات با تاریخ شمسی پیدا می‌شوند.
+ *
+ * یعنی اگر اینجا اشتباه شود، سالن یک روز اشتباه باز می‌ماند.
  */
 final class Jalali
 {
@@ -30,13 +31,13 @@ final class Jalali
 
     private const BREAKS = [-61, 9, 38, 199, 426, 686, 756, 818, 1111, 1181, 1210, 1635, 2060, 2097, 2192, 2262, 2324, 2394, 2456, 3178];
 
-    /** @return array{0:int,1:int,2:int} [jy, jm, jd] */
+    /** @return array{0:int,1:int,2:int} [سال، ماه، روزِ شمسی] */
     public static function fromGregorian(int $gy, int $gm, int $gd): array
     {
         return self::d2j(self::g2d($gy, $gm, $gd));
     }
 
-    /** @return array{0:int,1:int,2:int} [gy, gm, gd] */
+    /** @return array{0:int,1:int,2:int} [سال، ماه، روزِ میلادی] */
     public static function toGregorian(int $jy, int $jm, int $jd): array
     {
         return self::d2g(self::j2d($jy, $jm, $jd));
@@ -77,10 +78,10 @@ final class Jalali
         return new DateTimeImmutable($date, $tz);
     }
 
-    /** Iranian week: Saturday = 0 ... Friday = 6 (PHP's `w` gives Sunday = 0). */
+    /** هفتهٔ ایرانی: شنبه = ۰ تا جمعه = ۶ (در PHP یکشنبه = ۰ است). */
     public static function weekday(DateTimeInterface $dt): int
     {
-        $phpWeekday = (int) $dt->format('w'); // 0 (Sun) .. 6 (Sat)
+        $phpWeekday = (int) $dt->format('w'); // ۰ (یکشنبه) تا ۶ (شنبه)
 
         return ($phpWeekday + 1) % 7;
     }
@@ -92,7 +93,7 @@ final class Jalali
 
     public static function isWeekend(DateTimeInterface $dt): bool
     {
-        return self::weekday($dt) >= 5; // Thursday (5) or Friday (6)
+        return self::weekday($dt) >= 5; // پنج‌شنبه (۵) یا جمعه (۶)
     }
 
     public static function format(DateTimeInterface $dt, string $format = 'Y/m/d H:i'): string
@@ -131,7 +132,7 @@ final class Jalali
         return strtr($value, array_flip(self::PERSIAN_DIGITS));
     }
 
-    // --- low-level algorithm -------------------------------------------------
+    // ─── خودِ الگوریتم ────────────────────────────────────────────────────
 
     private static function div(int $a, int $b): int
     {
@@ -166,7 +167,7 @@ final class Jalali
         return [$gy, $gm, $gd];
     }
 
-    /** @return array{leap:int,gy:int,march:int} */
+    /** @return array{leap:int,gy:int,march:int} کبیسه، سال میلادی، روزِ مارس */
     private static function jalCal(int $jy): array
     {
         $bl = count(self::BREAKS);

@@ -9,15 +9,20 @@ use App\Core\DB;
 use DateTimeImmutable;
 
 /**
- * Turns an already-ordered per-staff queue into promised times. Formula
- * straight from doc 8.6:
+ * صف مرتب‌شدهٔ یک آرایشگر را به ساعت‌های وعده‌داده‌شده تبدیل می‌کند.
  *
- *   remaining(in_chair) = max(floor, expected(current) - elapsed)
- *   ETA(i) = now + remaining + sum_{j<i}( expected(j) + buffer )
- *   upper bound = same, using p80 instead of p50 throughout
+ *   باقی‌ماندهٔ نفر روی صندلی = بیشینهٔ (کف، انتظاری − گذشته)
+ *   ساعت نفر i = اکنون + باقی‌مانده + جمعِ (انتظاری + فاصله) برای نفرات جلوتر
+ *   کران بالا = همان فرمول، با p80 به‌جای p50
  *
- * Never returns "right now" (a 2-minute floor) and never estimates past a
- * 3-hour horizon — beyond that the error is meaningless (doc 8.6).
+ * دو محدودیت عمدی:
+ *
+ * هرگز «همین حالا» نمی‌گوید (کف دو دقیقه) — چون مشتری‌ای که «همین
+ * حالا» می‌شنود و می‌بیند هنوز کسی روی صندلی است، دیگر به هیچ عددی
+ * اعتماد نمی‌کند.
+ *
+ * و جلوتر از سه ساعت تخمین نمی‌زند. آن‌طرف‌تر خطا آن‌قدر بزرگ می‌شود
+ * که عدد دادن بدتر از عدد ندادن است.
  */
 final class EtaEngine
 {
@@ -29,9 +34,9 @@ final class EtaEngine
     }
 
     /**
-     * @param array<int,array> $orderedAppointments already in queue order for ONE staff member
+     * @param array<int,array> $orderedAppointments نوبت‌های *یک* آرایشگر، از قبل مرتب‌شده
      * @return array<int,array{expected_p50:float,expected_p80:float,start_p50:DateTimeImmutable,start_p80:DateTimeImmutable,position:int}>
-     *         keyed by appointment id
+     *         کلید: شناسهٔ نوبت
      */
     public function computeForStaffQueue(array $orderedAppointments, ?DateTimeImmutable $now = null): array
     {

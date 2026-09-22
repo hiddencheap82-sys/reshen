@@ -6,7 +6,7 @@ declare(strict_types=1);
 
 require dirname(__DIR__) . '/app/bootstrap.php';
 
-use App\Core\HealthCheck;
+use App\Domain\Diagnostics\HealthCheck;
 
 $mark = ['ok' => "\033[32m✓\033[0m", 'warn' => "\033[33m!\033[0m", 'fail' => "\033[31m✗\033[0m"];
 $failures = 0;

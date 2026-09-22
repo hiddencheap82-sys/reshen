@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace App\Support;
 
 /**
- * Integer Rial value object. Floating point in a percentage-payout
- * calculation accumulates rounding error and starts arguments with the
- * barber over money — exactly the problem the product exists to remove.
- * Percentage rounding always favors the staff member (round up their share).
+ * ریال، به‌صورت عدد صحیح.
+ *
+ * چرا اعشاری نه: در محاسبهٔ درصدِ سهم آرایشگر، خطای گرد کردن جمع
+ * می‌شود و سرِ ماه سر پول بحث راه می‌افتد — دقیقاً همان چیزی که این
+ * برنامه قرار بود از بین ببرد.
+ *
+ * و گرد کردن درصد همیشه به نفع آرایشگر است. چند ریال برای سالن چیزی
+ * نیست، ولی «سیستم سر من کم گذاشت» اعتماد را از بین می‌برد.
  */
 final class Money
 {
@@ -41,7 +45,7 @@ final class Money
         return new self($this->rials - $other->rials);
     }
 
-    /** Percentage share, rounded up in the staff's favor. */
+    /** سهم درصدی، رو به بالا و به نفع آرایشگر. */
     public function percentOf(float $percent): self
     {
         return new self((int) ceil($this->rials * $percent / 100));

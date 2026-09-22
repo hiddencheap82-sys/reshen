@@ -84,4 +84,4 @@ if (version_compare(PHP_VERSION, RESHEN_MIN_PHP, '<')) {
 }
 
 define('RESHEN_INSTALLER', true);
-require __DIR__ . '/install-app.php';
+require dirname(__DIR__) . '/app/Setup/installer.php';

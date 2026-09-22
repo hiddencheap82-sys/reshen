@@ -8,7 +8,7 @@ use App\Core\DB;
 use App\Core\Request;
 use App\Core\Response;
 use App\Domain\Booking\BookingService;
-use App\Domain\Queue\AppointmentRepository;
+use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Queue\QueueService;
 
 /** A10 — the passwordless "نوبت من" page a customer reaches from their SMS link. */

@@ -27,7 +27,7 @@ if (!defined('RESHEN_INSTALLER')) {
     exit;
 }
 
-const RESHEN_ROOT = __DIR__ . '/..';
+const RESHEN_ROOT = __DIR__ . '/../..';
 const LOCK_FILE = RESHEN_ROOT . '/storage/installed.lock';
 
 session_start();
@@ -56,7 +56,14 @@ if (is_file(LOCK_FILE) && !$justInstalled) {
 $step = $_GET['step'] ?? 'check';
 $errors = [];
 
-// ─── گام ۲: نوشتن .env و اجرای مهاجرت ─────────────────────────────
+/*
+ * کاربر سه گام می‌بیند — بررسی محیط، اتصال دیتابیس، پایان — ولی ترتیب
+ * کد همان نیست و نباید هم باشد: هر درخواست اول باید ببیند فرمی ارسال
+ * شده یا نه. پس بلوک‌ها به ترتیبِ *تصمیم* می‌آیند، نه به ترتیبِ
+ * چیزی که کاربر می‌بیند. عنوان هرکدام همین را می‌گوید.
+ */
+
+// ─── الف) فرم دیتابیس ارسال شده؟ ذخیره کن و مهاجرت را اجرا کن ──────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_step'] ?? '') === 'config') {
     if (!hash_equals((string) ($_SESSION['install_csrf'] ?? ''), (string) ($_POST['_csrf'] ?? ''))) {
         $errors[] = 'نشست منقضی شده است. صفحه را تازه کنید و دوباره تلاش کنید.';
@@ -119,13 +126,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_step'] ?? '') === 'config
     $step = 'config';
 }
 
-// ─── گام ۳: پایان ──────────────────────────────────────────────────
+// ─── ب) کار تمام شده؟ صفحهٔ پایان ─────────────────────────────────
 if ($step === 'done') {
     render_done();
     exit;
 }
 
-// ─── گام ۱: بررسی محیط ─────────────────────────────────────────────
+// ─── پ) وگرنه: محیط را بسنج، بعد فرم یا فهرست ایرادها ─────────────
 $_SESSION['install_csrf'] ??= bin2hex(random_bytes(32));
 
 $checks = environment_checks();

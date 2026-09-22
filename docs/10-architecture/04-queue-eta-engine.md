@@ -1,5 +1,11 @@
 # ۰۴ — موتور صف زنده و ETA
 
+> **دربارهٔ قطعه‌کدهای این سند:** این‌ها شبه‌کدِ دورهٔ طراحی‌اند و با
+> فرض ORM نوشته شده‌اند. پیاده‌سازی واقعی PHP خام است و از مخزن‌ها
+> استفاده می‌کند، ولی *قاعده‌ها* همان‌اند. بالای هر قطعه نوشته شده
+> کدام فایل واقعاً این کار را می‌کند.
+
+
 > مشخصات فنی [فیچر اصلی](../00-product/04-core-feature.md). اگر فقط یک بخش از این پروژه قرار است
 > درست کار کند، این است.
 
@@ -35,7 +41,7 @@
 | **قابل تنظیم است** | `salons.settings.priority_window_minutes` — هر سالن فرهنگ خودش را دارد |
 
 ```php
-// app/Domain/Queue/Services/QueueOrderer.php
+// شبه‌کد طراحی. پیاده‌سازی واقعی: app/Domain/Queue/QueueOrderingService.php
 private function sortKey(Appointment $a, CarbonInterface $now): array
 {
     if ($a->status === Status::InChair) {
@@ -201,7 +207,7 @@ reshen.ir/q/{token}
 با هر `AppointmentCompleted`:
 
 ```php
-// app/Domain/Queue/Actions/RecordActualDuration.php
+// شبه‌کد طراحی. پیاده‌سازی واقعی: app/Domain/Queue/DurationLearner.php
 $actual = $appointment->actual_start_at->diffInMinutes($appointment->actual_end_at);
 
 // ۱ — فیلتر دادهٔ پرت: کمتر از ۵ یا بیشتر از ۱۸۰ دقیقه، خطای ثبت است نه واقعیت

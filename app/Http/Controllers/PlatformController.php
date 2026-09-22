@@ -9,7 +9,13 @@ use App\Core\DB;
 use App\Core\Request;
 use App\Core\Response;
 
-/** G01/G03/G04 — the platform's own admin panel: salon list, support login-as (audited), key metrics. */
+/**
+ * پنل خودِ پلتفرم — بالاترین سطح دسترسی.
+ *
+ * فهرست سالن‌ها، آمار کلی، و «ورود به‌جای» صاحب سالن برای پشتیبانی.
+ * آن یکی در audit_logs ثبت می‌شود: دسترسی‌ای که رد نگذارد، دسترسی‌ای
+ * است که کسی جوابگویش نیست.
+ */
 final class PlatformController extends Controller
 {
     public function index(Request $request): Response

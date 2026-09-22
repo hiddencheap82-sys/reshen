@@ -8,15 +8,16 @@ use App\Core\DB;
 use App\Support\Jalali;
 
 /**
- * Official Iranian holidays. Only the *fixed-date* solar-Hijri holidays
- * (Nowruz, Sizdah be-dar, revolution anniversaries, ...) can be computed
- * programmatically. Lunar-Hijri holidays (Eid Fitr, Ashura, Ramadan, ...)
- * shift ~11 days a year and need an Umm al-Qura conversion this build does
- * not include — those are added manually from the settings screen instead.
+ * تعطیلات رسمی ایران.
+ *
+ * فقط تعطیلات *شمسیِ ثابت* (نوروز، سیزده‌به‌در، سالگردها و…) را می‌شود
+ * محاسبه کرد. تعطیلات قمری (عید فطر، عاشورا، ماه رمضان و…) هر سال حدود
+ * ۱۱ روز جابه‌جا می‌شوند و به تبدیل ام‌القری نیاز دارند که در این نسخه
+ * نیست — آن‌ها را از صفحهٔ تنظیمات دستی اضافه می‌کنند.
  */
 final class HolidayRepository
 {
-    /** [jalali month, jalali day, label] */
+    /** [ماه شمسی، روز شمسی، عنوان] */
     private const FIXED_HOLIDAYS = [
         [1, 1, 'نوروز'],
         [1, 2, 'نوروز'],

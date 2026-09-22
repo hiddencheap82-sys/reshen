@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Core;
+namespace App\Domain\Diagnostics;
 
+use App\Core\Config;
+use App\Core\Cron;
+use App\Core\DB;
+use App\Core\Migrator;
 use PDO;
 use Throwable;
 
@@ -53,7 +57,7 @@ final class HealthCheck
         return false;
     }
 
-    /** @return array<int,array{label:string,status:string,value:string,hint:string}> */
+    /** @return array<int,array{label:string,status:string,value:string,hint:string}> ردیف‌های یک بخش */
     private function php(): array
     {
         $ok = version_compare(PHP_VERSION, '8.1', '>=');
@@ -66,7 +70,7 @@ final class HealthCheck
         ]];
     }
 
-    /** @return array<int,array{label:string,status:string,value:string,hint:string}> */
+    /** @return array<int,array{label:string,status:string,value:string,hint:string}> ردیف‌های یک بخش */
     private function extensions(): array
     {
         // [نام => [ضروری؟, چرا لازم است]]
@@ -107,7 +111,7 @@ final class HealthCheck
         return $rows;
     }
 
-    /** @return array<int,array{label:string,status:string,value:string,hint:string}> */
+    /** @return array<int,array{label:string,status:string,value:string,hint:string}> ردیف‌های یک بخش */
     private function limits(): array
     {
         $memory = (string) ini_get('memory_limit');
@@ -147,7 +151,7 @@ final class HealthCheck
         ];
     }
 
-    /** @return array<int,array{label:string,status:string,value:string,hint:string}> */
+    /** @return array<int,array{label:string,status:string,value:string,hint:string}> ردیف‌های یک بخش */
     private function directories(): array
     {
         $rows = [];
@@ -171,7 +175,7 @@ final class HealthCheck
         return $rows;
     }
 
-    /** @return array<int,array{label:string,status:string,value:string,hint:string}> */
+    /** @return array<int,array{label:string,status:string,value:string,hint:string}> ردیف‌های یک بخش */
     private function database(): array
     {
         try {
@@ -216,7 +220,7 @@ final class HealthCheck
         }
     }
 
-    /** @return array<int,array{label:string,status:string,value:string,hint:string}> */
+    /** @return array<int,array{label:string,status:string,value:string,hint:string}> ردیف‌های یک بخش */
     private function configuration(): array
     {
         $rows = [];

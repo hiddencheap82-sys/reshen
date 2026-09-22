@@ -18,7 +18,7 @@ $router->get('/', function () {
 // شروعِ خودش را بدهد (ت-۳۲).
 $router->get('/manifest.webmanifest', [ManifestController::class, 'show']);
 
-// --- Auth -----------------------------------------------------------------
+// ─── ورود و خروج ─────────────────────────────────────────────────────
 $router->get('/login', [AuthController::class, 'showLogin']);
 $router->get('/login/verify', [AuthController::class, 'showVerify']);
 $router->get('/logout', [AuthController::class, 'logout']);

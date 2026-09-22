@@ -6,7 +6,7 @@ namespace App\Domain\Messaging;
 
 use App\Core\Config;
 use App\Core\DB;
-use App\Domain\Queue\AppointmentRepository;
+use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Queue\EtaEngine;
 use App\Domain\Queue\QueueOrderingService;
 use App\Support\Clock;
@@ -46,9 +46,12 @@ final class QueueNotificationService
         $salon = DB::selectOne('SELECT name FROM salons WHERE id = ?', [$salonId]);
         $staff = DB::selectOne('SELECT name FROM staff WHERE id = ?', [$staffId]);
 
-        // Rank among those still WAITING only — "you're next" means first in
-        // line behind whoever is in the chair, not first in the raw list
-        // (which always puts the in-chair person at index 0).
+        // رتبه فقط میان کسانی که هنوز *منتظرند* شمرده می‌شود.
+        //
+        // «نفر بعدی تویی» یعنی اول صفِ پشتِ کسی که روی صندلی است، نه
+        // اول فهرست خام — که همیشه نفرِ روی صندلی را در جایگاه صفر
+        // می‌گذارد. بدون این تفکیک، به کسی که دو نفر جلویش است پیامک
+        // «نوبت شماست» می‌رفت.
         $waitingRank = 0;
 
         foreach ($ordered as $appt) {

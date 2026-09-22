@@ -52,7 +52,8 @@ final class MelipayamakGateway implements SmsGatewayInterface
             return ['ok' => false, 'ref' => null, 'error' => 'شناسهٔ الگو (bodyId) تنظیم نشده است.'];
         }
 
-        // Template variables are separated by ";", so no value may contain one.
+        // متغیرهای الگو با «;» جدا می‌شوند، پس هیچ مقداری نباید این
+        // نویسه را داشته باشد — وگرنه پیامک با متن جابه‌جا ارسال می‌شود.
         $text = implode(';', array_map([$this, 'cleanParam'], $args));
 
         return $this->handle($this->request(self::ENDPOINT_PATTERN, [
@@ -64,7 +65,12 @@ final class MelipayamakGateway implements SmsGatewayInterface
         ]));
     }
 
-    /** Panel credit, for the setup/doctor check — a zero balance fails silently otherwise. */
+    /**
+     * اعتبار پنل — برای صفحهٔ نصب و سلامت.
+     *
+     * بدون این، اعتبار تمام‌شده بی‌صدا شکست می‌خورد: پیامک‌ها ارسال
+     * «موفق» می‌گیرند و هیچ‌وقت نمی‌رسند.
+     */
     public function credit(): ?float
     {
         $response = $this->request(self::ENDPOINT_CREDIT, [
@@ -121,8 +127,10 @@ final class MelipayamakGateway implements SmsGatewayInterface
     }
 
     /**
-     * On success `Value` carries the send record id; anything else — including
-     * a literal "0" with a success-looking status — is a failure.
+     * در حالت موفق، `Value` شناسهٔ ارسال است.
+     *
+     * هر چیز دیگری شکست است — از جمله «0» با وضعیتی که موفق به نظر
+     * می‌رسد، که حالت واقعیِ «اعتبار ندارید» است.
      */
     private function handle(array $response): array
     {

@@ -20,7 +20,13 @@ final class CustomerRepository
         return DB::selectOne('SELECT * FROM customers WHERE salon_id = ? AND phone = ?', [$salonId, $e164]);
     }
 
-    /** Finds or creates the salon-scoped customer record, linking to the global user identity if a phone is given. */
+    /**
+     * پروندهٔ مشتری در همین سالن را پیدا می‌کند، و اگر نبود می‌سازد.
+     *
+     * اگر شماره داده شده باشد، به هویت سراسری کاربر هم وصلش می‌کند —
+     * همان چیزی که باعث می‌شود مشتری بتواند نوبت‌هایش در چند سالن را
+     * یک‌جا ببیند.
+     */
     public function findOrCreate(int $salonId, ?string $name, ?string $phoneRaw): array
     {
         if ($phoneRaw !== null && $phoneRaw !== '') {

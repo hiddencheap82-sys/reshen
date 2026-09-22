@@ -8,7 +8,7 @@ use App\Core\DB;
 
 final class WorkingHoursRepository
 {
-    /** @return array<int,array> indexed by weekday 0..6 for the salon-wide default (staff_id null) */
+    /** @return array<int,array> به تفکیک روز هفته (۰ تا ۶)، ساعت پیش‌فرض کل سالن (staff_id خالی) */
     public function salonDefaults(int $salonId): array
     {
         $rows = DB::select(

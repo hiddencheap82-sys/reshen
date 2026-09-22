@@ -16,6 +16,7 @@ use App\Domain\Staff\TimeOffRepository;
 use App\Support\Clock;
 use App\Support\ImageUpload;
 use App\Support\Jalali;
+use App\Support\Str;
 use App\Support\Theme;
 
 final class SalonSettingsController extends Controller
@@ -99,7 +100,12 @@ final class SalonSettingsController extends Controller
 
     public function updateProfile(Request $request): Response
     {
-        DB::update('salons', [
+        $salonId = Auth::salonId();
+
+        $slugError = null;
+        $slug = $this->cleanSlug((string) $request->input('slug', ''), $salonId, $slugError);
+
+        $fields = [
             'name' => trim((string) $request->input('name', '')),
             'city' => trim((string) $request->input('city', '')) ?: null,
             'address' => trim((string) $request->input('address', '')) ?: null,
@@ -107,7 +113,13 @@ final class SalonSettingsController extends Controller
             // Theme::resolve مقدار ناشناخته را به پیش‌فرض برمی‌گرداند، پس
             // چیزی جز پالت‌های تعریف‌شده در دیتابیس نمی‌نشیند.
             'theme' => Theme::resolve((string) $request->input('theme', '')),
-        ], 'id = :id', ['id' => Auth::salonId()]);
+        ];
+
+        if ($slug !== null) {
+            $fields['slug'] = $slug;
+        }
+
+        DB::update('salons', $fields, 'id = :id', ['id' => $salonId]);
 
         $logoMessage = $this->handleLogo($request);
 
@@ -118,7 +130,58 @@ final class SalonSettingsController extends Controller
             return $this->withError($logoMessage, '/panel/settings');
         }
 
+        if ($slugError !== null) {
+            return $this->withError($slugError, '/panel/settings');
+        }
+
         return $this->withSuccess('اطلاعات سالن ذخیره شد.', '/panel/settings');
+    }
+
+    /**
+     * نشانی عمومی سالن — بخشی که در لینک دیده می‌شود.
+     *
+     * چرا اصلاً قابل ویرایش است: این نشانی روی QR پشت آینه چاپ می‌شود
+     * و در واتساپ فرستاده می‌شود. هنگام ثبت‌نام از روی نام سالن ساخته
+     * می‌شود، ولی حرف‌نویسی فارسی هیچ‌وقت دقیق نیست — «سالن» می‌شود
+     * saln — و صاحب سالن باید بتواند درستش کند.
+     *
+     * تغییر ندادن هم یک تصمیم است: ورودی خالی یعنی «دست نزن»، وگرنه
+     * هر بار ذخیرهٔ فرمِ پروفایل، لینک را عوض می‌کرد و QRهای چاپ‌شده
+     * از کار می‌افتادند.
+     *
+     * @param string|null $error پیام خطا، اگر نشانی پذیرفته نشد
+     */
+    private function cleanSlug(string $raw, int $salonId, ?string &$error): ?string
+    {
+        $raw = trim($raw);
+        if ($raw === '') {
+            return null;
+        }
+
+        $slug = Str::slug($raw);
+
+        if ($slug === '') {
+            $error = 'نشانی عمومی باید دست‌کم یک حرف انگلیسی یا رقم داشته باشد.';
+
+            return null;
+        }
+
+        $current = DB::selectOne('SELECT slug FROM salons WHERE id = ?', [$salonId]);
+        if ($current !== null && $current['slug'] === $slug) {
+            return null;
+        }
+
+        $taken = DB::selectOne(
+            'SELECT id FROM salons WHERE slug = ? AND id <> ?',
+            [$slug, $salonId]
+        );
+        if ($taken !== null) {
+            $error = 'این نشانی قبلاً گرفته شده. یکی دیگر انتخاب کنید.';
+
+            return null;
+        }
+
+        return $slug;
     }
 
     /**

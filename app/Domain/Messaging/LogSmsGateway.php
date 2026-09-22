@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Domain\Messaging;
 
 /**
- * Dev/staging driver: writes to storage/logs/sms.log instead of a real
- * carrier. Lets the whole OTP + reminder flow be exercised without
- * Melipayamak/Kavenegar credentials.
+ * درایور توسعه — به‌جای اپراتور واقعی در storage/logs/sms.log می‌نویسد.
+ *
+ * برای چه: کل مسیر کد ورود و یادآورها را می‌شود بدون حساب ملی‌پیامک یا
+ * کاوه‌نگار آزمایش کرد. پیش‌فرض همین است، پس نصب تازه به‌اشتباه برای
+ * کسی پیامک نمی‌فرستد.
  */
 final class LogSmsGateway implements SmsGatewayInterface
 {

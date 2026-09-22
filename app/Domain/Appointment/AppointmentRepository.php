@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Queue;
+namespace App\Domain\Appointment;
 
 use App\Core\DB;
 use App\Support\Str;
@@ -19,7 +19,12 @@ final class AppointmentRepository
         return DB::selectOne('SELECT * FROM appointments WHERE public_token = ?', [$token]);
     }
 
-    /** Everything still "live" for a salon today: queued, in_chair, or confirmed (booked, not yet arrived). */
+    /**
+     * هر چیزی که امروز در سالن هنوز «زنده» است.
+     *
+     * یعنی: در صف، روی صندلی، یا رزروشده‌ای که هنوز نرسیده. همین سه
+     * حالت‌اند که صفحهٔ صف و تخمین‌ها را می‌سازند.
+     */
     public function activeForSalon(int $salonId): array
     {
         return DB::select(

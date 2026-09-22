@@ -6,7 +6,7 @@ namespace App\Domain\Customer;
 
 use App\Core\DB;
 
-/** B03 — the fields that actually make a barber's notebook worth keeping. */
+/** همان چیزهایی که دفترچهٔ آرایشگر را به‌درد‌بخور می‌کنند. */
 final class CustomerPreferencesRepository
 {
     public function find(int $salonId, int $customerId): ?array

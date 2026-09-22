@@ -7,10 +7,14 @@ namespace App\Support;
 use InvalidArgumentException;
 
 /**
- * Normalizes the many ways an Iranian mobile number arrives in real input
- * (leading 0 or not, +98, 0098, Persian/Arabic-Indic digits, dashes/spaces)
- * into a single canonical E.164 string. Doc 8.7: this must live in one
- * place, never be re-parsed ad hoc across the codebase.
+ * شمارهٔ موبایل ایرانی، به یک شکل واحد.
+ *
+ * مردم شماره را به ده شکل می‌نویسند: با صفر و بی‌صفر، با ‎+98‎ و ‎0098‎،
+ * با ارقام فارسی، با خط تیره و فاصله. همه اینجا به یک رشتهٔ استاندارد
+ * E.164 تبدیل می‌شوند.
+ *
+ * عمداً فقط همین‌جا: اگر هر بخشی از کد خودش شماره را تفسیر کند، همان
+ * مشتری دو بار در دیتابیس ثبت می‌شود و نوبت‌هایش دو تکه می‌شود.
  */
 final class IranMobile
 {
@@ -23,7 +27,7 @@ final class IranMobile
         $normalized = self::normalizeDigits($raw);
         $normalized = preg_replace('/[\s\-()]/', '', $normalized) ?? '';
 
-        // 0098912..., +98912..., 98912..., 0912..., 912...
+        // ‎0098912…‎، ‎+98912…‎، ‎98912…‎، ‎0912…‎، ‎912…‎
         $normalized = preg_replace('/^0098/', '', $normalized);
         $normalized = preg_replace('/^\+98/', '', $normalized);
         $normalized = preg_replace('/^98(?=9\d{9}$)/', '', $normalized);
@@ -50,7 +54,7 @@ final class IranMobile
         return self::tryParse($raw) !== null;
     }
 
-    /** Local display form: 0912 345 6789 */
+    /** شکل نمایشی داخلی: ‎0912 345 6789‎ */
     public function local(): string
     {
         $digits = '0' . substr($this->e164, 3);

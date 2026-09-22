@@ -8,21 +8,22 @@ use App\Core\Config;
 use DateTimeImmutable;
 
 /**
- * The single-queue ordering rule (doc 8.6):
- *   1. whoever is in the chair right now (at most one)
- *   2. a booked appointment inside its priority window (10 min before to
- *      10 min after its slot) outranks any walk-in
- *   3. everyone else, by arrival order
+ * قاعدهٔ ترتیب صف — یک صف، نه دو تا.
  *
- * This is what makes "one queue, not two" actually fair and explainable:
- * a customer who booked 6:00 and is 40 minutes late does not cut in front
- * of someone who has been standing there for half an hour.
+ *   ۱. هر کسی که همین حالا روی صندلی است (حداکثر یک نفر)
+ *   ۲. نوبت رزروشده، اگر در بازهٔ اولویتش باشد (۱۰ دقیقه قبل تا ۱۰
+ *      دقیقه بعد از ساعتش)، بر هر مراجعهٔ بدون نوبت مقدم است
+ *   ۳. بقیه، به ترتیب رسیدن
+ *
+ * همین قاعده است که «یک صف» را منصف و قابل توضیح می‌کند: کسی که ساعت
+ * ۶ رزرو کرده و ۴۰ دقیقه دیر آمده، جلوی کسی که نیم ساعت آنجا ایستاده
+ * نمی‌پرد. و آرایشگر می‌تواند همین یک جمله را به مشتری معترض بگوید.
  */
 final class QueueOrderingService
 {
     /**
-     * @param array<int,array> $appointments raw rows (status in confirmed/queued/in_chair)
-     * @return array<int,array> the same rows, reordered
+     * @param array<int,array> $appointments ردیف‌های خام (وضعیت: confirmed/queued/in_chair)
+     * @return array<int,array> همان ردیف‌ها، مرتب‌شده
      */
     public function order(array $appointments, ?DateTimeImmutable $now = null): array
     {

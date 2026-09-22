@@ -14,9 +14,11 @@ final class SmsManager
     private static ?SmsGatewayInterface $fallback = null;
 
     /**
-     * Sends via the configured primary driver; if that fails and a real
-     * fallback provider is configured, retries once through it. Returns
-     * which provider actually delivered it (or failure details).
+     * با ارائه‌دهندهٔ اصلی می‌فرستد؛ اگر نشد و ارائه‌دهندهٔ پشتیبان
+     * تنظیم شده باشد، یک بار از آن راه دوباره امتحان می‌کند.
+     *
+     * برمی‌گرداند که در عمل کدام‌یک پیامک را رساند — بدون این، وقتی
+     * مشتری می‌گوید «نیامد» هیچ راهی برای دنبال کردنش نیست.
      *
      * @return array{ok:bool,provider:string,ref:?string,error:?string}
      */
@@ -26,13 +28,13 @@ final class SmsManager
     }
 
     /**
-     * Sends through a pre-approved template, falling back to plain text when
-     * no template is configured for the provider that is actually handling
-     * the send.
+     * با الگوی تأییدشده می‌فرستد، و اگر برای ارائه‌دهنده‌ای که واقعاً
+     * دارد می‌فرستد الگویی تنظیم نشده باشد، به متن آزاد برمی‌گردد.
      *
-     * `$patternKey` is resolved per provider: the same logical message has a
-     * different id at Melipayamak (a numeric bodyId) than at Kavenegar (a
-     * template name), so the backup provider must never reuse the primary's.
+     * `$patternKey` برای هر ارائه‌دهنده جدا ترجمه می‌شود: یک پیام واحد
+     * در ملی‌پیامک یک شمارهٔ bodyId است و در کاوه‌نگار یک نام الگو. پس
+     * پشتیبان هرگز نباید شناسهٔ اصلی را دوباره استفاده کند — پیامک
+     * بی‌صدا رد می‌شود.
      *
      * @param string[] $args
      */
@@ -89,7 +91,7 @@ final class SmsManager
     {
         $driver = Config::get('reshen.sms.driver', 'log');
         if ($driver !== 'melipayamak') {
-            return null; // only the real primary needs a real backup
+            return null; // فقط ارائه‌دهندهٔ واقعی به پشتیبان واقعی نیاز دارد
         }
         if (self::$fallback === null) {
             self::$fallback = self::make('kavenegar');

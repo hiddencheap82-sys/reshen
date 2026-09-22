@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Core;
 
 /**
- * Session-backed auth + active-tenant context.
+ * احراز هویت و اینکه کاربر همین حالا داخل کدام سالن است.
  *
- * A logged-in user is a single global identity (users.id). Which salon
- * they are currently acting inside is a *separate* piece of session state
- * (salon_id) resolved from their salon_user memberships — one person can
- * be staff at salon A and owner at salon B.
+ * کاربرِ واردشده یک هویت سراسری دارد (users.id). ولی اینکه الان در چه
+ * سالنی کار می‌کند، حالتی *جدا* در نشست است (salon_id) که از عضویت‌های
+ * او در salon_user درمی‌آید.
+ *
+ * چرا جدا: یک نفر می‌تواند در سالن الف کارمند باشد و در سالن ب صاحب.
+ * اگر این دو یکی بودند، نقشش در یک سالن به سالن دیگر نشت می‌کرد.
  */
 final class Auth
 {
@@ -101,7 +103,7 @@ final class Auth
         Session::put('_salon_theme', $salon['theme'] ?? null);
     }
 
-    /** @return array<int,array> memberships (salon_id, role, salon name) for the logged-in user */
+    /** @return array<int,array> عضویت‌های کاربر واردشده (salon_id، نقش، نام سالن) */
     public static function memberships(): array
     {
         if (!self::check()) {

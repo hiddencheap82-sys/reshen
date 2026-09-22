@@ -19,7 +19,7 @@ final class OtpService
 
     private const RESEND_COOLDOWN_SECONDS = 45;
 
-    /** @return array{ok:bool,error:?string,retry_after:?int} */
+    /** @return array{ok:bool,error:?string,retry_after:?int} retry_after: ثانیه تا تلاش بعدی */
     public function request(IranMobile $phone, string $purpose = 'login'): array
     {
         $ip = self::clientIp();
@@ -51,8 +51,8 @@ final class OtpService
 
         $code = Str::otp(5);
 
-        // Any earlier unused code for this number stops working the moment a
-        // new one is issued — otherwise two live codes double an attacker's odds.
+        // هر کد استفاده‌نشدهٔ قبلیِ این شماره همان لحظه باطل می‌شود.
+        // وگرنه دو کد زنده هم‌زمان، شانس حدس زدن را دو برابر می‌کند.
         DB::update(
             'otp_codes',
             ['consumed_at' => date('Y-m-d H:i:s')],
@@ -69,9 +69,9 @@ final class OtpService
             'expires_at' => date('Y-m-d H:i:s', time() + self::TTL_SECONDS),
         ]);
 
-        // Prefers the approved template; the plain-text form is only used when
-        // no template is configured, which in production means the salon is on
-        // a dedicated line (the only case where free-text actually delivers).
+        // اول الگوی تأییدشده. متن آزاد فقط وقتی استفاده می‌شود که هیچ
+        // الگویی تنظیم نشده باشد — که در عمل یعنی سالن خط اختصاصی دارد،
+        // تنها حالتی که متن آزاد واقعاً تحویل داده می‌شود.
         $result = SmsManager::sendPattern(
             $phone->e164,
             'otp',
@@ -80,8 +80,8 @@ final class OtpService
         );
 
         if (!$result['ok']) {
-            // Burn the code so the user can retry immediately instead of
-            // waiting out a cooldown for a message that never left.
+            // کد را بسوزان تا کاربر بتواند فوری دوباره تلاش کند و پشت
+            // زمان انتظارِ پیامکی که اصلاً ارسال نشده گیر نیفتد.
             DB::update('otp_codes', ['consumed_at' => date('Y-m-d H:i:s')], 'id = :id', ['id' => $otpId]);
 
             return ['ok' => false, 'error' => 'ارسال پیامک ناموفق بود: ' . ($result['error'] ?? 'خطای نامشخص'), 'retry_after' => null];
@@ -168,13 +168,14 @@ final class OtpService
     }
 
     /**
-     * The code echoed on screen in development, so the whole login flow can be
-     * exercised without a real carrier.
+     * کدی که در حالت توسعه روی صفحه نشان داده می‌شود.
      *
-     * Never returned for a platform-admin number: if debug mode is ever left
-     * on in production, anyone who knows the admin's phone could read their
-     * code off the page and walk into full support access. Testing with an
-     * ordinary number still works.
+     * برای چه: کل مسیر ورود بدون اپراتور واقعی قابل آزمایش باشد.
+     *
+     * ولی هرگز برای شمارهٔ مدیر پلتفرم برنمی‌گردد. اگر یک بار حالت
+     * دیباگ روی سرور واقعی روشن بماند، هر کسی که شمارهٔ مدیر را بداند
+     * می‌تواند کدش را از روی صفحه بخواند و با دسترسی کامل پشتیبانی
+     * وارد شود. آزمایش با شمارهٔ معمولی سر جایش است.
      */
     public static function devHint(string $e164Phone): ?string
     {

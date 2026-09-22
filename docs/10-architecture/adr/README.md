@@ -9,8 +9,9 @@
 | [0001](0001-single-database-multitenancy.md) | یک دیتابیس مشترک برای چندمستأجری | پذیرفته |
 | [0002](0002-path-based-tenant-routing.md) | مسیریابی مستأجر بر پایهٔ مسیر (نه زیردامنه) | پذیرفته |
 | [0003](0003-unified-appointments-table.md) | یک جدول برای نوبت رزروشده و مراجعهٔ حضوری | پذیرفته |
-| [0004](0004-livewire-over-spa.md) | Livewire به‌جای SPA جدا | پذیرفته |
+| [0004](0004-livewire-over-spa.md) | Livewire به‌جای SPA جدا | **جایگزین‌شده با ۰۰۰۹** |
 | [0005](0005-polling-before-websockets.md) | پولینگ در فاز ۱، وب‌سوکت در فاز ۲ | پذیرفته |
 | [0006](0006-statistics-not-ml-for-eta.md) | آمار ساده به‌جای یادگیری ماشین برای ETA | پذیرفته |
 | [0007](0007-money-as-integer-rial.md) | پول به‌صورت عدد صحیح ریال | پذیرفته |
 | [0008](0008-no-commission-model.md) | مدل اشتراک، نه کمیسیون | پذیرفته |
+| [0009](0009-vanilla-php-over-laravel.md) | PHP خام به‌جای لاراول | پذیرفته |

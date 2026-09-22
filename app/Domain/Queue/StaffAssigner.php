@@ -7,9 +7,11 @@ namespace App\Domain\Queue;
 use App\Core\DB;
 
 /**
- * Phase-1 "any available" assignment: pick the active staff member with the
- * fewest people currently ahead of them. Smarter reassignment when someone
- * no-shows (A22) is phase 3 — deliberately not built here.
+ * وقتی مشتری آرایشگر خاصی نخواسته: کم‌کارترین را بده.
+ *
+ * یعنی آرایشگری که کمترین نفر جلویش ایستاده. ساده است و عمداً ساده
+ * مانده — جابه‌جایی هوشمند صف وقتی کسی نمی‌آید، کارِ بعد است و اینجا
+ * ساخته نشده.
  */
 final class StaffAssigner
 {

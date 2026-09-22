@@ -6,7 +6,7 @@ namespace App\Domain\Messaging;
 
 interface SmsGatewayInterface
 {
-    /** @return array{ok:bool,ref:?string,error:?string} */
+    /** @return array{ok:bool,ref:?string,error:?string} نتیجهٔ ارسال */
     public function send(string $e164Phone, string $message): array;
 
     /**

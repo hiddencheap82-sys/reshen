@@ -9,11 +9,12 @@ use App\Core\Request;
 use App\Core\Response;
 
 /**
- * Ensures an active salon is selected in session AND that the logged-in
- * user actually has a membership row for it — the first of the three
- * tenancy-isolation layers described in the product doc (8.4): even if a
- * query forgot to scope by salon_id, no controller action runs without
- * this check passing first.
+ * سالن فعال در نشست هست، و کاربر واقعاً عضو همان سالن است؟
+ *
+ * لایهٔ اول از سه لایهٔ جداسازی داده بین سالن‌ها. اهمیتش اینجاست: حتی
+ * اگر یک کوئری یادش برود با salon_id محدود شود، هیچ اکشنی پیش از رد
+ * شدن از این بررسی اجرا نمی‌شود. یعنی یک اشتباه در یک کوئری، به‌تنهایی
+ * دادهٔ سالن دیگری را لو نمی‌دهد.
  */
 final class TenantRequired implements Middleware
 {

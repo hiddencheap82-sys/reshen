@@ -119,4 +119,4 @@ if (is_file($check)) {
 }
 
 define('RESHEN_DOCTOR', true);
-require __DIR__ . '/doctor-app.php';
+require dirname(__DIR__) . '/app/Setup/doctor.php';

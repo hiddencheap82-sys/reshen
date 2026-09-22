@@ -11,7 +11,7 @@ use App\Core\Response;
 use App\Domain\Access\Access;
 use App\Domain\Catalog\ServiceRepository;
 use App\Domain\Customer\CustomerRepository;
-use App\Domain\Queue\AppointmentRepository;
+use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Queue\QueueService;
 use App\Domain\Staff\StaffRepository;
 use RuntimeException;
@@ -35,9 +35,9 @@ final class QueueController extends Controller
             'myStaffId' => $myStaffId,
             'services' => $services,
             'staffList' => $staffList,
-            'todayCount' => (new \App\Domain\Queue\AppointmentRepository())->todayCompletedCount($salonId, $myStaffId),
+            'todayCount' => (new \App\Domain\Appointment\AppointmentRepository())->todayCompletedCount($salonId, $myStaffId),
             'todayEarnings' => $todayEarnings,
-            'todaySummary' => (new \App\Domain\Queue\AppointmentRepository())->todaySummary($salonId),
+            'todaySummary' => (new \App\Domain\Appointment\AppointmentRepository())->todaySummary($salonId),
             // درآمد کل سالن فقط برای صاحب و مدیر — آرایشگر نباید درآمد
             // بقیه را ببیند، وگرنه در سالن دعوا می‌شود (سند امنیت، بخش ۴).
             'salonEarnings' => Access::allows(Access::VIEW_SALON_EARNINGS)
@@ -46,7 +46,13 @@ final class QueueController extends Controller
         ]);
     }
 
-    /** JSON polling endpoint for near-real-time updates (doc 8.2: 15s polling with ETag for phase 1). */
+    /**
+     * نقطهٔ JSON برای به‌روزرسانی صف، تقریباً بی‌درنگ.
+     *
+     * هر ۱۵ ثانیه پرسیده می‌شود و با ETag جواب می‌دهد، پس وقتی چیزی
+     * عوض نشده فقط یک هدر ردوبدل می‌شود. عمداً WebSocket نیست: روی
+     * هاست اشتراکی cPanel چیزی که اتصال باز نگه دارد اجرا نمی‌شود.
+     */
     public function poll(Request $request): Response
     {
         $salonId = Auth::salonId();

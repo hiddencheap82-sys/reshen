@@ -115,8 +115,26 @@
           <?php endforeach; ?>
         </fieldset>
       </div>
-      <div class="bg-ink-50 rounded-xl px-3 py-2.5 text-xs text-ink-500">
-        لینک عمومی رزرو: <span dir="ltr" class="code text-accent"><?= e(url('s/' . $salon['slug'])) ?></span>
+      <div class="space-y-1.5">
+        <label for="salon-slug" class="block text-[13px] font-semibold text-ink-800">
+          نشانی عمومی رزرو
+        </label>
+        <div class="flex items-stretch rounded-xl overflow-hidden ring-1 ring-ink-200 bg-white
+                    focus-within:ring-2 focus-within:ring-accent" dir="ltr">
+          <span class="flex items-center px-2.5 text-[12px] text-ink-400 bg-ink-50 shrink-0 code">
+            <?= e(rtrim(url('s'), '/')) ?>/
+          </span>
+          <input type="text" id="salon-slug" name="slug" dir="ltr"
+                 value="<?= e($salon['slug']) ?>"
+                 class="flex-1 min-w-0 px-2.5 py-2.5 text-[13px] code bg-transparent
+                        border-0 outline-none"
+                 autocomplete="off" spellcheck="false">
+        </div>
+        <p class="text-[11px] text-ink-400 leading-relaxed">
+          همین نشانی روی QR چاپ می‌شود. اگر عوضش کنید، QRها و لینک‌هایی که
+          قبلاً پخش کرده‌اید دیگر کار نمی‌کنند — پس بهتر است همین اول کار
+          درستش کنید.
+        </p>
       </div>
       <button type="submit" class="btn-accent metal w-full">ذخیره</button>
     </form>

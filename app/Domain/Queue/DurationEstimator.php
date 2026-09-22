@@ -8,13 +8,18 @@ use App\Core\Config;
 use App\Core\DB;
 
 /**
- * The estimation waterfall from product doc 8.6:
- *   1. learned p50/p80 for (staff, service) — once >= min_samples real samples exist
- *   2. that barber's own override duration for the service
- *   3. the salon's nominal duration for the service
- *   4. a hard 30-minute fallback
- * Then the customer's personal pace factor (if they have enough history)
- * is applied on top, clamped so a single bad data point can't blow it up.
+ * این خدمت چقدر طول می‌کشد؟ — آبشار تخمین.
+ *
+ * از دقیق به مبهم، اولین چیزی که در دسترس باشد برنده است:
+ *   ۱. آنچه یاد گرفته‌ایم: p50/p80 واقعیِ همین آرایشگر برای همین خدمت،
+ *      به شرطی که به‌اندازهٔ کافی نمونه جمع شده باشد
+ *   ۲. زمانی که خود آن آرایشگر برای این خدمت ثبت کرده
+ *   ۳. زمان اسمی خدمت در سالن
+ *   ۴. و در نهایت ۳۰ دقیقه
+ *
+ * بعد ضریب سرعت شخصی مشتری اعمال می‌شود — اگر سابقهٔ کافی داشته باشد.
+ * ضریب محدود شده تا یک دادهٔ پرت (روزی که مشتری وسط کار تلفن داشت)
+ * نتواند همهٔ تخمین‌های بعدی را خراب کند.
  */
 final class DurationEstimator
 {
@@ -29,7 +34,7 @@ final class DurationEstimator
      */
     private static array $memo = [];
 
-    /** @return array{p50:float,p80:float,source:string} minutes */
+    /** @return array{p50:float,p80:float,source:string} برحسب دقیقه */
     public function forStaffService(int $staffId, int $serviceId): array
     {
         $key = $staffId . ':' . $serviceId;
@@ -108,7 +113,7 @@ final class DurationEstimator
         return ['p50' => $fallback, 'p80' => $fallback * 1.3, 'source' => 'fallback'];
     }
 
-    /** Applies the customer's personal pace multiplier, if active. */
+    /** ضریب سرعت شخصی مشتری را اعمال می‌کند، اگر فعال باشد. */
     public function customerFactor(?array $customer): float
     {
         if ($customer === null || $customer['duration_factor'] === null) {
@@ -123,8 +128,11 @@ final class DurationEstimator
     }
 
     /**
-     * Expected duration (p50, p80) in minutes for a full appointment
-     * (all its services combined), with the customer's pace factor applied.
+     * مدت انتظاری کل یک نوبت — جمع همهٔ خدماتش، با ضریب سرعت مشتری.
+     *
+     * p50 یعنی «نصف مواقع از این کمتر»، p80 یعنی «۸ بار از ۱۰ بار از
+     * این کمتر». دومی همان چیزی است که به مشتری وعده داده می‌شود: بهتر
+     * است زودتر تمام شود تا اینکه دیرتر.
      *
      * @param int[] $serviceIds
      * @return array{p50:float,p80:float}

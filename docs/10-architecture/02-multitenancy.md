@@ -45,7 +45,7 @@ trait BelongsToSalon
 ```php
 // tests/Architecture/TenancyTest.php
 test('هر مدل دارای ستون salon_id باید trait را داشته باشد', function () {
-    foreach (allEloquentModels() as $model) {
+    foreach (allTenantTables() as $table) {   // شبه‌کد — پیاده‌سازی: TenantRequired + محدودسازی دستی هر کوئری
         if (Schema::hasColumn($model->getTable(), 'salon_id')) {
             expect(class_uses_recursive($model))->toContain(BelongsToSalon::class);
         }

@@ -10,7 +10,7 @@ use App\Core\Response;
 use App\Domain\Access\Access;
 use App\Domain\Booking\BookingService;
 use App\Domain\Catalog\ServiceRepository;
-use App\Domain\Queue\AppointmentRepository;
+use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Staff\StaffRepository;
 use App\Support\Clock;
 use App\Support\JalaliCalendar;

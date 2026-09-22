@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Domain\Messaging;
 
 /**
- * Backup provider. SMS is a single point of failure in the product
- * (doc 8.7), so a queue notification that fails on Melipayamak must be
- * able to fall back here automatically — see SmsManager.
+ * ارائه‌دهندهٔ پشتیبان.
  *
- * Kavenegar's template equivalent of Melipayamak's pattern send is
- * `verify/lookup`, which is also the only endpoint they guarantee for OTP.
+ * پیامک تنها نقطه‌ای است که اگر بخوابد کل محصول می‌خوابد: کد ورود
+ * نمی‌رسد، یادآور نمی‌رسد. پس اعلان صفی که روی ملی‌پیامک شکست بخورد
+ * باید خودکار از این راه برود — ‏SmsManager همین کار را می‌کند.
+ *
+ * معادل «ارسال با الگو»ی ملی‌پیامک اینجا `verify/lookup` است، که تنها
+ * مسیری هم هست که کاوه‌نگار برای کد یک‌بارمصرف تضمین می‌کند.
  */
 final class KavenegarGateway implements SmsGatewayInterface
 {
@@ -37,7 +39,7 @@ final class KavenegarGateway implements SmsGatewayInterface
             'template' => $patternId,
         ];
 
-        // Kavenegar names them token, token2, token3 — and rejects whitespace inside a token.
+        // کاوه‌نگار اسمشان را token، token2، token3 گذاشته — و فاصلهٔ داخل یک توکن را قبول نمی‌کند.
         foreach (array_values($args) as $index => $value) {
             $key = $index === 0 ? 'token' : 'token' . ($index + 1);
             $params[$key] = str_replace([' ', "\r", "\n"], '_', (string) $value);

@@ -22,10 +22,10 @@ if (!defined('RESHEN_DOCTOR')) {
     exit;
 }
 
-require __DIR__ . '/../app/bootstrap.php';
+require dirname(__DIR__) . '/bootstrap.php';
 
 use App\Core\Auth;
-use App\Core\HealthCheck;
+use App\Domain\Diagnostics\HealthCheck;
 
 $installed = is_file(BASE_PATH . '/storage/installed.lock');
 

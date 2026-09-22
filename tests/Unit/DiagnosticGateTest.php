@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -28,22 +29,20 @@ final class DiagnosticGateTest extends TestCase
     public static function gates(): array
     {
         return [
-            'نصاب' => ['install.php', 'install-app.php'],
-            'سلامت' => ['doctor.php', 'doctor-app.php'],
+            'نصاب' => ['public/install.php', 'app/Setup/installer.php'],
+            'سلامت' => ['public/doctor.php', 'app/Setup/doctor.php'],
         ];
     }
 
     private function source(string $file): string
     {
-        $path = dirname(__DIR__, 2) . '/public/' . $file;
+        $path = dirname(__DIR__, 2) . '/' . $file;
         $this->assertFileExists($path);
 
         return (string) file_get_contents($path);
     }
 
-    /**
-     * @dataProvider gates
-     */
+    #[DataProvider('gates')]
     public function testGateLoadsNothingButItsOwnApp(string $gate, string $app): void
     {
         $loads = $this->loadedPaths($this->source($gate));
@@ -52,7 +51,7 @@ final class DiagnosticGateTest extends TestCase
 
         foreach ($loads as $line => $target) {
             $this->assertStringContainsString(
-                $app,
+                basename($app),
                 $target,
                 "«{$gate}» خط {$line} چیزی جز «{$app}» را بارگذاری می‌کند. "
                 . 'دروازه پیش از سنجیدن محیط نباید به autoload یا bootstrap دست بزند.'
@@ -60,9 +59,7 @@ final class DiagnosticGateTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider gates
-     */
+    #[DataProvider('gates')]
     public function testAppRefusesToRunWithoutItsGate(string $gate, string $app): void
     {
         $src = $this->source($app);
@@ -84,9 +81,24 @@ final class DiagnosticGateTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider gates
-     */
+    #[DataProvider('gates')]
+    public function testOnlyTheGateSitsInTheWebRoot(string $gate, string $app): void
+    {
+        // دروازه کوچک است و باید از وب قابل باز شدن باشد. پیاده‌سازی —
+        // ۶۰۰ خط که دیتابیس می‌سازد و .env می‌نویسد — کاری در ریشهٔ وب
+        // ندارد. در app/ می‌نشیند، که .htaccess ریشه از وب می‌بنددش.
+        $this->assertStringStartsWith('public/', $gate);
+        $this->assertStringStartsWith('app/', $app);
+
+        $htaccess = (string) file_get_contents(dirname(__DIR__, 2) . '/.htaccess');
+        $this->assertStringContainsString(
+            'app',
+            $htaccess,
+            '.htaccess باید پوشهٔ app را از وب ببندد.'
+        );
+    }
+
+    #[DataProvider('gates')]
     public function testGateDeclaresTheMinimumItChecks(string $gate): void
     {
         $src = $this->source($gate);

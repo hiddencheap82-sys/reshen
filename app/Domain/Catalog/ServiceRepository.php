@@ -39,7 +39,7 @@ final class ServiceRepository
         $this->update($salonId, $id, ['is_active' => $active ? 1 : 0]);
     }
 
-    /** @return array<int,array> staff_service override rows for a service */
+    /** @return array<int,array> ردیف‌های staff_service — استثناهای هر آرایشگر برای یک خدمت */
     public function overridesFor(int $salonId, int $serviceId): array
     {
         return DB::select(
@@ -80,7 +80,13 @@ final class ServiceRepository
         ]);
     }
 
-    /** Effective duration/price for a (staff, service) pair, honoring per-staff overrides. */
+    /**
+     * مدت و قیمت واقعی یک خدمت وقتی آرایشگرِ مشخصی انجامش می‌دهد.
+     *
+     * هر آرایشگر می‌تواند برای یک خدمت زمان و قیمت خودش را داشته باشد —
+     * استادکار همان اصلاح را زودتر و گران‌تر انجام می‌دهد. اگر استثنایی
+     * ثبت نشده باشد، مقدار خودِ خدمت برمی‌گردد.
+     */
     public function effective(int $salonId, int $staffId, int $serviceId): array
     {
         $row = DB::selectOne(

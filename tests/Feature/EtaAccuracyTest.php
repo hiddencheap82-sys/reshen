@@ -380,7 +380,7 @@ final class EtaAccuracyTest extends TestCase
     /** @return array<int,array> */
     private function computeAt(DateTimeImmutable $now): array
     {
-        $active = (new \App\Domain\Queue\AppointmentRepository())
+        $active = (new \App\Domain\Appointment\AppointmentRepository())
             ->activeForStaff($this->salonId, $this->staffId);
         $ordered = (new QueueOrderingService())->order($active, $now);
 

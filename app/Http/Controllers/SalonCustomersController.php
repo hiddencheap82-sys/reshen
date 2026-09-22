@@ -12,8 +12,14 @@ use App\Domain\Customer\CustomerRepository;
 use App\Domain\Staff\StaffRepository;
 use App\Support\IranMobile;
 
-/** B01/B02/B03/B05/B08 — customer records and the barber's notebook. */
-final class CustomerController extends Controller
+/**
+ * پروندهٔ مشتری‌های سالن — «دفترچهٔ آرایشگر».
+ *
+ * چیزی که آرایشگر سال‌ها در ذهنش نگه می‌داشت: این مشتری چه مدلی
+ * می‌خواهد، چه شماره‌ای، بار قبل کِی آمد. اینجا نوشته می‌شود تا با
+ * عوض شدن نیرو از بین نرود.
+ */
+final class SalonCustomersController extends Controller
 {
     public function index(Request $request): Response
     {
@@ -60,7 +66,8 @@ final class CustomerController extends Controller
         $phoneRaw = trim((string) $request->input('phone', ''));
         $phone = $phoneRaw !== '' ? IranMobile::tryParse($phoneRaw) : null;
 
-        (new CustomerRepository())->find($salonId, $id); // 404 guard implicit via update no-op if missing
+        (new CustomerRepository())->find($salonId, $id); // اگر مشتری وجود نداشته باشد، update هیچ ردیفی را عوض نمی‌کند —
+        // پس نیازی به بررسی جداگانه نیست.
         \App\Core\DB::update('customers', [
             'name' => trim((string) $request->input('name', '')) ?: null,
             'phone' => $phone?->e164,

@@ -8,8 +8,11 @@ use PDO;
 use PDOStatement;
 
 /**
- * Thin PDO facade. Domain repositories build their own SQL — this only
- * centralises the connection, prepared-statement execution and transactions.
+ * پوسته‌ای نازک روی PDO.
+ *
+ * ‏SQL را خودِ مخزن‌های دامنه می‌نویسند؛ اینجا فقط اتصال، اجرای امنِ
+ * کوئری آماده، و تراکنش‌ها یک‌جا جمع شده‌اند. عمداً ORM نیست: روی هاست
+ * اشتراکی، هر لایهٔ اضافه یعنی کندی و یک چیز بیشتر که می‌تواند خراب شود.
  */
 final class DB
 {
@@ -73,7 +76,7 @@ final class DB
         self::$queryLog = [];
     }
 
-    /** @return array<int,array{sql:string,ms:float}> */
+    /** @return array<int,array{sql:string,ms:float}> کوئری‌های اجراشده و زمانشان */
     public static function queryLog(): array
     {
         return self::$queryLog;

@@ -23,7 +23,7 @@
 
   var saved = null;
   try {
-    saved = localStorage.getItem('reshen-mode');      // 'light' | 'dark' | null
+    saved = localStorage.getItem('reshen-mode');      // روشن، تاریک، یا هیچ‌کدام (پیروی از سیستم)
   } catch (e) { /* حالت ناشناس: ذخیره‌سازی در دسترس نیست */ }
 
   window.reshenApplyMode(

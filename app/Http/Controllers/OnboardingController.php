@@ -11,7 +11,12 @@ use App\Core\Response;
 use App\Core\Session;
 use App\Support\Str;
 
-/** F01 — salon registration and setup in under 10 minutes. */
+/**
+ * ثبت سالن — از ورود تا آمادهٔ رزرو، زیر ده دقیقه.
+ *
+ * هرچه اینجا پرسیده شود یک مانع است، پس فقط چیزهایی پرسیده می‌شوند که
+ * بدونشان سالن کار نمی‌کند. بقیه بعداً در تنظیمات.
+ */
 final class OnboardingController extends Controller
 {
     public function show(Request $request): Response
@@ -62,7 +67,8 @@ final class OnboardingController extends Controller
                 'role' => 'owner',
             ]);
 
-            // Sensible salon-wide default hours: every day 09:00-21:00, editable later.
+            // ساعت کاری پیش‌فرض: هر روز ۹ تا ۲۱، بعداً قابل تغییر. بدون این،
+        // سالن تازه هیچ سانس آزادی ندارد و صفحهٔ عمومی‌اش خالی است.
             for ($weekday = 0; $weekday <= 6; $weekday++) {
                 DB::insert('working_hours', [
                     'salon_id' => $id,
@@ -70,7 +76,7 @@ final class OnboardingController extends Controller
                     'weekday' => $weekday,
                     'opens_at' => '09:00:00',
                     'closes_at' => '21:00:00',
-                    'is_closed' => $weekday === 6 ? 1 : 0, // Friday closed by default
+                    'is_closed' => $weekday === 6 ? 1 : 0, // جمعه پیش‌فرض تعطیل
                 ]);
             }
 

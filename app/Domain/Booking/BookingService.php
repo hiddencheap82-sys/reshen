@@ -11,11 +11,17 @@ use App\Domain\Messaging\SmsManager;
 use App\Domain\Messaging\SmsNotifier;
 use App\Support\Clock;
 use App\Support\JalaliCalendar;
-use App\Domain\Queue\AppointmentRepository;
+use App\Domain\Appointment\AppointmentRepository;
 use DateTimeImmutable;
 use RuntimeException;
 
-/** A05/A06/A07/A08/A09 — the public, no-install, no-password booking flow. */
+/**
+ * مسیر رزرو عمومی — بدون نصب، بدون رمز.
+ *
+ * مشتری QR را اسکن می‌کند و تا ثبت نوبت هیچ حسابی نمی‌سازد و هیچ
+ * رمزی نمی‌گذارد. هر گامی که اضافه شود، درصدی از مشتری‌ها همان‌جا
+ * می‌ایستند — و آرایشگاه دوباره برمی‌گردد سر تلفن.
+ */
 final class BookingService
 {
     private SlotFinder $slots;
@@ -25,7 +31,7 @@ final class BookingService
         $this->slots = new SlotFinder();
     }
 
-    /** @return array<string,int[]> "H:i" => staff_ids free at that time, for the "any barber" option */
+    /** @return array<string,int[]> «ساعت:دقیقه» ← آرایشگرهای آزاد در آن لحظه (برای گزینهٔ «هر آرایشگری») */
     public function freeSlots(int $salonId, ?int $staffId, DateTimeImmutable $date, int $durationMinutes): array
     {
         // تقویم برای هر روزِ ماه یک بار اینجا می‌آید؛ فهرست آرایشگرها

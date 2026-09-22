@@ -46,7 +46,7 @@ final class SlotFinder
     /** @var array<int,array{appointments:array,offs:array}> */
     private static array $busyCache = [];
 
-    /** @return string[] "H:i" start times */
+    /** @return string[] ساعت شروع سانس‌ها، به شکل «ساعت:دقیقه» */
     public function freeSlotsForStaff(int $salonId, int $staffId, DateTimeImmutable $date, int $durationMinutes): array
     {
         $weekday = Jalali::weekday($date);

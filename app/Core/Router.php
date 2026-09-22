@@ -75,7 +75,25 @@ final class Router
                 continue;
             }
 
-            $params = array_filter($matches, static fn ($key) => !is_int($key), ARRAY_FILTER_USE_KEY);
+            /*
+             * پارامترها رمزگشایی می‌شوند، ولی خودِ مسیر نه.
+             *
+             * چرا اینجا و نه در Request: نشانی خام است، پس یک slug فارسی
+             * به‌شکل %D8%A2... می‌رسد و هرگز با مقداری که در دیتابیس
+             * نشسته جور نمی‌شود — صفحهٔ عمومی سالن ۴۰۴ می‌داد، و چون
+             * آنبوردینگ از نام فارسی slug فارسی می‌سازد، این یعنی هر
+             * سالنی که از مسیر عادی ساخته شود لینک عمومی‌اش کار نمی‌کند.
+             *
+             * ولی رمزگشایی کل مسیر پیش از تطبیق، خطرناک است: یک %2F
+             * داخل مقدار، بعد از رمزگشایی «/» می‌شود و می‌تواند مسیر را
+             * به جای دیگری ببرد. پس تطبیق روی نشانی خام انجام می‌شود —
+             * جایی که [^/]+ واقعاً یعنی «بدون جداکنندهٔ مسیر» — و فقط
+             * چیزی که گرفته شده رمزگشایی می‌شود.
+             */
+            $params = array_map(
+                static fn (string $value): string => rawurldecode($value),
+                array_filter($matches, static fn ($key) => !is_int($key), ARRAY_FILTER_USE_KEY)
+            );
             $request->routeParams = $params;
 
             $pipeline = array_reverse($route['middleware']);

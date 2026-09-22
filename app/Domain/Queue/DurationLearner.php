@@ -95,7 +95,7 @@ final class DurationLearner
         }
     }
 
-    /** @param float[] $sortedValues */
+    /** @param float[] $sortedValues مقادیر، از قبل مرتب‌شده */
     private function percentile(array $sortedValues, int $p): float
     {
         $n = count($sortedValues);

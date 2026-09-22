@@ -6,16 +6,22 @@ namespace App\Domain\Queue;
 
 use App\Core\Config;
 use App\Core\DB;
+use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Customer\CustomerRepository;
 use App\Domain\Messaging\QueueNotificationService;
 use DateTimeImmutable;
 use RuntimeException;
 
 /**
- * Orchestrates the queue lifecycle. The one non-negotiable rule from the
- * product doc (4.6 / 9.2): "Complete" and "settle" are a single action —
- * a barber can't get paid without the system learning from it, and the
- * next customer's chair status advances automatically the moment they do.
+ * چرخهٔ عمر صف را می‌گرداند.
+ *
+ * یک قاعده اینجا قابل مذاکره نیست: «تمام شد» و «تسویه» یک دکمه‌اند.
+ *
+ * دلیلش رفتار واقعی آرایشگاه است. اگر دو کار جدا باشند، آرایشگر تسویه
+ * می‌کند و ثبت «تمام شد» را فراموش می‌کند — و آن‌وقت سیستم هیچ‌وقت
+ * یاد نمی‌گیرد که این خدمت چقدر طول کشید، صف جلو نمی‌رود، و تخمین‌های
+ * بعدی همه غلط می‌شوند. با یکی بودنشان، همان لحظه که پول گرفته شد
+ * مشتری بعدی خودکار روی صندلی می‌نشیند.
  */
 final class QueueService
 {
@@ -33,8 +39,10 @@ final class QueueService
     }
 
     /**
-     * A02/A03: one-tap walk-in add. If no staff chosen, assigns the least
-     * busy active barber (phase-1 "any available" rule).
+     * افزودن مراجعهٔ بدون نوبت، با یک ضربه.
+     *
+     * اگر آرایشگری انتخاب نشده باشد، کم‌کارترینِ فعال را می‌دهد. سرعت
+     * اینجا مهم‌تر از دقت است: مشتری جلوی پیشخوان ایستاده.
      *
      * @param int[] $serviceIds
      */
@@ -153,7 +161,12 @@ final class QueueService
         }
     }
 
-    /** If the chair is empty, whoever is next in that staff's ordered queue becomes in_chair automatically (doc 4.6 defense #2). */
+    /**
+     * اگر صندلی خالی است، نفر بعدیِ صف همان آرایشگر خودکار می‌نشیند.
+     *
+     * لایهٔ دوم دفاع در برابر فراموشی: آرایشگر وسط کار یادش می‌رود دکمه
+     * بزند، و بدون این، صف روی صفحهٔ مشتری‌ها یخ می‌زند.
+     */
     private function autoStartIfChairFree(int $salonId, int $staffId): void
     {
         $inChair = $this->appointments->inChairFor($salonId, $staffId);
@@ -171,8 +184,10 @@ final class QueueService
     }
 
     /**
-     * Full salon snapshot for the panel/public queue displays: every
-     * active staff's queue, ordered, with ETA + display text attached.
+     * عکس لحظه‌ای کل سالن — برای پنل و صفحهٔ عمومی صف.
+     *
+     * صف همهٔ آرایشگرهای فعال، مرتب‌شده، با ساعت تخمینی و متنی که
+     * مستقیم قابل نشان دادن است.
      */
     public function salonSnapshot(int $salonId): array
     {
@@ -207,7 +222,7 @@ final class QueueService
         return $snapshot;
     }
 
-    /** Queue view for one customer's public "my appointment" link. */
+    /** همان نما، ولی از دید یک مشتری — برای لینک «نوبت من». */
     public function customerView(string $publicToken): ?array
     {
         $appt = $this->appointments->findByToken($publicToken);
