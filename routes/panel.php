@@ -112,6 +112,9 @@ $router->group(['middleware' => [AuthRequired::class, TenantRequired::class]], f
         $router->get('/panel/sms', [SmsPatternController::class, 'index']);
         $router->get('/panel/settings', [SalonSettingsController::class, 'show']);
         $router->group(['middleware' => [VerifyCsrf::class]], function ($router) {
+            // ثبت الگو در سامانهٔ اپراتور. داخل گروه «صاحب و مدیر» است
+            // چون روی حساب پیامکی اثر می‌گذارد، نه فقط روی این سالن.
+            $router->post('/panel/sms/register', [SmsPatternController::class, 'register']);
             $router->post('/panel/settings/profile', [SalonSettingsController::class, 'updateProfile']);
             $router->post('/panel/settings/hours', [SalonSettingsController::class, 'updateHours']);
             $router->post('/panel/settings/holidays/seed', [SalonSettingsController::class, 'seedHolidays']);

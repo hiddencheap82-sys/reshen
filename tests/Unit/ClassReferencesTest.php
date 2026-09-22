@@ -28,13 +28,29 @@ final class ClassReferencesTest extends TestCase
     /** نام‌هایی که کلاس نیستند و در کد به‌شکل کلاس دیده می‌شوند. */
     private const NOT_CLASSES = ['self', 'static', 'parent', 'class'];
 
+    /**
+     * کلاس‌هایی که فقط با یک افزونهٔ اختیاری PHP وجود دارند.
+     *
+     * روی این ماشین نصب نیستند، ولی نبودشان ایراد نیست: کد پیش از
+     * استفاده `extension_loaded()` را می‌سنجد و راه دومی دارد. اگر
+     * چنین محافظتی نباشد، همان‌جا خطا می‌گیریم — تست پایین بررسی
+     * می‌کند که واقعاً محافظت شده باشند.
+     *
+     * @var array<string,string> نام کلاس => افزونه‌ای که می‌آوردش
+     */
+    private const OPTIONAL_EXTENSION_CLASSES = [
+        'SoapClient' => 'soap',
+        'SoapFault' => 'soap',
+        'Imagick' => 'imagick',
+    ];
+
     public function test_every_referenced_class_exists(): void
     {
         $missing = [];
 
         foreach ($this->projectFiles() as $path) {
             foreach ($this->referencedClasses($path) as $line => $class) {
-                if ($this->exists($class)) {
+                if ($this->exists($class) || isset(self::OPTIONAL_EXTENSION_CLASSES[$class])) {
                     continue;
                 }
                 $missing[] = sprintf(
@@ -48,6 +64,40 @@ final class ClassReferencesTest extends TestCase
 
         self::assertSame([], $missing, "کلاس‌هایی که نام برده شده‌اند ولی وجود ندارند:\n"
             . implode("\n", $missing));
+    }
+
+    /**
+     * کلاسِ افزونه‌ای بدون بررسیِ وجودِ افزونه، یعنی خطای مرگبار.
+     *
+     * روی هاست مشتری که soap ندارد، `new SoapClient(...)` بدون
+     * `extension_loaded('soap')` صفحه را با خطای «Class not found»
+     * می‌خواباند — همان نوع خرابی‌ای که فقط روی سرور دیگری دیده
+     * می‌شود، نه اینجا.
+     */
+    public function test_optional_extension_classes_are_guarded(): void
+    {
+        $unguarded = [];
+
+        foreach ($this->projectFiles() as $path) {
+            $src = (string) file_get_contents($path);
+
+            foreach (self::OPTIONAL_EXTENSION_CLASSES as $class => $extension) {
+                if (!str_contains($src, $class)) {
+                    continue;
+                }
+                $guard = sprintf("extension_loaded('%s')", $extension);
+                if (!str_contains($src, $guard)) {
+                    $unguarded[] = sprintf(
+                        '%s از %s استفاده می‌کند ولی %s ندارد',
+                        substr($path, strlen(dirname(__DIR__, 2)) + 1),
+                        $class,
+                        $guard
+                    );
+                }
+            }
+        }
+
+        self::assertSame([], $unguarded, implode("\n", $unguarded));
     }
 
     private function exists(string $class): bool

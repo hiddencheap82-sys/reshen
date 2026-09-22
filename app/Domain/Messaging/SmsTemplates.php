@@ -138,6 +138,47 @@ final class SmsTemplates
     }
 
     /**
+     * همان متن، ولی با شکلِ متغیرهایی که *اپراتور* می‌شناسد.
+     *
+     * این جایی است که یک اشتباه بی‌صدا نشسته بود: صفحهٔ پیامک متنِ
+     * داخلی رشن را نشان می‌داد («‎%name% عزیز…‎») و می‌گفت همین را در
+     * پنل اپراتور ثبت کن. ولی `%name%` برای هیچ‌کدام از دو اپراتور
+     * معنایی ندارد — ملی‌پیامک متغیرها را با `{0}` و `{1}` می‌شناسد و
+     * کاوه‌نگار با `%token%` و `%token2%`.
+     *
+     * نتیجه‌اش این بود: الگو ثبت می‌شد ولی *بدون هیچ متغیری*، و ارسال
+     * با کد ‎-5‎ («متغیرها با الگو نمی‌خواند») برمی‌گشت. صاحب سالن هم
+     * دقیقاً همان متنی را ثبت کرده بود که برنامه گفته بود.
+     *
+     * ترتیب متغیرها همان `vars` است، چون ارسال هم به همان ترتیب
+     * مقادیر را می‌فرستد.
+     */
+    public static function providerPattern(string $code, string $provider): string
+    {
+        $template = self::get($code);
+        if ($template === null) {
+            return '';
+        }
+
+        $text = $template['pattern'];
+
+        foreach ($template['vars'] as $i => $var) {
+            $text = str_replace('%' . $var . '%', self::placeholder($provider, $i), $text);
+        }
+
+        return $text;
+    }
+
+    /** شکل متغیرِ شمارهٔ $index نزد یک اپراتور. */
+    public static function placeholder(string $provider, int $index): string
+    {
+        return match ($provider) {
+            'kavenegar' => $index === 0 ? '%token%' : '%token' . ($index + 1) . '%',
+            default => '{' . $index . '}',
+        };
+    }
+
+    /**
      * متن نهایی با مقادیر جاگذاری‌شده.
      *
      * دو کاربرد دارد و هر دو واقعی‌اند: متن جایگزین برای خط اختصاصی، و

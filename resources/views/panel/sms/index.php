@@ -4,6 +4,8 @@
  *
  * @var array $rows
  * @var string $driver
+ * @var string $provider
+ * @var bool $canRegister
  * @var bool $dedicatedLine
  */
 $configured = 0;
@@ -37,6 +39,19 @@ $total = count($rows);
       </p>
     </div>
   </div>
+
+  <?php if (!$canRegister && $provider === 'melipayamak'): ?>
+    <!--
+      چرا دکمهٔ ثبت نیست: بدون نام کاربری و رمز، هیچ تماسی با ملی‌پیامک
+      ممکن نیست. نبودِ بی‌توضیحِ دکمه، کاربر را به این نتیجه می‌رساند که
+      چنین قابلیتی وجود ندارد.
+    -->
+    <p class="text-[12px] text-ink-500 mt-3 pt-3 leading-relaxed" style="border-top:1px solid var(--line)">
+      برای ثبت خودکار الگوها، <span class="code">SMS_MELIPAYAMAK_USERNAME</span> و
+      <span class="code">SMS_MELIPAYAMAK_PASSWORD</span> را در فایل <span class="code">.env</span>
+      بگذارید. تا آن موقع متن‌های زیر را دستی در پنل ملی‌پیامک ثبت کنید.
+    </p>
+  <?php endif; ?>
 
   <?php if ($dedicatedLine): ?>
     <p class="text-[12px] text-ink-500 mt-3 pt-3 leading-relaxed" style="border-top:1px solid var(--line)">
@@ -74,18 +89,55 @@ $total = count($rows);
 
         <div>
           <div class="flex items-center justify-between mb-1.5">
-            <span class="text-[12px] font-bold text-ink-500">متنی که باید ثبت کنی</span>
+            <span class="text-[12px] font-bold text-ink-500">
+              متنی که باید ثبت شود
+              <span class="font-normal text-ink-400">— با متغیرهای <?= e($provider === 'kavenegar' ? 'کاوه‌نگار' : 'ملی‌پیامک') ?></span>
+            </span>
             <!--
               ۴۴ پیکسل، نه ۳۶: این دکمه روی موبایل زده می‌شود و کنارش
               متنی است که نباید اشتباهی انتخاب شود.
             -->
             <button type="button" class="copy-btn h-11 min-h-[44px] px-3 rounded-lg text-[12px] font-bold text-accent
                                          hover:bg-ink-100 transition-colors cursor-pointer"
-                    data-copy="<?= e($r['pattern']) ?>">کپی</button>
+                    data-copy="<?= e($r['providerPattern']) ?>">کپی</button>
           </div>
           <pre class="text-[12px] leading-relaxed rounded-xl px-3 py-2.5 whitespace-pre-wrap
-                      text-ink-800" style="background:var(--accent-soft)"><?= e($r['pattern']) ?></pre>
+                      text-ink-800" style="background:var(--accent-soft)"><?= e($r['providerPattern']) ?></pre>
         </div>
+
+        <?php if ($r['registered'] !== null): ?>
+          <!--
+            ثبت‌شده، ولی لزوماً کار نمی‌کند: تأیید اپراتور چند روز طول
+            می‌کشد و تا آن موقع ارسال با کد ‎-4‎ برمی‌گردد. پس هم شناسه
+            را نشان می‌دهیم و هم خطِ دقیقی که باید در .env برود.
+          -->
+          <div class="rounded-xl px-3 py-2.5 text-[12px] leading-relaxed"
+               style="background:var(--fill-secondary)">
+            <p class="font-bold text-ink-700 mb-1">
+              ثبت شد — شناسه <span class="code text-accent"><?= e($r['registered']['body_id']) ?></span>
+            </p>
+            <p class="text-ink-500 mb-2">
+              این خط را در فایل <span class="code">.env</span> بگذارید:
+            </p>
+            <div class="flex items-center gap-2">
+              <code class="code flex-1 min-w-0 truncate rounded-lg px-2 py-1.5 bg-ink-100 text-ink-800"
+                    dir="ltr"><?= e($r['envKey']) ?>=<?= e($r['registered']['body_id']) ?></code>
+              <button type="button" class="copy-btn h-11 min-h-[44px] px-3 rounded-lg text-[12px] font-bold text-accent
+                                           hover:bg-ink-100 transition-colors cursor-pointer shrink-0"
+                      data-copy="<?= e($r['envKey']) ?>=<?= e($r['registered']['body_id']) ?>">کپی</button>
+            </div>
+          </div>
+        <?php endif; ?>
+
+        <?php if ($canRegister): ?>
+          <form method="post" action="<?= e(url('panel/sms/register')) ?>">
+            <?= csrf_field() ?>
+            <input type="hidden" name="code" value="<?= e($code) ?>">
+            <button type="submit" class="btn-ink w-full h-11 text-[13px]">
+              <?= $r['registered'] !== null ? 'ثبت دوباره در ملی‌پیامک' : 'ثبت در ملی‌پیامک' ?>
+            </button>
+          </form>
+        <?php endif; ?>
 
         <div>
           <span class="block text-[12px] font-bold text-ink-500 mb-1.5">
