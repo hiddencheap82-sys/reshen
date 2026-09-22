@@ -57,7 +57,7 @@ $currentPath = '/' . trim($_SERVER['REQUEST_URI'] ?? '', '/');
       <div class="w-9 h-9 rounded-xl bg-ink-900 text-white flex items-center justify-center font-bold">ر</div>
       <div>
         <div class="font-bold text-sm leading-tight"><?= e($salonName ?? 'رشن') ?></div>
-        <div class="text-[11px] text-ink-400"><?= e(['owner'=>'صاحب سالن','manager'=>'مدیر','staff'=>'آرایشگر','reception'=>'پذیرش'][$role] ?? '') ?></div>
+        <div class="text-[12px] text-ink-400"><?= e(['owner'=>'صاحب سالن','manager'=>'مدیر','staff'=>'آرایشگر','reception'=>'پذیرش'][$role] ?? '') ?></div>
       </div>
     </div>
     <nav class="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
@@ -165,7 +165,7 @@ $currentPath = '/' . trim($_SERVER['REQUEST_URI'] ?? '', '/');
           <?php foreach ($navRest as $item): ?>
             <a href="<?= e(url($item['href'])) ?>"
                class="min-w-0 flex flex-col items-center justify-center gap-1 h-[4.5rem] rounded-xl tap
-                      text-[11px] font-semibold <?= $isActive($item) ? 'text-accent' : 'text-ink-600' ?>"
+                      text-[12px] font-semibold <?= $isActive($item) ? 'text-accent' : 'text-ink-600' ?>"
                <?= $isActive($item) ? 'aria-current="page"' : '' ?>
                style="<?= $isActive($item) ? 'background:var(--accent-soft)' : '' ?>">
               <?= icon($item['icon'], 'w-5 h-5 shrink-0') ?>
@@ -181,7 +181,7 @@ $currentPath = '/' . trim($_SERVER['REQUEST_URI'] ?? '', '/');
        style="padding-bottom:env(safe-area-inset-bottom,0px)">
     <?php foreach ($navPrimary as $item): ?>
       <a href="<?= e(url($item['href'])) ?>"
-         class="flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 text-[11px]
+         class="flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 text-[12px]
                 <?= $isActive($item) ? 'text-accent font-bold' : 'text-ink-400' ?>"
          <?= $isActive($item) ? 'aria-current="page"' : '' ?>>
         <?= icon($item['icon'], 'w-5 h-5 shrink-0') ?>
@@ -193,7 +193,7 @@ $currentPath = '/' . trim($_SERVER['REQUEST_URI'] ?? '', '/');
       <?php $restActive = array_filter($navRest, $isActive) !== []; ?>
       <button type="button"
               onclick="var d=document.getElementById('more-nav'); d.open ? d.removeAttribute('open') : d.setAttribute('open','');"
-              class="flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 text-[11px] cursor-pointer
+              class="flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 text-[12px] cursor-pointer
                      <?= $restActive ? 'text-accent font-bold' : 'text-ink-400' ?>"
               aria-label="گزینه‌های بیشتر">
         <?= icon('more', 'w-5 h-5') ?>

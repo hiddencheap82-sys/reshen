@@ -12,19 +12,19 @@ $maxDaily = max(array_map(fn($d) => (int)$d['total'], $dailySeries) ?: [1]);
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
   <div class="glass rounded-2xl p-4 text-center">
     <div class="text-2xl font-extrabold text-accent"><?= toman((int)$totals['total']) ?></div>
-    <div class="text-[11px] text-ink-400 mt-1">فروش کل</div>
+    <div class="text-[12px] text-ink-400 mt-1">فروش کل</div>
   </div>
   <div class="glass rounded-2xl p-4 text-center">
     <div class="text-2xl font-extrabold text-ink-800"><?= fa_num($totals['count']) ?></div>
-    <div class="text-[11px] text-ink-400 mt-1">تعداد نوبت</div>
+    <div class="text-[12px] text-ink-400 mt-1">تعداد نوبت</div>
   </div>
   <div class="glass rounded-2xl p-4 text-center">
     <div class="text-2xl font-extrabold text-ink-800"><?= toman((int)$totals['tips']) ?></div>
-    <div class="text-[11px] text-ink-400 mt-1">انعام</div>
+    <div class="text-[12px] text-ink-400 mt-1">انعام</div>
   </div>
   <div class="bg-green-50 rounded-2xl border border-green-100 p-4 text-center">
     <div class="text-2xl font-extrabold text-green-800"><?= fa_num($rescued['count']) ?></div>
-    <div class="text-[11px] text-green-800 mt-1">نجات‌یافته با یادآور</div>
+    <div class="text-[12px] text-green-800 mt-1">نجات‌یافته با یادآور</div>
   </div>
 </div>
 

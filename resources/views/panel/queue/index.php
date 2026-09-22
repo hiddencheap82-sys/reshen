@@ -30,12 +30,12 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
         <?= e(JalaliCalendar::humanDate($today, true)) ?>
       </div>
       <?php if (App\Support\Jalali::isWeekend($today)): ?>
-        <div class="text-[11px] text-accent font-bold mt-0.5">آخر هفته — روز شلوغ</div>
+        <div class="text-[12px] text-accent font-bold mt-0.5">آخر هفته — روز شلوغ</div>
       <?php endif; ?>
     </div>
     <?php if ($salonEarnings !== null): ?>
       <div class="text-left">
-        <div class="text-[11px] text-ink-400">فروش امروز</div>
+        <div class="text-[12px] text-ink-400">فروش امروز</div>
         <div class="text-xl font-extrabold text-accent tabular-nums">
           <?= e(toman((int) ($salonEarnings['total'] ?? 0))) ?>
         </div>
@@ -52,7 +52,7 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
     ] as [$label, $value, $fg, $bg]): ?>
       <div class="<?= $bg ?> rounded-xl py-2 px-1 text-center">
         <dd class="text-xl font-extrabold <?= $fg ?> tabular-nums"><?= e(fa_num((int) $value)) ?></dd>
-        <dt class="text-[11px] text-ink-500 mt-0.5"><?= e($label) ?></dt>
+        <dt class="text-[12px] text-ink-500 mt-0.5"><?= e($label) ?></dt>
       </div>
     <?php endforeach; ?>
   </dl>
@@ -70,11 +70,27 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
   <form method="post" action="<?= url('panel/queue/walkin') ?>" class="space-y-3">
     <?= csrf_field() ?>
     <div class="grid sm:grid-cols-2 gap-3">
-      <input type="text" name="name" placeholder="نام مشتری (اختیاری)" class="rounded-xl border border-ink-200 px-3 py-2.5 text-sm">
-      <input type="tel" name="phone" dir="ltr" placeholder="شمارهٔ موبایل (اختیاری)" class="rounded-xl border border-ink-200 px-3 py-2.5 text-sm text-left">
+      <!--
+        برچسب‌ها sr-only هستند، نه غایب: placeholder به‌محض تایپ کردن
+        ناپدید می‌شود و صفحه‌خوان هم آن را نام فیلد حساب نمی‌کند. اینجا
+        فرم باید فشرده بماند (آرایشگر وسط کار، مشتری جلوی پیشخوان)،
+        پس برچسب هست ولی دیده نمی‌شود.
+      -->
+      <div>
+        <label for="walkin-name" class="sr-only">نام مشتری (اختیاری)</label>
+        <input type="text" id="walkin-name" name="name" placeholder="نام مشتری (اختیاری)"
+               autocomplete="name"
+               class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm">
+      </div>
+      <div>
+        <label for="walkin-phone" class="sr-only">شمارهٔ موبایل (اختیاری)</label>
+        <input inputmode="numeric" type="tel" id="walkin-phone" name="phone" dir="ltr"
+               autocomplete="tel" placeholder="شمارهٔ موبایل (اختیاری)"
+               class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm text-left">
+      </div>
     </div>
     <div>
-      <label class="block text-xs text-ink-500 mb-1.5">خدمت(ها)</label>
+      <label class="block text-xs text-ink-500 mb-1.5" for="staff_id">خدمت(ها)</label>
       <div class="flex flex-wrap gap-2">
         <?php foreach ($services as $s): ?>
         <label class="flex items-center gap-1.5 text-xs bg-ink-50 border border-ink-200 rounded-lg px-2.5 py-1.5 cursor-pointer">
@@ -85,7 +101,7 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
     </div>
     <div>
       <label class="block text-xs text-ink-500 mb-1.5">آرایشگر</label>
-      <select name="staff_id" class="rounded-xl border border-ink-200 px-3 py-2.5 text-sm">
+      <select id="staff_id" name="staff_id" class="rounded-xl border border-ink-200 px-3 py-2.5 text-sm">
         <option value="">فرقی نمی‌کند (کمترین صف)</option>
         <?php foreach ($staffList as $st): ?>
         <option value="<?= (int)$st['id'] ?>"><?= e($st['name']) ?></option>
@@ -123,7 +139,7 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
       </div>
       <form method="post" action="<?= url('panel/queue/' . $current['id'] . '/start') ?>">
         <?= csrf_field() ?>
-        <button type="submit" class="btn-ink w-full font-extrabold text-xl rounded-2xl py-8 h-auto">شروع</button>
+        <button type="submit" class="btn-accent w-full font-extrabold text-xl rounded-2xl py-8 h-auto">شروع</button>
       </form>
     <?php endif; ?>
 
@@ -157,7 +173,7 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
         </span>
         <span class="font-extrabold text-[14px] text-ink-900 flex-1"><?= e($group['staff']['name']) ?></span>
         <?php $n = count($group['queue']); ?>
-        <span class="text-[11px] font-bold tabular-nums px-2 py-1 rounded-lg
+        <span class="text-[12px] font-bold tabular-nums px-2 py-1 rounded-lg
                      <?= $n > 0 ? 'bg-gold-50 text-accent' : 'text-ink-400' ?>">
           <?= $n > 0 ? e(fa_num($n)) . ' نفر' : 'خالی' ?>
         </span>
@@ -187,15 +203,15 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
                   <?= e($row['customer_name'] ?: 'مشتری') ?>
                 </span>
                 <?php if ($row['kind'] === 'booked'): ?>
-                  <span class="text-[11px] font-bold bg-ink-100 text-ink-600 rounded px-1.5 py-0.5 whitespace-nowrap">رزرو</span>
+                  <span class="text-[12px] font-bold bg-ink-100 text-ink-600 rounded px-1.5 py-0.5 whitespace-nowrap">رزرو</span>
                 <?php endif; ?>
               </div>
-              <p class="text-[11px] text-ink-500 mt-0.5 truncate">
+              <p class="text-[12px] text-ink-500 mt-0.5 truncate">
                 <?= e(implode('، ', array_column($row['items'], 'service_name'))) ?>
               </p>
             </div>
 
-            <span class="text-[11px] font-bold shrink-0 text-left tabular-nums
+            <span class="text-[12px] font-bold shrink-0 text-left tabular-nums
                          <?= $inChair ? 'text-accent' : 'text-ink-500' ?>">
               <?= e($row['display']['text'] ?? '') ?>
             </span>
@@ -204,13 +220,16 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
           <!--
             دکمه‌ها ۴۴ پیکسل‌اند، نه ۲۲. آرایشگری که قیچی دستش است،
             دکمهٔ ریز را نمی‌زند — یا بدتر، اشتباهی «لغو» را می‌زند.
-            کنشِ اصلی پررنگ است و کنش‌های خطرناک کم‌رنگ‌تر.
+            کنشِ اصلی رنگِ پالت را دارد و کنش‌های خطرناک فقط متن‌اند.
+            پیش‌تر «شروع» خاکستری بود — همان خاکستریِ دکمهٔ غیرفعال — و
+            در عکس صفحه شبیه دکمه‌ای می‌شد که کار نمی‌کند. مسیر رنگ‌ها
+            حالا خوانا است: طلایی «شروع کن»، سبز «تمام شد».
           -->
           <div class="flex items-center gap-2">
             <?php if (!$inChair): ?>
               <form method="post" action="<?= e(url('panel/queue/' . $row['id'] . '/start')) ?>" class="flex-1">
                 <?= csrf_field() ?>
-                <button class="btn-ink w-full h-11 text-[13px]">شروع</button>
+                <button class="btn-accent w-full h-11 text-[13px]">شروع</button>
               </form>
             <?php else: ?>
               <form method="post" action="<?= e(url('panel/queue/' . $row['id'] . '/complete')) ?>" class="flex-1">

@@ -96,10 +96,12 @@
       </div>
     </div>
 
-    <button type="submit" class="btn-accent metal w-full mt-4">
-      ادامه
-      <?= icon('chevron-end', 'w-4 h-4') ?>
-    </button>
+    <?php
+    echo App\Core\View::render('components.sticky-action', [
+        'label' => 'ادامه',
+        'hint' => 'دست‌کم یک خدمت را انتخاب کن',
+    ]);
+    ?>
   </form>
 
   <script>

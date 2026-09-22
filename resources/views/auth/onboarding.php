@@ -9,25 +9,25 @@
 <form method="post" action="<?= url('onboarding') ?>" class="space-y-4">
   <?= csrf_field() ?>
   <div>
-    <label class="block text-sm text-ink-600 mb-1.5">نام سالن</label>
-    <input type="text" name="name" required autofocus placeholder="آرایشگاه شهاب"
+    <label class="block text-sm text-ink-600 mb-1.5" for="name">نام سالن</label>
+    <input id="name" type="text" name="name" required autofocus placeholder="آرایشگاه شهاب"
       class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
   </div>
   <div class="grid grid-cols-2 gap-3">
     <div>
-      <label class="block text-sm text-ink-600 mb-1.5">شهر</label>
-      <input type="text" name="city" placeholder="شیراز"
+      <label class="block text-sm text-ink-600 mb-1.5" for="city">شهر</label>
+      <input id="city" type="text" name="city" placeholder="شیراز"
         class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
     </div>
     <div>
-      <label class="block text-sm text-ink-600 mb-1.5">تعداد صندلی</label>
-      <input type="number" name="seats" value="1" min="1" max="20"
+      <label class="block text-sm text-ink-600 mb-1.5" for="seats">تعداد صندلی</label>
+      <input id="seats" inputmode="numeric" type="number" name="seats" value="1" min="1" max="20"
         class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
     </div>
   </div>
   <div>
-    <label class="block text-sm text-ink-600 mb-1.5">آدرس (اختیاری)</label>
-    <input type="text" name="address" placeholder="خیابان..."
+    <label class="block text-sm text-ink-600 mb-1.5" for="address">آدرس (اختیاری)</label>
+    <input id="address" type="text" name="address" placeholder="خیابان..."
       class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
   </div>
   <button type="submit" class="btn-ink w-full">

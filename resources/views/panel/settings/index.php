@@ -48,7 +48,7 @@
               <?= icon('plus', 'w-4 h-4') ?>
               انتخاب تصویر
             </label>
-            <span id="logo-name" class="block text-[11px] text-ink-500 mt-1.5">فایلی انتخاب نشده</span>
+            <span id="logo-name" class="block text-[12px] text-ink-500 mt-1.5">فایلی انتخاب نشده</span>
             <script>
             (function () {
               var input = document.getElementById('logo-input');
@@ -61,11 +61,11 @@
               });
             })();
             </script>
-            <p class="text-[10.5px] text-ink-400 mt-1.5 leading-relaxed">
+            <p class="text-[12px] text-ink-400 mt-1.5 leading-relaxed">
               PNG یا JPG، تا ۳ مگابایت. به‌طور خودکار کوچک می‌شود.
             </p>
             <?php if ($logoUrl !== null): ?>
-              <label class="inline-flex items-center gap-1.5 text-[11px] text-ink-500 mt-1.5 cursor-pointer">
+              <label class="inline-flex items-center gap-1.5 text-[12px] text-ink-500 mt-1.5 cursor-pointer" for="name">
                 <input type="checkbox" name="remove_logo" value="1" class="w-4 h-4 accent-current">
                 حذف لوگوی فعلی
               </label>
@@ -74,27 +74,27 @@
         </div>
       </div>
       <div>
-        <label class="block text-xs text-ink-500 mb-1">نام سالن</label>
-        <input type="text" name="name" value="<?= e($salon['name']) ?>" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
+        <label for="salon-name" class="block text-xs text-ink-500 mb-1">نام سالن</label>
+        <input id="salon-name" type="text" name="name" value="<?= e($salon['name']) ?>" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div>
-          <label class="block text-xs text-ink-500 mb-1">شهر</label>
-          <input type="text" name="city" value="<?= e($salon['city'] ?? '') ?>" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
+          <label class="block text-xs text-ink-500 mb-1" for="city">شهر</label>
+          <input id="city" type="text" name="city" value="<?= e($salon['city'] ?? '') ?>" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
         </div>
         <div>
-          <label class="block text-xs text-ink-500 mb-1">تلفن</label>
-          <input type="text" dir="ltr" name="phone" value="<?= e($salon['phone'] ?? '') ?>" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm text-left focus:outline-none focus:ring-2 focus:ring-accent">
+          <label class="block text-xs text-ink-500 mb-1" for="phone">تلفن</label>
+          <input id="phone" type="tel" inputmode="numeric" autocomplete="tel" dir="ltr" name="phone" value="<?= e($salon['phone'] ?? '') ?>" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm text-left focus:outline-none focus:ring-2 focus:ring-accent">
         </div>
       </div>
       <div>
-        <label class="block text-xs text-ink-500 mb-1">آدرس</label>
-        <input type="text" name="address" value="<?= e($salon['address'] ?? '') ?>" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
+        <label class="block text-xs text-ink-500 mb-1" for="address">آدرس</label>
+        <input id="address" type="text" name="address" value="<?= e($salon['address'] ?? '') ?>" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
       </div>
 
       <div>
         <label class="block text-xs font-bold text-ink-600 mb-2">رنگ صفحهٔ سالن</label>
-        <p class="text-[11px] text-ink-400 mb-3">
+        <p class="text-[12px] text-ink-400 mb-3">
           صفحه‌ای که مشتری می‌بیند با این رنگ نمایش داده می‌شود.
         </p>
 
@@ -130,7 +130,7 @@
                         border-0 outline-none"
                  autocomplete="off" spellcheck="false">
         </div>
-        <p class="text-[11px] text-ink-400 leading-relaxed">
+        <p class="text-[12px] text-ink-400 leading-relaxed">
           همین نشانی روی QR چاپ می‌شود. اگر عوضش کنید، QRها و لینک‌هایی که
           قبلاً پخش کرده‌اید دیگر کار نمی‌کنند — پس بهتر است همین اول کار
           درستش کنید.
@@ -144,7 +144,7 @@
     <div class="flex items-baseline justify-between mb-1">
       <h2 class="card-title">ساعت کاری و سانس‌بندی</h2>
     </div>
-    <p class="text-[11px] text-ink-400 mb-4">
+    <p class="text-[12px] text-ink-400 mb-4">
       سانس‌های قابل رزرو از همین ساعت‌ها ساخته می‌شوند. استراحت، آن بازه را از رزرو درمی‌آورد.
     </p>
 
@@ -163,7 +163,7 @@
             </option>
           <?php endforeach; ?>
         </select>
-        <p class="text-[11px] text-ink-400 mt-1.5">
+        <p class="text-[12px] text-ink-400 mt-1.5">
           فاصلهٔ بین زمان‌هایی که مشتری می‌بیند. کوتاه‌تر یعنی گزینهٔ بیشتر، ولی فهرست شلوغ‌تر.
         </p>
       </div>
@@ -200,8 +200,8 @@
           -->
           <div class="flex items-center justify-between gap-2 mb-2">
             <span class="text-[13px] font-bold text-ink-800"><?= e($dayName) ?></span>
-            <label class="flex items-center gap-1.5 text-[11px] text-ink-600 cursor-pointer
-                          py-1 px-1.5 -me-1.5 rounded-lg">
+            <label class="flex items-center gap-1.5 text-[12px] text-ink-600 cursor-pointer
+                          py-1 px-1.5 -me-1.5 rounded-lg" for="off_staff_id">
               <input type="checkbox" name="closed_<?= $i ?>" <?= $closed ? 'checked' : '' ?>
                      class="w-4 h-4 accent-current">
               تعطیل
@@ -217,10 +217,10 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-            <span class="text-[11px] text-ink-500 shrink-0">استراحت</span>
+            <span class="text-[12px] text-ink-500 shrink-0">استراحت</span>
             <?php $timeField("break_start_{$i}", $h['break_start'] ?? null,
                              'شروع استراحت ' . $dayName, true, true); ?>
-            <span class="text-ink-400 text-[11px] shrink-0">تا</span>
+            <span class="text-ink-400 text-[12px] shrink-0">تا</span>
             <?php $timeField("break_end_{$i}", $h['break_end'] ?? null,
                              'پایان استراحت ' . $dayName, true, true); ?>
           </div>
@@ -279,7 +279,7 @@
         <button class="btn-ink h-11 text-[13px] px-4 shrink-0">افزودن</button>
       </div>
     </form>
-    <p class="text-[11px] text-ink-400 mt-2">تعطیلات قمری (مثل عید فطر، تاسوعا و عاشورا) هر سال جابه‌جا می‌شوند و باید دستی اضافه شوند.</p>
+    <p class="text-[12px] text-ink-400 mt-2">تعطیلات قمری (مثل عید فطر، تاسوعا و عاشورا) هر سال جابه‌جا می‌شوند و باید دستی اضافه شوند.</p>
   </div>
 
 <!--
@@ -293,7 +293,7 @@
   <div class="flex items-baseline justify-between mb-1">
     <h2 class="card-title">مرخصی و بستن سانس</h2>
     <?php if (!empty($timeOffs)): ?>
-      <span class="text-[11px] text-ink-400 tabular-nums"><?= e(fa_num(count($timeOffs))) ?> بازه</span>
+      <span class="text-[12px] text-ink-400 tabular-nums"><?= e(fa_num(count($timeOffs))) ?> بازه</span>
     <?php endif; ?>
   </div>
   <p class="text-[12px] text-ink-500 mb-4 leading-relaxed">
@@ -318,7 +318,7 @@
                 <span class="font-normal text-ink-600">— تمام روز</span>
               <?php endif; ?>
             </p>
-            <p class="text-[11px] text-ink-500 mt-0.5">
+            <p class="text-[12px] text-ink-500 mt-0.5">
               <?= $off['staff_name'] !== null ? e($off['staff_name']) : 'کل آرایشگاه' ?>
               <?php if (!empty($off['reason'])): ?> · <?= e($off['reason']) ?><?php endif; ?>
             </p>
@@ -356,7 +356,7 @@
 
     <div>
       <label class="block text-xs text-ink-500 mb-1">برای چه کسی</label>
-      <select name="off_staff_id" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
+      <select id="off_staff_id" name="off_staff_id" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
         <option value="">کل آرایشگاه</option>
         <?php foreach ($staffList as $st): ?>
           <option value="<?= (int) $st['id'] ?>"><?= e($st['name']) ?></option>
@@ -365,8 +365,8 @@
     </div>
 
     <div>
-      <label class="block text-xs text-ink-500 mb-1">دلیل (اختیاری)</label>
-      <input type="text" name="off_reason" maxlength="150" placeholder="مثلاً: عروسی"
+      <label class="block text-xs text-ink-500 mb-1" for="off_reason">دلیل (اختیاری)</label>
+      <input id="off_reason" type="text" name="off_reason" maxlength="150" placeholder="مثلاً: عروسی"
              class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
     </div>
 

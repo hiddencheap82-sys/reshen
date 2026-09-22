@@ -46,7 +46,7 @@
            inputmode="numeric" autocomplete="tel" placeholder="۰۹۱۲۳۴۵۶۷۸۹"
            class="w-full h-12 rounded-xl border border-ink-200 bg-transparent px-4 text-left text-[17px]
                   tracking-wider tabular-nums focus:outline-none focus:ring-2 focus:ring-accent">
-    <p class="text-[11px] text-ink-400 mt-1.5">برای یادآوری نوبت و خبر دادن وقتی نوبتت نزدیک شد.</p>
+    <p class="text-[12px] text-ink-400 mt-1.5">برای یادآوری نوبت و خبر دادن وقتی نوبتت نزدیک شد.</p>
   </div>
 
   <div>
@@ -58,8 +58,9 @@
                   focus:outline-none focus:ring-2 focus:ring-accent">
   </div>
 
-  <button type="submit" class="btn-accent metal w-full mt-1">
-    <?= $needsVerification ? 'ارسال کد تأیید' : 'ثبت نوبت' ?>
-    <?= icon('chevron-end', 'w-4 h-4') ?>
-  </button>
+<?php
+  echo App\Core\View::render('components.sticky-action', [
+      'label' => $needsVerification ? 'ارسال کد تأیید' : 'ثبت نوبت',
+  ]);
+  ?>
 </form>

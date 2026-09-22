@@ -8,21 +8,21 @@
 <form method="post" action="<?= url($staff ? 'panel/staff/' . $staff['id'] : 'panel/staff') ?>" class="glass rounded-2xl p-5 space-y-4">
   <?= csrf_field() ?>
   <div>
-    <label class="block text-sm text-ink-600 mb-1.5">نام</label>
-    <input type="text" name="name" required value="<?= e($staff['name'] ?? '') ?>"
+    <label class="block text-sm text-ink-600 mb-1.5" for="name">نام</label>
+    <input id="name" type="text" name="name" required value="<?= e($staff['name'] ?? '') ?>"
       class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent">
   </div>
   <?php if (!$staff): ?>
   <div>
-    <label class="block text-sm text-ink-600 mb-1.5">شمارهٔ موبایل (برای ورود آرایشگر به پنل — اختیاری)</label>
-    <input type="tel" name="phone" dir="ltr" placeholder="09123456789"
+    <label class="block text-sm text-ink-600 mb-1.5" for="phone">شمارهٔ موبایل (برای ورود آرایشگر به پنل — اختیاری)</label>
+    <input id="phone" inputmode="numeric" type="tel" name="phone" dir="ltr" placeholder="09123456789"
       class="w-full rounded-xl border border-ink-200 px-4 py-3 text-left focus:outline-none focus:ring-2 focus:ring-accent">
   </div>
   <?php endif; ?>
   <div class="space-y-4">
     <div>
-      <label class="block text-sm text-ink-600 mb-1.5">درصد پیش‌فرض تسویه</label>
-      <input type="number" step="0.1" name="commission_percent" value="<?= e((string)($staff['commission_percent'] ?? '')) ?>" placeholder="۵۰"
+      <label class="block text-sm text-ink-600 mb-1.5" for="commission_percent">درصد پیش‌فرض تسویه</label>
+      <input id="commission_percent" inputmode="numeric" type="number" step="0.1" name="commission_percent" value="<?= e((string)($staff['commission_percent'] ?? '')) ?>" placeholder="۵۰"
         class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent">
     </div>
     <div>

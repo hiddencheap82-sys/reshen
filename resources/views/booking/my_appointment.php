@@ -23,7 +23,7 @@ $live = in_array($appointment['status'], ['confirmed','queued','in_chair'], true
   <?php elseif ($display): ?>
     <div class="text-xs text-ink-400 mb-1">زمان تقریبی نوبت شما</div>
     <div class="text-2xl font-extrabold text-accent"><?= e($display['text']) ?></div>
-    <?php if ($display['rough']): ?><div class="text-[11px] text-amber-600 mt-1">تخمین تقریبی</div><?php endif; ?>
+    <?php if ($display['rough']): ?><div class="text-[12px] text-amber-600 mt-1">تخمین تقریبی</div><?php endif; ?>
   <?php else: ?>
     <div class="text-lg font-bold text-ink-600"><?= e($statusLabels[$appointment['status']] ?? $appointment['status']) ?></div>
   <?php endif; ?>

@@ -19,7 +19,9 @@
 
 <form method="post" action="<?= url('login/verify') ?>" class="space-y-4">
   <?= csrf_field() ?>
-  <input type="text" name="code" inputmode="numeric" autofocus maxlength="5" placeholder="١٢٣٤٥"
+  <label for="otp-code" class="sr-only">کد پنج‌رقمی که پیامک شد</label>
+  <input type="text" id="otp-code" name="code" inputmode="numeric" autocomplete="one-time-code"
+    autofocus maxlength="5" placeholder="١٢٣٤٥"
     class="w-full rounded-xl border border-ink-200 px-4 py-3 text-center text-2xl tracking-[0.5em] focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
   <button type="submit" class="btn-ink w-full">
     تأیید و ورود

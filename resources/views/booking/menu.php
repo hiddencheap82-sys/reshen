@@ -49,7 +49,7 @@ $shortest = $services === [] ? 0 : min(array_map(static fn ($s) => (int) $s['dur
               <p class="text-[12px] text-ink-500 mt-1 leading-relaxed"><?= e($s['description']) ?></p>
             <?php endif; ?>
 
-            <p class="flex items-center gap-1.5 text-[11px] text-ink-400 mt-1.5">
+            <p class="flex items-center gap-1.5 text-[12px] text-ink-400 mt-1.5">
               <?= icon('clock', 'w-3.5 h-3.5 shrink-0') ?>
               <span class="tabular-nums"><?= e(fa_num((int) $s['duration_minutes'])) ?> دقیقه</span>
             </p>
@@ -70,7 +70,7 @@ $shortest = $services === [] ? 0 : min(array_map(static fn ($s) => (int) $s['dur
     </a>
   </div>
 
-  <p class="text-[11px] text-ink-400 text-center mt-3 leading-relaxed">
+  <p class="text-[12px] text-ink-400 text-center mt-3 leading-relaxed">
     قیمت‌ها ممکن است بسته به نوع مو و زمان تغییر کند.
     <?php if (!empty($salon['phone'])): ?>
       برای اطمینان <a href="tel:<?= e($salon['phone']) ?>" class="text-accent font-semibold">تماس بگیر</a>.

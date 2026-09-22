@@ -28,11 +28,11 @@
     <div class="flex-1 min-w-0">
       <p class="text-[13px] font-extrabold text-ink-900">نصب روی گوشی</p>
 
-      <p id="install-text-android" class="hidden text-[11px] text-ink-500 mt-0.5 leading-relaxed">
+      <p id="install-text-android" class="hidden text-[12px] text-ink-500 mt-0.5 leading-relaxed">
         مثل یک برنامه باز می‌شود، بدون نوار مرورگر.
       </p>
 
-      <p id="install-text-ios" class="hidden text-[11px] text-ink-500 mt-0.5 leading-relaxed">
+      <p id="install-text-ios" class="hidden text-[12px] text-ink-500 mt-0.5 leading-relaxed">
         دکمهٔ <span class="font-bold text-ink-700">اشتراک‌گذاری</span> پایین صفحه را بزن،
         بعد <span class="font-bold text-ink-700">«افزودن به صفحهٔ اصلی»</span>.
       </p>

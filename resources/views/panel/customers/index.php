@@ -2,7 +2,9 @@
 <h1 class="page-title mb-4">مشتریان</h1>
 
 <form method="get" action="<?= url('panel/customers') ?>" class="mb-4">
-  <input type="text" name="q" value="<?= e($q) ?>" placeholder="جستجو با نام یا شماره..."
+  <label for="customer-search" class="sr-only">جستجوی مشتری با نام یا شماره</label>
+  <input type="search" id="customer-search" name="q" value="<?= e($q) ?>"
+    placeholder="جستجو با نام یا شماره..."
     class="w-full rounded-xl border border-ink-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
 </form>
 

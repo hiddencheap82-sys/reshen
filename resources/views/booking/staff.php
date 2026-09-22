@@ -81,8 +81,10 @@
     <?php endforeach; ?>
   </fieldset>
 
-  <button type="submit" class="btn-accent metal w-full mt-4">
-    ادامه
-    <?= icon('chevron-end', 'w-4 h-4') ?>
-  </button>
+<?php
+  echo App\Core\View::render('components.sticky-action', [
+      'label' => 'ادامه',
+      'hint' => 'یا بگذار هر آرایشگری که زودتر آزاد شد',
+  ]);
+  ?>
 </form>

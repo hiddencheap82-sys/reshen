@@ -37,6 +37,14 @@ use RuntimeException;
  */
 final class BookingWizardController extends Controller
 {
+    /**
+     * چند روز در نوار بالای صفحهٔ رزرو دیده شود.
+     *
+     * دو هفته: بلندتر از این، نوار افقی آن‌قدر دراز می‌شود که کسی تا
+     * تهش نمی‌رود. برای دورتر، تقویم کامل هست.
+     */
+    private const DAY_STRIP_LENGTH = 14;
+
     /** گام ۱ — روز و سانس. */
     public function landing(Request $request): Response
     {
@@ -235,6 +243,40 @@ final class BookingWizardController extends Controller
         $dateParam = (string) $request->query('date', date('Y-m-d'));
         $date = new DateTimeImmutable($dateParam);
 
+        $days = $this->upcomingDays($salonId, $session, $date);
+
+        /*
+         * اگر کاربر روزی را انتخاب نکرده و امروز وقتی ندارد، برو روی
+         * اولین روزی که دارد.
+         *
+         * چرا: سالن ساعت ۸ شب دیگر سانسی ندارد، و مشتری‌ای که همان موقع
+         * لینک را باز می‌کند با «این روز سانس آزادی ندارد» روبه‌رو
+         * می‌شد — درست در لحظه‌ای که تصمیم داشت نوبت بگیرد. حالا صفحه
+         * روی نزدیک‌ترین روزِ آزاد باز می‌شود.
+         *
+         * فقط وقتی روز صراحتاً خواسته نشده باشد: اگر کسی روی «جمعه» زد
+         * و جمعه پر بود، باید همان را ببیند، نه اینکه بی‌خبر جای دیگری
+         * برود.
+         */
+        if ($request->query('date') === null) {
+            foreach ($days as $candidate) {
+                if ($candidate['available']) {
+                    if ($candidate['date'] !== $dateParam) {
+                        $dateParam = $candidate['date'];
+                        $date = new DateTimeImmutable($dateParam);
+
+                        // فقط نشانهٔ انتخاب جابه‌جا می‌شود. محاسبهٔ دوبارهٔ
+                        // نوار یعنی چهارده بار جست‌وجوی سانس آزاد، که روی
+                        // هاست اشتراکی حس می‌شود.
+                        foreach ($days as $i => $d) {
+                            $days[$i]['selected'] = $d['date'] === $dateParam;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
         $slotsByTime = $booking->freeSlots($salonId, null, $date, $session);
 
         /*
@@ -262,6 +304,7 @@ final class BookingWizardController extends Controller
         $dayStates = $this->monthAvailability($salonId, null, $session, $viewYear, $viewMonth);
 
         return $this->page('layouts.booking', 'booking.slots', [
+            'days' => $days,
             'title' => $salon['name'],
             'step' => $step,
             'salon' => $salon,
@@ -374,6 +417,63 @@ final class BookingWizardController extends Controller
      *
      * @return array<string,array{available:bool,label:string}>
      */
+    /**
+     * چند روز آیندهٔ نزدیک، با شمارِ سانس آزاد هرکدام.
+     *
+     * چرا این و نه تقویم ماهانه: تقویم ماه، سی خانه نشان می‌دهد که
+     * بیست‌وچند تایش گذشته و خاکستری است. روی موبایل یعنی یک صفحهٔ
+     * کامل اسکرول برای رسیدن به ساعت‌ها — و مشتری‌ای که لینک را از
+     * اینستاگرام باز کرده، همان‌جا می‌رود.
+     *
+     * تقریباً همهٔ رزروها برای امروز تا چند روز آینده‌اند. پس همان‌ها
+     * جلوی چشم می‌آیند و تقویم کامل پشت یک دکمه می‌ماند برای کسی که
+     * واقعاً ماه بعد را می‌خواهد.
+     *
+     * شمارِ سانس هم نمایش داده می‌شود چون تصمیم را عوض می‌کند: «۱ سانس»
+     * یعنی عجله کن، «۱۲ سانس» یعنی خیالت راحت.
+     *
+     * @return array<int,array{date:string,label:string,day:string,free:int,available:bool,selected:bool}>
+     */
+    private function upcomingDays(int $salonId, int $session, DateTimeImmutable $selected): array
+    {
+        $today = new DateTimeImmutable('today');
+        $horizon = (int) Config::get('reshen.booking.max_days_ahead', 30);
+        $span = min(self::DAY_STRIP_LENGTH, max(1, $horizon));
+
+        $booking = new BookingService();
+        $selectedKey = $selected->format('Y-m-d');
+        $days = [];
+
+        for ($i = 0; $i < $span; $i++) {
+            $date = $today->modify('+' . $i . ' days');
+            $key = $date->format('Y-m-d');
+            [, , $jd] = Jalali::fromDateTime($date);
+            $free = count($booking->freeSlots($salonId, null, $date, $session));
+
+            /*
+             * برچسب کوتاه: «امروز»، «فردا»، «پس‌فردا»، بعد نام روز هفته.
+             *
+             * relativeDate برای روزهای دورتر «جمعه ۳ مهر» می‌دهد که خودش
+             * شمارهٔ روز را دارد — کنار شمارهٔ بزرگ زیرش، همان عدد دو بار
+             * تکرار می‌شد.
+             */
+            $label = $i <= 2
+                ? JalaliCalendar::relativeDate($date, $today)
+                : Jalali::weekdayName($date);
+
+            $days[] = [
+                'date' => $key,
+                'label' => $label,
+                'day' => fa_num((string) $jd),
+                'free' => $free,
+                'available' => $free > 0,
+                'selected' => $key === $selectedKey,
+            ];
+        }
+
+        return $days;
+    }
+
     private function monthAvailability(
         int $salonId,
         ?int $staffId,

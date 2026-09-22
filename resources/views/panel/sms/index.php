@@ -29,7 +29,7 @@ $total = count($rows);
       <p class="text-[13px] font-bold text-ink-900">
         <?= e(fa_num($configured)) ?> از <?= e(fa_num($total)) ?> الگو تنظیم شده
       </p>
-      <p class="text-[11px] text-ink-400 mt-0.5">
+      <p class="text-[12px] text-ink-400 mt-0.5">
         درایور فعلی: <span class="code"><?= e($driver) ?></span>
         <?php if ($driver === 'log'): ?>
           — حالت توسعه، پیامک واقعی فرستاده نمی‌شود
@@ -39,11 +39,11 @@ $total = count($rows);
   </div>
 
   <?php if ($dedicatedLine): ?>
-    <p class="text-[11px] text-ink-500 mt-3 pt-3 leading-relaxed" style="border-top:1px solid var(--line)">
+    <p class="text-[12px] text-ink-500 mt-3 pt-3 leading-relaxed" style="border-top:1px solid var(--line)">
       خط اختصاصی روشن است: الگویی که تنظیم نشده باشد، با متن آزاد فرستاده می‌شود.
     </p>
   <?php else: ?>
-    <p class="text-[11px] text-ink-500 mt-3 pt-3 leading-relaxed" style="border-top:1px solid var(--line)">
+    <p class="text-[12px] text-ink-500 mt-3 pt-3 leading-relaxed" style="border-top:1px solid var(--line)">
       الگویی که تنظیم نشده باشد، <strong class="text-ink-700">فرستاده نمی‌شود</strong> —
       به‌جای اینکه بی‌صدا به مقصد نرسد.
     </p>
@@ -61,21 +61,25 @@ $total = count($rows);
               aria-hidden="true"></span>
         <h2 class="card-title flex-1 min-w-0"><?= e($r['title']) ?></h2>
         <?php if ($r['critical']): ?>
-          <span class="text-[10px] font-bold rounded-full px-2 py-0.5 text-accent"
+          <span class="text-[12px] font-bold rounded-full px-2 py-0.5 text-accent"
                 style="background:var(--accent-soft)">حیاتی</span>
         <?php endif; ?>
-        <span class="text-[11px] <?= $ready ? 'text-green-700' : 'text-ink-400' ?> font-bold shrink-0">
+        <span class="text-[12px] <?= $ready ? 'text-green-700' : 'text-ink-400' ?> font-bold shrink-0">
           <?= $ready ? 'تنظیم شده' : 'تنظیم نشده' ?>
         </span>
       </div>
 
       <div class="p-4 space-y-3">
-        <p class="text-[11px] text-ink-400 leading-relaxed"><?= e($r['note']) ?></p>
+        <p class="text-[12px] text-ink-400 leading-relaxed"><?= e($r['note']) ?></p>
 
         <div>
           <div class="flex items-center justify-between mb-1.5">
-            <span class="text-[11px] font-bold text-ink-500">متنی که باید ثبت کنی</span>
-            <button type="button" class="copy-btn h-9 px-3 rounded-lg text-[11px] font-bold text-accent
+            <span class="text-[12px] font-bold text-ink-500">متنی که باید ثبت کنی</span>
+            <!--
+              ۴۴ پیکسل، نه ۳۶: این دکمه روی موبایل زده می‌شود و کنارش
+              متنی است که نباید اشتباهی انتخاب شود.
+            -->
+            <button type="button" class="copy-btn h-11 min-h-[44px] px-3 rounded-lg text-[12px] font-bold text-accent
                                          hover:bg-ink-100 transition-colors cursor-pointer"
                     data-copy="<?= e($r['pattern']) ?>">کپی</button>
           </div>
@@ -84,12 +88,12 @@ $total = count($rows);
         </div>
 
         <div>
-          <span class="block text-[11px] font-bold text-ink-500 mb-1.5">
+          <span class="block text-[12px] font-bold text-ink-500 mb-1.5">
             ترتیب متغیرها <span class="font-normal text-ink-400">— اپراتور با شماره می‌شناسدشان</span>
           </span>
           <ol class="flex flex-wrap gap-1.5">
             <?php foreach ($r['vars'] as $i => $v): ?>
-              <li class="text-[11px] rounded-lg px-2 py-1 bg-ink-100 text-ink-700">
+              <li class="text-[12px] rounded-lg px-2 py-1 bg-ink-100 text-ink-700">
                 <span class="tabular-nums text-ink-400"><?= e(fa_num($i + 1)) ?>.</span>
                 <span class="code"><?= e($v) ?></span>
               </li>
@@ -98,9 +102,9 @@ $total = count($rows);
         </div>
 
         <div>
-          <span class="block text-[11px] font-bold text-ink-500 mb-1.5">شناسه را اینجا بگذار</span>
-          <code class="code block text-[11px] rounded-xl px-3 py-2 bg-ink-100 text-ink-700"><?= e($r['envKey']) ?>=…</code>
-          <p class="text-[10.5px] text-ink-400 mt-1.5">در فایل <span class="code">.env</span> کنار بقیهٔ تنظیمات.</p>
+          <span class="block text-[12px] font-bold text-ink-500 mb-1.5">شناسه را اینجا بگذار</span>
+          <code class="code block text-[12px] rounded-xl px-3 py-2 bg-ink-100 text-ink-700"><?= e($r['envKey']) ?>=…</code>
+          <p class="text-[12px] text-ink-400 mt-1.5">در فایل <span class="code">.env</span> کنار بقیهٔ تنظیمات.</p>
         </div>
       </div>
     </section>

@@ -53,7 +53,7 @@ $step = $step ?? null;
         <div class="flex items-center gap-2 mb-3">
           <span class="w-7 h-7 rounded-lg grid place-items-center text-[13px] font-extrabold"
                 style="background:rgb(255 255 255/.22);color:#fff" aria-hidden="true">ر</span>
-          <span class="text-[11px] tracking-wide" style="color:rgb(255 255 255/.85)">رشن</span>
+          <span class="text-[12px] tracking-wide" style="color:rgb(255 255 255/.85)">رشن</span>
 
           <!-- کلید روشن/تیره در انتهای همان ردیف، دور از دکمه‌های رزرو -->
           <span class="ms-auto -my-2 -me-2">
@@ -122,7 +122,7 @@ $step = $step ?? null;
                 <?= $now ? 'aria-current="step"' : '' ?>>
               <span class="h-1 rounded-full transition-colors duration-300
                            <?= $done ? 'bg-accent' : ($now ? 'bg-ink-900' : 'bg-ink-200') ?>"></span>
-              <span class="text-[11px] font-semibold text-center
+              <span class="text-[12px] font-semibold text-center
                            <?= $now ? 'text-ink-900' : ($done ? 'text-accent' : 'text-ink-400') ?>">
                 <?= e($label) ?>
               </span>
@@ -138,7 +138,7 @@ $step = $step ?? null;
   </main>
 
   <footer class="text-center pb-5 pt-2">
-    <span class="text-[11px] text-ink-400">رشن — زمانِ راست می‌گوید</span>
+    <span class="text-[12px] text-ink-400">رشن — زمانِ راست می‌گوید</span>
   </footer>
 </div>
 

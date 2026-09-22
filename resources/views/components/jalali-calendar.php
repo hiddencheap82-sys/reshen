@@ -36,10 +36,10 @@ $atMin = $minMonth !== null
 
   <div class="flex items-center justify-between px-2 py-2 border-b" style="border-color:var(--line)">
     <?php if ($atMin): ?>
-      <span class="w-11 h-11" aria-hidden="true"></span>
+      <span class="w-11 h-11 min-w-[44px] min-h-[44px]" aria-hidden="true"></span>
     <?php else: ?>
       <a href="<?= e($navFor($cal['prev']['year'], $cal['prev']['month'])) ?>"
-         class="w-11 h-11 grid place-items-center rounded-xl text-ink-500 hover:bg-ink-100
+         class="w-11 h-11 min-w-[44px] min-h-[44px] grid place-items-center rounded-xl text-ink-500 hover:bg-ink-100
                 focus-visible:outline-2 focus-visible:outline-accent transition-colors cursor-pointer"
          aria-label="ماه قبل">
         <?= icon('chevron-start', 'w-5 h-5') ?>
@@ -51,7 +51,7 @@ $atMin = $minMonth !== null
     </h2>
 
     <a href="<?= e($navFor($cal['next']['year'], $cal['next']['month'])) ?>"
-       class="w-11 h-11 grid place-items-center rounded-xl text-ink-500 hover:bg-ink-100
+       class="w-11 h-11 min-w-[44px] min-h-[44px] grid place-items-center rounded-xl text-ink-500 hover:bg-ink-100
               focus-visible:outline-2 focus-visible:outline-accent transition-colors cursor-pointer"
        aria-label="ماه بعد">
       <?= icon('chevron-end', 'w-5 h-5') ?>
@@ -61,7 +61,7 @@ $atMin = $minMonth !== null
   <div class="p-2">
     <div class="grid grid-cols-7 gap-1 mb-1" aria-hidden="true">
       <?php foreach (JalaliCalendar::WEEKDAY_INITIALS as $i => $initial): ?>
-        <div class="h-7 grid place-items-center text-[11px] font-bold
+        <div class="h-7 grid place-items-center text-[12px] font-bold
                     <?= $i >= 5 ? 'text-accent' : 'text-ink-400' ?>">
           <?= e($initial) ?>
         </div>
@@ -73,7 +73,7 @@ $atMin = $minMonth !== null
         <?php foreach ($week as $cell): ?>
 
           <?php if ($cell === null): ?>
-            <span class="h-11"></span>
+            <span class="h-11 min-h-[44px]"></span>
 
           <?php else:
               $isSelected = $selected !== null && $cell['gregorian'] === $selected;
@@ -86,7 +86,7 @@ $atMin = $minMonth !== null
 
             <?php if (!$cell['available']): ?>
               <button type="button" disabled aria-label="<?= e($aria) ?>"
-                      class="h-11 rounded-xl text-sm tabular-nums cursor-not-allowed
+                      class="h-11 min-h-[44px] rounded-xl text-sm tabular-nums cursor-not-allowed
                              text-ink-300 <?= $cell['isToday'] ? 'ring-1 ring-ink-200' : '' ?>">
                 <?= e(fa_num($cell['jday'])) ?>
               </button>
@@ -94,7 +94,7 @@ $atMin = $minMonth !== null
               <a href="<?= e($linkFor($cell['gregorian'])) ?>"
                  aria-label="<?= e($aria) ?>"
                  <?= $isSelected ? 'aria-current="date"' : '' ?>
-                 class="h-11 grid place-items-center rounded-xl text-sm tabular-nums font-semibold
+                 class="h-11 min-h-[44px] grid place-items-center rounded-xl text-sm tabular-nums font-semibold
                         transition-colors cursor-pointer
                         focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent
                         <?php if ($isSelected): ?>

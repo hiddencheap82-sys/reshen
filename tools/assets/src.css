@@ -149,7 +149,12 @@
   .code{
     font-family:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
     direction:ltr; unicode-bidi:plaintext;
-    font-size:.92em; letter-spacing:-.01em;
+    /*
+     * کف ۱۲ پیکسل. ‎.92em‎ روی متنِ ۱۲ پیکسلی، ۱۱ می‌شد — و رشتهٔ
+     * تک‌عرضِ لاتین در آن اندازه روی موبایل خوانده نمی‌شود، مخصوصاً
+     * وقتی قرار است کاربر آن را در پنل اپراتور تایپ کند.
+     */
+    font-size:max(12px, .92em); letter-spacing:-.01em;
     /*
      * نشانی یک واژهٔ بلندِ ناشکستنی است. بدون این، کارتِ دربرگیرنده به
      * اندازهٔ کل نشانی پهن می‌شد و روی صفحهٔ ۳۲۰ پیکسلی، ۳۹ پیکسل از
@@ -318,6 +323,72 @@ html.dark[data-theme="ruby"]{
   }
   @media (prefers-reduced-transparency: reduce){
     .glass{background:var(--glass-solid)}
+  }
+
+  /*
+   * نوار افقیِ اسکرول‌شونده بدون میلهٔ اسکرول.
+   *
+   * نوار روزها روی موبایل کشیده می‌شود، نه اسکرول‌بار می‌خواهد نه
+   * فضایی که اسکرول‌بار بگیرد. روی دسکتاپ هم پنهان است چون کارت‌ها
+   * خودشان لبهٔ بریده نشان می‌دهند که ادامه دارد.
+   */
+  .no-scrollbar{
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+    scroll-snap-type:x proximity;
+  }
+  .no-scrollbar::-webkit-scrollbar{display:none}
+  .no-scrollbar > * > *{scroll-snap-align:start}
+
+  /*
+   * چیپ روزِ نوار بالای صفحهٔ رزرو.
+   *
+   * حالت انتخاب‌شده رنگِ پالت را می‌گیرد، نه ink-900. در حالت تیره
+   * ink-900 به یک رنگ *روشن* برمی‌گردد و متن سفیدِ روی آن ناپدید
+   * می‌شد — «۴۴ سانس» سفیدِ ۷۰٪ روی زمینهٔ سفید. با متغیرِ accent
+   * هر دو حالت یک منطق دارند و متنش همان on-accent است.
+   */
+  .day-chip{
+    background:var(--glass-solid);
+    border:1px solid var(--glass-line);
+    color:var(--text);
+  }
+  .day-chip:hover{border-color:var(--accent)}
+  .day-chip-on{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:var(--on-accent);
+  }
+  /*
+   * بدون شفافیت. با ۰٫۷۵ کنتراستِ «۴۸ سانس» روی طلاییِ حالت روشن
+   * ۳٫۵۱ می‌شد — زیر آستانهٔ AA برای متن کوچک. سلسله‌مراتب را همان
+   * اختلاف اندازه می‌سازد، لازم نیست کم‌رنگ هم بشود.
+   */
+  .day-chip-on .day-chip-note{color:var(--on-accent)}
+  .day-chip-off{
+    background:var(--fill-secondary);
+    border:1px solid transparent;
+    color:var(--text-muted);
+  }
+
+  /*
+   * نوار اقدامِ چسبیده به پایین.
+   *
+   * پیش‌فرض مات است، نه نیمه‌شفاف: پشتش شبکهٔ ساعت‌هاست و رد شدنشان
+   * از پشت نوار، خواندن خودِ دکمه را سخت می‌کرد. شفافیت فقط جایی
+   * برمی‌گردد که مرورگر blur دارد، که آن‌وقت پشت‌زمینه واقعاً محو
+   * می‌شود و نه فقط کم‌رنگ.
+   */
+  .sticky-action{background:var(--surface)}
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)){
+    .sticky-action{
+      background:color-mix(in srgb, var(--surface) 82%, transparent);
+      -webkit-backdrop-filter:saturate(180%) blur(20px);
+      backdrop-filter:saturate(180%) blur(20px);
+    }
+  }
+  @media (prefers-reduced-transparency: reduce){
+    .sticky-action{background:var(--surface);backdrop-filter:none}
   }
 
   /* نوار شناور پایین — همان حسِ تب‌بار iOS */

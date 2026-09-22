@@ -32,7 +32,7 @@
   <!-- همین بخش چاپ می‌شود -->
   <section id="qr-sheet"
            class="glass rounded-2xl p-6 sm:p-8 text-center mx-auto w-full max-w-xs sm:max-w-sm">
-    <p class="text-[11px] tracking-wide text-ink-400 mb-1">رزرو نوبت</p>
+    <p class="text-[12px] tracking-wide text-ink-400 mb-1">رزرو نوبت</p>
     <h2 class="text-lg sm:text-xl font-extrabold text-ink-900 mb-4 leading-tight">
       <?= e($salon['name']) ?>
     </h2>
@@ -42,7 +42,7 @@
          width="240" height="240">
 
     <p class="mt-4 text-[12px] font-bold text-ink-700">دوربین موبایلت را بگیر روی این کد</p>
-    <p dir="ltr" class="mt-1.5 text-[11px] code text-ink-400 break-all"><?= e($link) ?></p>
+    <p dir="ltr" class="mt-1.5 text-[12px] code text-ink-400 break-all"><?= e($link) ?></p>
   </section>
 
   <div class="space-y-3">
@@ -62,7 +62,7 @@
           </a>
         <?php endif; ?>
       </div>
-      <p class="text-[11px] text-ink-400 mt-3 leading-relaxed">
+      <p class="text-[12px] text-ink-400 mt-3 leading-relaxed">
         SVG برای چاپ است — هر قدر بزرگش کنی لبه‌ها تیز می‌ماند.
         PNG برای فرستادن در واتساپ و اینستاگرام که SVG را نشان نمی‌دهند.
       </p>
@@ -70,7 +70,7 @@
 
     <div class="glass rounded-2xl p-5">
       <h3 class="card-title mb-2">لینک مستقیم</h3>
-      <p class="text-[11px] text-ink-400 mb-2.5">
+      <p class="text-[12px] text-ink-400 mb-2.5">
         همین را در بیو اینستاگرام یا وضعیت واتساپ بگذار.
       </p>
       <div class="flex items-center gap-2">
@@ -80,7 +80,7 @@
                aria-label="لینک عمومی سالن">
         <button type="button" id="copy-link" class="btn-ink h-11 px-4 text-[13px] shrink-0">کپی</button>
       </div>
-      <p id="copy-done" class="text-[11px] text-green-700 mt-2 hidden">کپی شد.</p>
+      <p id="copy-done" class="text-[12px] text-green-700 mt-2 hidden">کپی شد.</p>
     </div>
   </div>
 </div>

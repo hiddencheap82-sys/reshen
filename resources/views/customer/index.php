@@ -28,7 +28,7 @@ $card = static function (array $a, bool $cancellable) use ($labels): void {
         <span class="text-[14px] font-extrabold text-ink-900 flex-1 min-w-0 truncate">
           <?= e($a['salon_name']) ?>
         </span>
-        <span class="text-[11px] font-bold <?= $tone ?> shrink-0"><?= e($label) ?></span>
+        <span class="text-[12px] font-bold <?= $tone ?> shrink-0"><?= e($label) ?></span>
       </div>
 
       <p class="text-[13px] text-ink-700 tabular-nums">

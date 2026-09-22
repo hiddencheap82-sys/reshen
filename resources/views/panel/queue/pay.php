@@ -22,13 +22,13 @@ use App\Support\Money;
   <form method="post" action="<?= url('panel/pay/' . $appointment['id']) ?>" class="glass rounded-2xl p-5 space-y-4">
     <?= csrf_field() ?>
     <div>
-      <label class="block text-sm text-ink-600 mb-1.5">مبلغ کل (تومان)</label>
-      <input type="number" name="amount_toman" value="<?= (int) Money::fromRials($amount)->toToman() ?>"
+      <label class="block text-sm text-ink-600 mb-1.5" for="amount_toman">مبلغ کل (تومان)</label>
+      <input id="amount_toman" inputmode="numeric" type="number" name="amount_toman" value="<?= (int) Money::fromRials($amount)->toToman() ?>"
         class="w-full rounded-xl border border-ink-200 px-4 py-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-accent">
     </div>
     <div>
-      <label class="block text-sm text-ink-600 mb-1.5">انعام (اختیاری)</label>
-      <input type="number" name="tip_toman" value="0" class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent">
+      <label class="block text-sm text-ink-600 mb-1.5" for="tip_toman">انعام (اختیاری)</label>
+      <input id="tip_toman" inputmode="numeric" type="number" name="tip_toman" value="0" class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent">
     </div>
     <div>
       <label class="block text-sm text-ink-600 mb-2">روش پرداخت</label>

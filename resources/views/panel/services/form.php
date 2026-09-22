@@ -17,8 +17,8 @@ foreach ($overrides as $o) { $overrideMap[(int)$o['staff_id']] = $o; }
 <form method="post" action="<?= url($service ? 'panel/services/' . $service['id'] : 'panel/services') ?>" class="glass rounded-2xl p-5 space-y-4">
   <?= csrf_field() ?>
   <div>
-    <label class="block text-sm text-ink-600 mb-1.5">نام خدمت</label>
-    <input type="text" name="name" required value="<?= e($service['name'] ?? '') ?>" placeholder="اصلاح مو"
+    <label class="block text-sm text-ink-600 mb-1.5" for="name">نام خدمت</label>
+    <input id="name" type="text" name="name" required value="<?= e($service['name'] ?? '') ?>" placeholder="اصلاح مو"
       class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent">
   </div>
   <div>
@@ -29,20 +29,20 @@ foreach ($overrides as $o) { $overrideMap[(int)$o['staff_id']] = $o; }
       placeholder="مثلاً: شست‌وشو، اصلاح با ماشین و قیچی، حالت‌دهی"
       class="w-full rounded-xl border border-ink-200 bg-transparent px-4 py-3 text-sm leading-relaxed
              focus:outline-none focus:ring-2 focus:ring-accent"><?= e($service['description'] ?? '') ?></textarea>
-    <p class="text-[11px] text-ink-400 mt-1.5">
+    <p class="text-[12px] text-ink-400 mt-1.5">
       در «منوی خدمات» که مشتری می‌بیند نمایش داده می‌شود.
     </p>
   </div>
 
   <div class="grid grid-cols-2 gap-3">
     <div>
-      <label class="block text-sm text-ink-600 mb-1.5">مدت (دقیقه)</label>
-      <input type="number" name="duration_minutes" value="<?= e((string)($service['duration_minutes'] ?? 30)) ?>"
+      <label class="block text-sm text-ink-600 mb-1.5" for="duration_minutes">مدت (دقیقه)</label>
+      <input id="duration_minutes" inputmode="numeric" type="number" name="duration_minutes" value="<?= e((string)($service['duration_minutes'] ?? 30)) ?>"
         class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent">
     </div>
     <div>
-      <label class="block text-sm text-ink-600 mb-1.5">قیمت (تومان)</label>
-      <input type="number" name="price_toman" value="<?= e((string)($service ? App\Support\Money::fromRials((int)$service['price'])->toToman() : 0)) ?>"
+      <label class="block text-sm text-ink-600 mb-1.5" for="price_toman">قیمت (تومان)</label>
+      <input id="price_toman" inputmode="numeric" type="number" name="price_toman" value="<?= e((string)($service ? App\Support\Money::fromRials((int)$service['price'])->toToman() : 0)) ?>"
         class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent">
     </div>
   </div>
@@ -59,9 +59,13 @@ foreach ($overrides as $o) { $overrideMap[(int)$o['staff_id']] = $o; }
       <?= csrf_field() ?>
       <input type="hidden" name="staff_id" value="<?= (int)$st['id'] ?>">
       <span class="text-sm text-ink-700 w-24 shrink-0 truncate"><?= e($st['name']) ?></span>
-      <input type="number" name="duration_minutes" placeholder="دقیقه" value="<?= e($ov ? (string)$ov['duration_minutes'] : '') ?>"
+      <input inputmode="numeric" type="number" name="duration_minutes" placeholder="دقیقه"
+        aria-label="مدت این خدمت برای <?= e($st['name']) ?> (دقیقه)"
+        value="<?= e($ov ? (string)$ov['duration_minutes'] : '') ?>"
         class="w-20 rounded-lg border border-ink-200 px-2 py-1.5 text-sm">
-      <input type="number" name="price_toman" placeholder="تومان" value="<?= e($ov && $ov['price'] !== null ? (string) App\Support\Money::fromRials((int)$ov['price'])->toToman() : '') ?>"
+      <input inputmode="numeric" type="number" name="price_toman" placeholder="تومان"
+        aria-label="قیمت این خدمت برای <?= e($st['name']) ?> (تومان)"
+        value="<?= e($ov && $ov['price'] !== null ? (string) App\Support\Money::fromRials((int)$ov['price'])->toToman() : '') ?>"
         class="w-28 rounded-lg border border-ink-200 px-2 py-1.5 text-sm">
       <button type="submit" class="text-xs bg-ink-100 hover:bg-ink-200 rounded-lg px-3 py-1.5">ذخیره</button>
     </form>

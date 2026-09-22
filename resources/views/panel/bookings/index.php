@@ -33,7 +33,7 @@ $totalRows = array_sum(array_map(static fn ($d) => count($d['rows']), $days));
 <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
   <div>
     <h1 class="page-title">رزروها</h1>
-    <p class="text-[11px] text-ink-400 mt-0.5">
+    <p class="text-[12px] text-ink-400 mt-0.5">
       <?= e(JalaliCalendar::humanDate($from)) ?> تا <?= e(JalaliCalendar::humanDate($to, true)) ?>
       <?php if ($onlyMine): ?> — فقط نوبت‌های خودت<?php endif; ?>
     </p>
@@ -66,7 +66,7 @@ $totalRows = array_sum(array_map(static fn ($d) => count($d['rows']), $days));
   ] as [$label, $value, $fg, $bg]): ?>
     <div class="<?= $bg ?> rounded-xl py-2.5 px-1 text-center">
       <dd class="text-xl font-extrabold <?= $fg ?> tabular-nums"><?= e(fa_num((int) $value)) ?></dd>
-      <dt class="text-[11px] text-ink-500 mt-0.5"><?= e($label) ?></dt>
+      <dt class="text-[12px] text-ink-500 mt-0.5"><?= e($label) ?></dt>
     </div>
   <?php endforeach; ?>
 </dl>
@@ -85,7 +85,7 @@ $bySalon = (int) ($counts['cancelled_by']['salon'] ?? 0);
 $byCustomer = (int) ($counts['cancelled_by']['customer'] ?? 0);
 ?>
 <?php if ($bySalon > 0 || $byCustomer > 0): ?>
-  <p class="text-[11.5px] text-ink-500 -mt-3 mb-5 leading-relaxed">
+  <p class="text-[12px] text-ink-500 -mt-3 mb-5 leading-relaxed">
     از لغوها،
     <span class="font-bold text-ink-700"><?= e(fa_num($bySalon)) ?></span> مورد را آرایشگاه لغو کرده
     و <span class="font-bold text-ink-700"><?= e(fa_num($byCustomer)) ?></span> مورد را مشتری.
@@ -118,9 +118,9 @@ $byCustomer = (int) ($counts['cancelled_by']['customer'] ?? 0);
           <span class="text-[13px] font-extrabold text-ink-900"><?= e($day['label']) ?></span>
           <?php /* دورتر از پس‌فردا، برچسب نسبی خودش همان تاریخ است — دوبار ننویسیم */ ?>
           <?php if ($day['label'] !== $full): ?>
-            <span class="text-[11px] text-ink-400"><?= e($full) ?></span>
+            <span class="text-[12px] text-ink-400"><?= e($full) ?></span>
           <?php endif; ?>
-          <span class="ms-auto text-[11px] font-bold text-ink-500 tabular-nums">
+          <span class="ms-auto text-[12px] font-bold text-ink-500 tabular-nums">
             <?= e(fa_num(count($day['rows']))) ?> نوبت
           </span>
         </h2>
@@ -142,7 +142,7 @@ $byCustomer = (int) ($counts['cancelled_by']['customer'] ?? 0);
 
               <div class="min-w-0 flex-1">
                 <p class="text-[13px] font-bold text-ink-800 truncate"><?= e($r['customer_name']) ?></p>
-                <p class="text-[11px] text-ink-400 truncate">
+                <p class="text-[12px] text-ink-400 truncate">
                   <?= e($r['staff_name'] ?? 'بدون آرایشگر مشخص') ?>
                   <?php if (!empty($r['customer_phone'])): ?>
                     · <span class="ltr tabular-nums"><?= e(fa_num($r['customer_phone'])) ?></span>
@@ -150,7 +150,7 @@ $byCustomer = (int) ($counts['cancelled_by']['customer'] ?? 0);
                 </p>
               </div>
 
-              <span class="shrink-0 text-[11px] font-bold rounded-full px-2.5 py-1 <?= $fg ?> <?= $bg ?>">
+              <span class="shrink-0 text-[12px] font-bold rounded-full px-2.5 py-1 <?= $fg ?> <?= $bg ?>">
                 <?= e($label) ?>
               </span>
             </li>

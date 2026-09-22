@@ -2,6 +2,7 @@
 /**
  * @var array $salon
  * @var array $calendar
+ * @var array $days
  * @var array $minMonth
  * @var string $selectedDate
  * @var string $selectedDateLabel
@@ -54,7 +55,7 @@ $base = 's/' . $salon['slug'];
         <?php endif; ?>
       </div>
 
-      <span class="text-[11px] font-semibold text-ink-400 shrink-0">زنده</span>
+      <span class="text-[12px] font-semibold text-ink-400 shrink-0">زنده</span>
     </div>
   </div>
 <?php else: ?>
@@ -73,7 +74,29 @@ $base = 's/' . $salon['slug'];
 </div>
 
 <?php
-// گام ۱ — تقویم
+/*
+ * گام ۱ — روز.
+ *
+ * نوار افقی روزهای نزدیک جلوی چشم است، و تقویم کامل پشت یک دکمه.
+ * تقریباً همهٔ رزروها برای همین چند روزند؛ تقویم ماهانه فقط وقتی لازم
+ * می‌شود که کسی واقعاً ماه بعد را بخواهد.
+ */
+echo App\Core\View::render('components.day-strip', [
+    'days' => $days,
+    'linkFor' => static fn (string $g): string => url($base . '?date=' . $g),
+]);
+?>
+
+<details class="mt-3 group">
+  <summary class="tap inline-flex items-center gap-1.5 h-11 text-[13px] font-semibold
+                  text-ink-600 cursor-pointer select-none list-none
+                  focus-visible:outline-2 focus-visible:outline-accent rounded-lg">
+    <?= icon('calendar', 'w-4 h-4') ?>
+    روز دیگری می‌خواهم
+  </summary>
+
+  <div class="mt-3">
+<?php
 echo App\Core\View::render('components.jalali-calendar', [
     'cal' => $calendar,
     'selected' => $selectedDate,
@@ -86,6 +109,8 @@ echo App\Core\View::render('components.jalali-calendar', [
     ),
 ]);
 ?>
+  </div>
+</details>
 
 <div class="mt-5 rise rise-2">
   <div class="flex items-baseline justify-between mb-2">
@@ -93,7 +118,7 @@ echo App\Core\View::render('components.jalali-calendar', [
       سانس‌های آزاد — <?= e($selectedDateLabel) ?>
     </h2>
     <?php if (!empty($slots)): ?>
-      <span class="text-[11px] text-ink-400 tabular-nums"><?= e(fa_num(count($slots))) ?> سانس</span>
+      <span class="text-[12px] text-ink-400 tabular-nums"><?= e(fa_num(count($slots))) ?> سانس</span>
     <?php endif; ?>
   </div>
 
@@ -101,7 +126,7 @@ echo App\Core\View::render('components.jalali-calendar', [
     <div class="glass rounded-2xl py-12 px-5 text-center">
       <?= icon('calendar-x', 'w-10 h-10 mx-auto text-ink-300 mb-3') ?>
       <p class="text-sm font-semibold text-ink-600 mb-1">این روز سانس آزادی ندارد</p>
-      <p class="text-[12px] text-ink-400">روز دیگری را از تقویم بالا انتخاب کنید.</p>
+      <p class="text-[12px] text-ink-400">روز دیگری را از نوار بالا انتخاب کنید.</p>
     </div>
   <?php else: ?>
     <form method="post" action="<?= e(url($base)) ?>">
@@ -139,7 +164,7 @@ echo App\Core\View::render('components.jalali-calendar', [
               <div class="flex items-center gap-2 mb-2">
                 <h3 class="text-[12px] font-bold text-ink-500"><?= e($label) ?></h3>
                 <span class="flex-1 h-px" style="background:var(--line)" aria-hidden="true"></span>
-                <span class="text-[11px] text-ink-400 tabular-nums"><?= e(fa_num(count($times))) ?></span>
+                <span class="text-[12px] text-ink-400 tabular-nums"><?= e(fa_num(count($times))) ?></span>
               </div>
 
               <div class="grid grid-cols-3 gap-2">
@@ -159,10 +184,12 @@ echo App\Core\View::render('components.jalali-calendar', [
         </div>
       </fieldset>
 
-      <button type="submit" class="btn-accent metal w-full">
-        ادامه
-        <?= icon('chevron-end', 'w-4 h-4') ?>
-      </button>
+      <?php
+      echo App\Core\View::render('components.sticky-action', [
+          'label' => 'ادامه',
+          'hint' => 'یک ساعت را انتخاب کن',
+      ]);
+      ?>
     </form>
   <?php endif; ?>
 </div>
