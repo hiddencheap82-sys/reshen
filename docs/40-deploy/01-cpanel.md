@@ -200,6 +200,8 @@ SMS_PATTERN_MELIPAYAMAK_BOOKING_CANCELLED=12352
 |---|---|
 | صفحهٔ سفید | `APP_DEBUG=true` بگذارید تا خطا را ببینید — بعد حتماً برش گردانید |
 | خطای ۵۰۰ روی همهٔ صفحات | `.htaccess` یا نسخهٔ PHP. `doctor.php` را باز کنید |
+| `Composer detected issues in your platform: … require a PHP version ">= 8.4"` | بسته‌ای قدیمی دارید که با PHP جدیدتری ساخته شده. نسخهٔ تازه را از نو آپلود کنید — بستهٔ فعلی برای **۸.۱** ساخته می‌شود و بیلد جلوی تکرارش را می‌گیرد |
+| `Fatal error: syntax error, unexpected token "->"` | همان موضوع بالا: کدی که برای PHP جدیدتر نوشته شده روی هاست شما پارس نمی‌شود. بستهٔ تازه را آپلود کنید |
 | صفحه بدون استایل | پوشهٔ `public/assets/` آپلود نشده |
 | همهٔ لینک‌ها ۴۰۴ | `mod_rewrite` خاموش است یا `.htaccess` آپلود نشده (فایل مخفی است — در File Manager گزینهٔ Show Hidden Files را بزنید) |
 | پیامک نمی‌رود | `doctor.php` → ردیف‌های `soap` و «آخرین اجرای کرون» |

@@ -73,7 +73,7 @@ if (version_compare(PHP_VERSION, RESHEN_MIN_PHP, '<')) {
     <ol>
       <li>وارد cPanel شوید.</li>
       <li>دنبال <strong>Select PHP Version</strong> (یا <strong>MultiPHP Manager</strong>) بگردید.</li>
-      <li>برای همین دامنه، نسخه را روی <strong>۸.۲</strong> یا بالاتر بگذارید و ذخیره کنید.</li>
+      <li>برای همین دامنه، نسخه را روی <strong>۸.۱</strong> یا بالاتر بگذارید و ذخیره کنید.</li>
       <li>همین صفحه را دوباره باز کنید.</li>
     </ol>
   </div>
