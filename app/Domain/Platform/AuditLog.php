@@ -37,6 +37,9 @@ final class AuditLog
     public const PLATFORM_ADMIN_REVOKED = 'platform_admin_revoked';
     public const USER_CREATED = 'user_created';
     public const USER_PASSWORD_RESET = 'user_password_reset';
+    public const SALON_CREATED = 'salon_created';
+    public const SUPPORT_REPLIED = 'support_replied';
+    public const SUPPORT_CLOSED = 'support_closed';
 
     /** عنوان فارسیِ هر کنش، برای صفحهٔ گزارش. */
     private const LABELS = [
@@ -51,6 +54,9 @@ final class AuditLog
         self::PLATFORM_ADMIN_REVOKED => 'گرفتن دسترسی مدیر پلتفرم',
         self::USER_CREATED => 'ساخت کاربر',
         self::USER_PASSWORD_RESET => 'بازنشانی رمز کاربر',
+        self::SALON_CREATED => 'ساخت سالن',
+        self::SUPPORT_REPLIED => 'جواب پشتیبانی',
+        self::SUPPORT_CLOSED => 'بستن تیکت پشتیبانی',
     ];
 
     /**

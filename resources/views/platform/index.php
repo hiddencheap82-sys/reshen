@@ -10,6 +10,7 @@
  * @var array $quiet
  * @var array $invoiceTotals
  * @var array $recent
+ * @var array $alerts
  */
 $active = '';
 include __DIR__ . '/_nav.php';
@@ -20,6 +21,34 @@ $paid = $invoiceTotals['paid'] ?? ['count' => 0, 'total' => 0];
 ?>
 
 <h1 class="page-title mb-4">نمای کلی</h1>
+
+<?php if ($alerts !== []): ?>
+  <!--
+    چه چیزی *همین الان* خراب است.
+
+    بالاتر از «نیاز به رسیدگی» است چون آن یکی دربارهٔ کسب‌وکار است
+    (سالن ساکت، صورتحساب معوق) و این یکی دربارهٔ خودِ سیستم: اگر
+    زمان‌بند نخوابیده یا پیامک روی حالت آزمایشی است، هیچ‌کدام از
+    آن کارها هم انجام نمی‌شود.
+  -->
+  <section class="space-y-2 mb-5">
+    <?php foreach ($alerts as $a): ?>
+      <a href="<?= e(url($a['href'])) ?>"
+         class="tap glass rounded-2xl px-4 py-3 flex items-start gap-3 hover:shadow-lift
+                <?= $a['level'] === 'bad' ? 'hairline-bad' : 'hairline-accent' ?>">
+        <span class="w-9 h-9 shrink-0 rounded-xl grid place-items-center
+                     <?= $a['level'] === 'bad' ? 'text-bad' : 'text-warn' ?>"
+              style="background:<?= $a['level'] === 'bad' ? 'var(--bad-soft)' : 'var(--warn-soft)' ?>"
+              aria-hidden="true"><?= icon('alert', 'w-4 h-4') ?></span>
+        <span class="flex-1 min-w-0">
+          <span class="block text-[13px] font-bold text-ink-900"><?= e($a['title']) ?></span>
+          <span class="block text-[12px] text-ink-500 mt-0.5 leading-relaxed"><?= e($a['note']) ?></span>
+        </span>
+        <?= icon('chevron-end', 'w-4 h-4 text-ink-400 shrink-0 mt-2') ?>
+      </a>
+    <?php endforeach; ?>
+  </section>
+<?php endif; ?>
 
 <?php if ($quiet !== [] || $overdue['count'] > 0): ?>
   <!--

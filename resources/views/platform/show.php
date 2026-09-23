@@ -8,6 +8,8 @@
  * @var int   $monthlyPrice
  * @var array $invoices
  * @var array $auditLogs
+ * @var array $issues
+ * @var array $tickets
  */
 $roleNames = ['owner' => 'صاحب', 'manager' => 'مدیر', 'staff' => 'آرایشگر', 'reception' => 'پذیرش'];
 $statusNames = [
@@ -28,6 +30,55 @@ $trialEnds = $salon['trial_ends_at'];
     <span class="text-[12px] rounded-full px-2.5 py-1 bg-ink-100 text-ink-500 shrink-0">غیرفعال</span>
   <?php endif; ?>
 </div>
+
+<?php if ($issues !== []): ?>
+  <!--
+    ایرادهای این سالن، بالای هر چیز دیگر.
+
+    پیش‌تر برای فهمیدنِ اینکه یک سالن چرا کار نمی‌کند باید وارد پنلش
+    می‌شدی و دستی می‌گشتی. حالا همان چیزی که صفحهٔ سلامت می‌داند،
+    اینجا هم هست.
+  -->
+  <section class="glass rounded-2xl overflow-hidden mb-4
+                  <?= $issues[0]['level'] === 'blocking' ? 'hairline-bad' : 'hairline-accent' ?>">
+    <h2 class="card-title px-4 pt-4 pb-2">وضعیت</h2>
+    <?php foreach ($issues as $issue): ?>
+      <div class="flex items-start gap-3 px-4 py-3 border-t" style="border-color:var(--line)">
+        <span class="w-8 h-8 shrink-0 rounded-xl grid place-items-center
+                     <?= $issue['level'] === 'blocking' ? 'text-bad' : ($issue['level'] === 'warning' ? 'text-warn' : 'text-ink-500') ?>"
+              style="background:<?= $issue['level'] === 'blocking' ? 'var(--bad-soft)' : ($issue['level'] === 'warning' ? 'var(--warn-soft)' : 'var(--fill-secondary)') ?>"
+              aria-hidden="true"><?= icon($issue['level'] === 'info' ? 'info' : 'alert', 'w-4 h-4') ?></span>
+        <div class="min-w-0">
+          <p class="text-[13px] font-bold text-ink-900"><?= e($issue['title']) ?></p>
+          <p class="text-[12px] text-ink-500 mt-0.5 leading-relaxed"><?= e($issue['fix']) ?></p>
+        </div>
+      </div>
+    <?php endforeach; ?>
+  </section>
+<?php endif; ?>
+
+<?php if ($tickets !== []): ?>
+  <section class="glass rounded-2xl overflow-hidden mb-4">
+    <h2 class="card-title px-4 pt-4 pb-2">تیکت‌های پشتیبانی</h2>
+    <?php foreach (array_slice($tickets, 0, 5) as $t): ?>
+      <a href="<?= e(url('platform/support/' . $t['id'])) ?>"
+         class="tap flex items-center gap-3 px-4 py-3 border-t hover:bg-ink-50"
+         style="border-color:var(--line)">
+        <span class="flex-1 min-w-0">
+          <span class="block text-[13px] font-bold text-ink-900 truncate"><?= e($t['subject']) ?></span>
+          <span class="block text-[12px] text-ink-400 tabular-nums">
+            <?= e(jdate((string) $t['last_message_at'], 'Y/m/d')) ?>
+          </span>
+        </span>
+        <?php if ($t['status'] === 'open'): ?>
+          <span class="shrink-0 text-[11px] font-bold px-2 py-1 rounded-lg text-bad"
+                style="background:var(--bad-soft)">منتظر ما</span>
+        <?php endif; ?>
+        <?= icon('chevron-end', 'w-4 h-4 text-ink-400 shrink-0') ?>
+      </a>
+    <?php endforeach; ?>
+  </section>
+<?php endif; ?>
 
 <div class="grid lg:grid-cols-2 gap-4">
 

@@ -15,6 +15,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SmsPatternController;
 use App\Http\Controllers\SalonSettingsController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\SupportController;
 use App\Domain\Access\Access;
 use App\Http\Middleware\AbilityRequired;
 use App\Http\Middleware\AuthRequired;
@@ -45,6 +46,20 @@ $router->group(['middleware' => [AuthRequired::class]], function ($router) {
 });
 
 $router->group(['middleware' => [AuthRequired::class, TenantRequired::class]], function ($router) {
+    /*
+     * پشتیبانی — هر کسی که به پنل سالن دسترسی دارد می‌تواند بپرسد.
+     * عمداً پشت OwnerManagerRequired نیست: آرایشگری که وسط کار به
+     * مشکل می‌خورد، نباید منتظر بماند تا صاحب سالن بیاید.
+     */
+    $router->get('/panel/support', [SupportController::class, 'index']);
+    $router->get('/panel/support/new', [SupportController::class, 'create']);
+    $router->get('/panel/support/{id}', [SupportController::class, 'show']);
+
+    $router->group(['middleware' => [VerifyCsrf::class]], function ($router) {
+        $router->post('/panel/support', [SupportController::class, 'store']);
+        $router->post('/panel/support/{id}/reply', [SupportController::class, 'reply']);
+    });
+
     $router->get('/panel', [QueueController::class, 'index']);
     $router->get('/panel/queue/poll', [QueueController::class, 'poll']);
     $router->get('/panel/bookings', [BookingsController::class, 'index']);

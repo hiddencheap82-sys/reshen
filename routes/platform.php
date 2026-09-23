@@ -19,6 +19,10 @@ use App\Http\Middleware\VerifyCsrf;
 $router->group(['middleware' => [PlatformAdminRequired::class]], function ($router) {
     $router->get('/platform', [PlatformController::class, 'index']);
     $router->get('/platform/salons', [PlatformController::class, 'salons']);
+    $router->get('/platform/salons/create', [PlatformController::class, 'createSalon']);
+    $router->get('/platform/health', [PlatformController::class, 'health']);
+    $router->get('/platform/support', [PlatformController::class, 'support']);
+    $router->get('/platform/support/{id}', [PlatformController::class, 'supportShow']);
     $router->get('/platform/plans', [PlatformController::class, 'plans']);
     $router->get('/platform/invoices', [PlatformController::class, 'invoices']);
     $router->get('/platform/users', [PlatformController::class, 'users']);
@@ -38,6 +42,10 @@ $router->group(['middleware' => [PlatformAdminRequired::class]], function ($rout
         // که به SSH نیاز داشت و روی هاست اشتراکی قابل اجرا نبود.
         $router->post('/platform/users', [PlatformController::class, 'storeUser']);
         $router->post('/platform/users/{id}/password', [PlatformController::class, 'resetUserPassword']);
+
+        $router->post('/platform/salons', [PlatformController::class, 'storeSalon']);
+        $router->post('/platform/support/{id}/reply', [PlatformController::class, 'supportReply']);
+        $router->post('/platform/support/{id}/close', [PlatformController::class, 'supportClose']);
 
         $router->post('/platform/{id}/impersonate', [PlatformController::class, 'impersonate']);
         $router->post('/platform/{id}/plan', [PlatformController::class, 'updatePlan']);

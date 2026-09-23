@@ -11,7 +11,14 @@ $active = 'salons';
 include __DIR__ . '/_nav.php';
 ?>
 
-<h1 class="page-title mb-4">سالن‌ها</h1>
+<div class="flex items-start justify-between gap-3 mb-4">
+  <h1 class="page-title">سالن‌ها</h1>
+  <a href="<?= e(url('platform/salons/create')) ?>"
+     class="btn-accent metal h-11 px-4 text-[13px] shrink-0">
+    <?= icon('plus', 'w-4 h-4') ?>
+    سالن تازه
+  </a>
+</div>
 
 <form method="get" action="<?= e(url('platform/salons')) ?>" class="flex gap-2 mb-4">
   <label for="salon-q" class="sr-only">جستجوی سالن</label>

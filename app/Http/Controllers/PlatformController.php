@@ -5,15 +5,21 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Core\Auth;
+use App\Core\Config;
 use App\Core\DB;
+use App\Core\Migrator;
 use App\Core\Request;
 use App\Core\Response;
+use App\Core\Scheduler;
 use App\Domain\Identity\PasswordService;
 use App\Domain\Platform\AuditLog;
 use App\Domain\Platform\InvoiceRepository;
 use App\Domain\Platform\PlanRepository;
 use App\Domain\Platform\SalonAdminRepository;
+use App\Domain\Platform\SalonHealth;
+use App\Domain\Support\TicketRepository;
 use App\Support\IranMobile;
+use App\Support\Str;
 use App\Support\Money;
 use DateTimeImmutable;
 
@@ -47,6 +53,7 @@ final class PlatformController extends Controller
             'quiet' => $salons->goingQuiet(),
             'invoiceTotals' => $invoices->totals(),
             'recent' => AuditLog::recent(8),
+            'alerts' => $this->alerts(),
         ]);
     }
 
@@ -96,6 +103,8 @@ final class PlatformController extends Controller
             ),
             'invoices' => (new InvoiceRepository())->forSalon($id),
             'auditLogs' => AuditLog::recent(20, $id),
+            'issues' => (new SalonHealth())->forSalon($id),
+            'tickets' => (new TicketRepository())->forSalon($id),
         ]);
     }
 
@@ -539,6 +548,345 @@ final class PlatformController extends Controller
         Auth::stopImpersonating();
 
         return $this->redirect('/platform');
+    }
+
+    // ─── ساخت سالن ───────────────────────────────────────────────────
+
+    /**
+     * فرم ساخت سالن از پنل پلتفرم.
+     *
+     * چرا لازم شد: تا حالا سالن فقط با ثبت‌نام خودِ صاحبش ساخته
+     * می‌شد. یعنی برای راه‌اندازی یک مشتری، باید پای تلفن راهنمایی‌اش
+     * می‌کردیم که خودش ثبت‌نام کند — و بیشترِ آرایشگرها همان‌جا گیر
+     * می‌کردند. حالا ما سالن و حسابش را می‌سازیم و فقط شماره و رمز را
+     * به او می‌دهیم.
+     */
+    public function createSalon(Request $request): Response
+    {
+        return $this->page('layouts.panel', 'platform.salon-create', [
+            'title' => 'سالن تازه',
+            'plans' => (new PlanRepository())->all(),
+        ]);
+    }
+
+    public function storeSalon(Request $request): Response
+    {
+        $name = trim((string) $request->input('name', ''));
+        $city = trim((string) $request->input('city', ''));
+        $address = trim((string) $request->input('address', ''));
+        $planCode = (string) $request->input('plan_code', 'trial');
+        $seats = max(1, (int) $request->input('seats', 1));
+        $ownerPhoneRaw = trim((string) $request->input('owner_phone', ''));
+        $ownerName = trim((string) $request->input('owner_name', ''));
+        $ownerPassword = (string) $request->input('owner_password', '');
+
+        if ($name === '') {
+            return $this->withError('نام سالن را وارد کنید.', '/platform/salons/create');
+        }
+
+        $phone = IranMobile::tryParse($ownerPhoneRaw);
+        if ($phone === null) {
+            return $this->withError('شمارهٔ موبایل صاحب سالن معتبر نیست.', '/platform/salons/create');
+        }
+
+        $plans = new PlanRepository();
+        if ($plans->find($planCode) === null) {
+            return $this->withError('پلن انتخاب‌شده وجود ندارد.', '/platform/salons/create');
+        }
+
+        // همان قاعدهٔ صفحهٔ سالن: پلن تک‌صندلی، دو صندلی نمی‌گیرد.
+        if (!$plans->allowsSeats($planCode, $seats)) {
+            return $this->withError(
+                'این پلن بیش از این تعداد صندلی را پوشش نمی‌دهد.',
+                '/platform/salons/create'
+            );
+        }
+
+        // رمز اختیاری است: صاحب سالنی که رمز ندارد با کد پیامکی وارد می‌شود.
+        if ($ownerPassword !== '') {
+            $weak = PasswordService::reject($ownerPassword, $ownerPhoneRaw);
+            if ($weak !== null) {
+                return $this->withError($weak, '/platform/salons/create');
+            }
+        }
+
+        /*
+         * slug پایهٔ لینک عمومی و QR است، پس باید لاتین و یکتا باشد.
+         * اگر تکراری شد، عدد می‌گیرد — همان کاری که onboarding می‌کند.
+         */
+        $slug = Str::slug($name) ?: 'salon';
+        $base = $slug;
+        $i = 1;
+        while (DB::selectOne('SELECT id FROM salons WHERE slug = ?', [$slug]) !== null) {
+            $slug = $base . '-' . (++$i);
+        }
+
+        $result = DB::transaction(function () use (
+            $name, $slug, $city, $address, $seats, $planCode, $phone, $ownerName, $ownerPassword
+        ) {
+            $user = DB::selectOne('SELECT id, name FROM users WHERE phone = ?', [$phone->e164]);
+            $isNewUser = $user === null;
+
+            if ($isNewUser) {
+                $userId = (int) DB::insert('users', [
+                    'phone' => $phone->e164,
+                    'name' => $ownerName !== '' ? $ownerName : null,
+                ]);
+            } else {
+                $userId = (int) $user['id'];
+                // نامِ خالیِ کاربرِ موجود را پر می‌کنیم، ولی نامِ پرشده را
+                // با چیزی که اینجا تایپ شده عوض نمی‌کنیم.
+                if ($ownerName !== '' && ($user['name'] ?? '') === '') {
+                    DB::update('users', ['name' => $ownerName], 'id = :id', ['id' => $userId]);
+                }
+            }
+
+            if ($ownerPassword !== '') {
+                PasswordService::set($userId, $ownerPassword);
+            }
+
+            $salonId = (int) DB::insert('salons', [
+                'slug' => $slug,
+                'name' => $name,
+                'city' => $city !== '' ? $city : null,
+                'address' => $address !== '' ? $address : null,
+                'seats' => $seats,
+                'plan_code' => $planCode,
+                'sms_credit' => 200,
+                'trial_ends_at' => $planCode === 'trial'
+                    ? date('Y-m-d H:i:s', strtotime('+30 days'))
+                    : null,
+            ]);
+
+            DB::insert('salon_user', [
+                'salon_id' => $salonId,
+                'user_id' => $userId,
+                'role' => 'owner',
+            ]);
+
+            /*
+             * ساعت کاری پیش‌فرض. بدون این، سالنِ تازه هیچ سانس آزادی
+             * ندارد و صفحهٔ عمومی‌اش خالی است — همان ایرادی که صفحهٔ
+             * سلامت «هیچ روز بازی ندارد» می‌نامدش.
+             */
+            for ($weekday = 0; $weekday <= 6; $weekday++) {
+                DB::insert('working_hours', [
+                    'salon_id' => $salonId,
+                    'staff_id' => null,
+                    'weekday' => $weekday,
+                    'opens_at' => '09:00:00',
+                    'closes_at' => '21:00:00',
+                    'is_closed' => $weekday === 6 ? 1 : 0,
+                ]);
+            }
+
+            return ['salon_id' => $salonId, 'user_id' => $userId, 'new_user' => $isNewUser];
+        });
+
+        AuditLog::record(AuditLog::SALON_CREATED, $result['salon_id'], 'salon', $result['salon_id'], [
+            'name' => $name,
+            'slug' => $slug,
+            'owner_phone' => $phone->e164,
+            'new_user' => $result['new_user'],
+        ]);
+
+        $note = $result['new_user']
+            ? ' حساب صاحب سالن هم ساخته شد.'
+            : ' شمارهٔ صاحب سالن از قبل حساب داشت و به همین سالن وصل شد.';
+
+        return $this->withSuccess(
+            'سالن «' . $name . '» ساخته شد.' . $note,
+            '/platform/' . $result['salon_id']
+        );
+    }
+
+    // ─── سلامت سالن‌ها ───────────────────────────────────────────────
+
+    /**
+     * کدام سالن همین الان کار نمی‌کند.
+     *
+     * صفحه‌ای که نبودش بزرگ‌ترین حفرهٔ این پنل بود: می‌شد دید چند سالن
+     * داریم، نمی‌شد دید کدامشان خراب است. و خرابی‌های واقعی بی‌صدایند
+     * — سالن بدون آرایشگر هیچ خطایی نمی‌دهد، فقط هیچ سانسی ندارد.
+     */
+    public function health(Request $request): Response
+    {
+        $onlyBroken = (string) $request->query('all', '') !== '1';
+        $health = new SalonHealth();
+
+        return $this->page('layouts.panel', 'platform.health', [
+            'title' => 'سلامت سالن‌ها',
+            'entries' => $health->all($onlyBroken),
+            'summary' => $health->summary(),
+            'onlyBroken' => $onlyBroken,
+        ]);
+    }
+
+    // ─── پشتیبانی ────────────────────────────────────────────────────
+
+    public function support(Request $request): Response
+    {
+        $repo = new TicketRepository();
+        $status = (string) $request->query('status', '');
+
+        return $this->page('layouts.panel', 'platform.support', [
+            'title' => 'پشتیبانی',
+            'tickets' => $repo->all($status),
+            'counts' => $repo->counts(),
+            'status' => $status,
+        ]);
+    }
+
+    public function supportShow(Request $request): Response
+    {
+        $repo = new TicketRepository();
+        $ticket = $repo->find((int) $request->param('id'));
+
+        if ($ticket === null) {
+            return $this->withError('تیکت یافت نشد.', '/platform/support');
+        }
+
+        return $this->page('layouts.panel', 'platform.support-show', [
+            'title' => $ticket['subject'],
+            'ticket' => $ticket,
+            'messages' => $repo->messages((int) $ticket['id']),
+            'issues' => (new SalonHealth())->forSalon((int) $ticket['salon_id']),
+        ]);
+    }
+
+    public function supportReply(Request $request): Response
+    {
+        $id = (int) $request->param('id');
+        $repo = new TicketRepository();
+        $ticket = $repo->find($id);
+
+        if ($ticket === null) {
+            return $this->withError('تیکت یافت نشد.', '/platform/support');
+        }
+
+        $body = trim((string) $request->input('body', ''));
+        if ($body === '') {
+            return $this->withError('متن جواب خالی است.', '/platform/support/' . $id);
+        }
+
+        $repo->reply($id, Auth::id(), TicketRepository::SIDE_PLATFORM, $body);
+
+        AuditLog::record(AuditLog::SUPPORT_REPLIED, (int) $ticket['salon_id'], 'ticket', $id);
+
+        return $this->withSuccess('جواب ثبت شد.', '/platform/support/' . $id);
+    }
+
+    public function supportClose(Request $request): Response
+    {
+        $id = (int) $request->param('id');
+        $repo = new TicketRepository();
+        $ticket = $repo->find($id);
+
+        if ($ticket === null) {
+            return $this->withError('تیکت یافت نشد.', '/platform/support');
+        }
+
+        $repo->close($id);
+
+        AuditLog::record(AuditLog::SUPPORT_CLOSED, (int) $ticket['salon_id'], 'ticket', $id);
+
+        return $this->withSuccess('تیکت بسته شد.', '/platform/support');
+    }
+
+    /**
+     * چه چیزی *همین الان* خراب است.
+     *
+     * بالای صفحهٔ نخست می‌نشیند و اگر خالی باشد اصلاً نمایش داده
+     * نمی‌شود. قاعده‌اش این است: هر ردیف باید کاری باشد که همین امروز
+     * می‌شود انجامش داد. «۱۲۰۰ نوبت ثبت شده» هشدار نیست، عدد است — و
+     * عددها پایین‌ترند.
+     *
+     * @return array<int,array{level:string,title:string,note:string,href:string}>
+     */
+    private function alerts(): array
+    {
+        $out = [];
+
+        // ۱. زمان‌بند. اگر نخوابیده، یادآورها نمی‌روند و هیچ خطایی هم
+        //    جایی ثبت نمی‌شود — همان چیزی که کرون را شکننده کرده بود.
+        $lastRun = Scheduler::lastRunAt();
+        if ($lastRun === null || $lastRun < time() - 86400) {
+            $out[] = [
+                'level' => 'bad',
+                'title' => 'زمان‌بند اجرا نشده',
+                'note' => $lastRun === null
+                    ? 'هنوز هیچ کار دوره‌ای اجرا نشده. یادآورها و پاک‌سازی متوقف‌اند.'
+                    : 'بیش از یک روز است اجرا نشده. یادآورها نمی‌روند.',
+                'href' => 'doctor.php',
+            ];
+        }
+
+        // ۲. ارائه‌دهندهٔ پیامک روی log یعنی هیچ پیامکی واقعاً نمی‌رود.
+        if ((string) Config::get('reshen.sms.driver', 'log') === 'log') {
+            $out[] = [
+                'level' => 'bad',
+                'title' => 'پیامک روی حالت آزمایشی است',
+                'note' => 'هیچ پیامکی ارسال نمی‌شود، فقط در فایل نوشته می‌شود. در .env مقدار SMS_DRIVER را عوض کنید.',
+                'href' => 'platform/sms',
+            ];
+        }
+
+        // ۳. سالن‌هایی که از کار افتاده‌اند.
+        $health = (new SalonHealth())->summary();
+        if ($health['blocking'] > 0) {
+            $out[] = [
+                'level' => 'bad',
+                'title' => fa_num($health['blocking']) . ' سالن نمی‌تواند نوبت بگیرد',
+                'note' => 'آرایشگر، خدمت یا ساعت کاری ندارند. صفحهٔ عمومی‌شان باز می‌شود ولی هیچ سانسی ندارد.',
+                'href' => 'platform/health',
+            ];
+        } elseif ($health['warning'] > 0) {
+            $out[] = [
+                'level' => 'warn',
+                'title' => fa_num($health['warning']) . ' سالن هشدار دارد',
+                'note' => 'کار می‌کنند ولی چیزی دارد بد پیش می‌رود.',
+                'href' => 'platform/health',
+            ];
+        }
+
+        // ۴. تیکت‌های بی‌جواب.
+        $waiting = (new TicketRepository())->waitingCount();
+        if ($waiting > 0) {
+            $out[] = [
+                'level' => 'warn',
+                'title' => fa_num($waiting) . ' تیکت منتظر جواب',
+                'note' => 'صاحب سالن پرسیده و هنوز جوابی نگرفته.',
+                'href' => 'platform/support',
+            ];
+        }
+
+        // ۵. پیامک‌های ناموفق در ۷ روز.
+        $failed = (int) (DB::selectOne(
+            "SELECT COUNT(*) AS c FROM sms_messages
+              WHERE status = 'failed' AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)"
+        )['c'] ?? 0);
+        if ($failed > 0) {
+            $out[] = [
+                'level' => 'warn',
+                'title' => fa_num($failed) . ' پیامک ناموفق در هفتهٔ گذشته',
+                'note' => 'معمولاً یعنی الگو تأیید نشده یا حساب اپراتور تمام شده.',
+                'href' => 'platform/sms',
+            ];
+        }
+
+        // ۶. مهاجرت‌های اجرانشده — بعد از آپدیت بسته پیش می‌آید و
+        //    تا اجرا نشوند، صفحه‌هایی که ستون تازه می‌خواهند خطا می‌دهند.
+        $pending = (new Migrator(BASE_PATH . '/database/migrations'))->pendingCount();
+        if ($pending > 0) {
+            $out[] = [
+                'level' => 'bad',
+                'title' => fa_num($pending) . ' مهاجرت اجرا نشده',
+                'note' => 'بستهٔ تازه آپلود شده ولی دیتابیس به‌روز نشده. install.php را باز کنید.',
+                'href' => 'doctor.php',
+            ];
+        }
+
+        return $out;
     }
 
     private function qualityMetrics(): array

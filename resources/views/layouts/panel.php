@@ -31,6 +31,9 @@ $navItems = [
     ['href' => '/panel/qr',       'label' => 'کد QR',         'icon' => 'qr',       'ability' => null, 'needsSalon' => true],
     ['href' => '/panel/sms',      'label' => 'الگوی پیامک',   'icon' => 'message',  'ability' => Access::MANAGE_SALON, 'needsSalon' => true],
     ['href' => '/panel/settings', 'label' => 'تنظیمات سالن',  'icon' => 'cog',      'ability' => Access::MANAGE_SALON, 'needsSalon' => true],
+    // پشتیبانی — برای همه، چون آرایشگری که وسط کار گیر کرده نباید
+    // منتظر بماند تا صاحب سالن بیاید و به‌جایش بپرسد.
+    ['href' => '/panel/support',  'label' => 'پشتیبانی',      'icon' => 'phone',    'ability' => null, 'needsSalon' => true],
     // حساب خودِ کاربر — برای همه، حتی آرایشگر و پذیرش.
     ['href' => '/panel/account',  'label' => 'حساب کاربری',   'icon' => 'user',     'ability' => null, 'needsSalon' => false],
 ];

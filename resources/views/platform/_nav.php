@@ -11,6 +11,8 @@
 $items = [
     '' => ['نمای کلی', 'chart'],
     'salons' => ['سالن‌ها', 'users'],
+    'health' => ['سلامت', 'alert'],
+    'support' => ['پشتیبانی', 'phone'],
     'plans' => ['پلن‌ها', 'tag'],
     'invoices' => ['صورتحساب', 'wallet'],
     'users' => ['کاربران', 'user'],
