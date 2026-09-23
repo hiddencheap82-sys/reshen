@@ -31,6 +31,18 @@ $visibleNav = array_values(array_filter(
     static fn ($i) => $i['ability'] === null || Access::allows($i['ability'])
 ));
 $currentPath = '/' . trim($_SERVER['REQUEST_URI'] ?? '', '/');
+
+/*
+ * در پنل پلتفرم، ناوبری سالن کنار می‌رود.
+ *
+ * چرا: نوار پایین می‌گوید «صف زنده» و «رزروها»، ولی آن‌ها مال *یک*
+ * سالن‌اند — سالنی که مدیر پلتفرم اتفاقاً عضوش است. وقتی داری همهٔ
+ * سالن‌ها را می‌بینی، آن نوار می‌گوید در جایی هستی که نیستی.
+ *
+ * به‌جایش یک راه بازگشت روشن می‌ماند، چون مدیر پلتفرم معمولاً صاحب
+ * سالن هم هست و باید بتواند برگردد.
+ */
+$onPlatform = str_starts_with($currentPath, '/platform');
 ?>
 <!doctype html>
 <html lang="fa" dir="rtl" data-font="<?= e((string) App\Core\Config::get('reshen.ui.font', 'vazirmatn')) ?>" <?= theme_attr(App\Core\Session::get('_salon_theme')) ?>>
@@ -122,7 +134,9 @@ $currentPath = '/' . trim($_SERVER['REQUEST_URI'] ?? '', '/');
     <?php endif; ?>
 
     <main class="flex-1 p-4 md:p-6 md:pb-6"
-          style="padding-bottom:calc(5.5rem + env(safe-area-inset-bottom,0px))">
+          <?php if (!$onPlatform): ?>
+          style="padding-bottom:calc(5.5rem + env(safe-area-inset-bottom,0px))"
+          <?php endif; ?>>
       <?= $content ?>
     </main>
   </div>
@@ -143,6 +157,16 @@ $currentPath = '/' . trim($_SERVER['REQUEST_URI'] ?? '', '/');
   $navRest = array_slice($visibleNav, 4);
   $isActive = fn (array $i) => $currentPath === rtrim(url($i['href']), '/');
 ?>
+<?php if ($onPlatform): ?>
+  <!-- راه بازگشت به پنل سالن، به‌جای ناوبری‌ای که به اینجا ربطی ندارد. -->
+  <div class="md:hidden px-4 pb-6">
+    <a href="<?= e(url('panel')) ?>"
+       class="tap glass rounded-2xl px-4 h-12 flex items-center gap-2 text-[13px] font-semibold text-ink-600">
+      <?= icon('chevron-start', 'w-4 h-4') ?>
+      بازگشت به پنل آرایشگاه
+    </a>
+  </div>
+<?php else: ?>
 <nav class="md:hidden fixed bottom-0 inset-x-0 z-30" aria-label="ناوبری اصلی">
 
   <?php if ($navRest !== []): ?>
@@ -202,6 +226,7 @@ $currentPath = '/' . trim($_SERVER['REQUEST_URI'] ?? '', '/');
     <?php endif; ?>
   </div>
 </nav>
+<?php endif; ?>
 
 <?php include BASE_PATH . '/resources/views/components/install-prompt.php'; ?>
 

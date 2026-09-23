@@ -2,17 +2,19 @@
 
 declare(strict_types=1);
 
-use App\Core\Response;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\ManifestController;
 use App\Http\Middleware\AuthRequired;
 use App\Http\Middleware\VerifyCsrf;
 
 /** @var \App\Core\Router $router */
 
-$router->get('/', function () {
-    return Response::redirect('/login');
-});
+/*
+ * صفحهٔ نخست. پیش از این مستقیم به /login می‌رفت، که فقط برای صاحب
+ * سالن درست بود — مشتری به فرمی می‌رسید که هیچ ربطی به او نداشت.
+ */
+$router->get('/', [LandingController::class, 'index']);
 
 // مانیفست PWA — در لحظه ساخته می‌شود تا برای هر سالن، اسم و صفحهٔ
 // شروعِ خودش را بدهد (ت-۳۲).
