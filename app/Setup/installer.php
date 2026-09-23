@@ -49,7 +49,7 @@ if (is_file(LOCK_FILE) && !$justInstalled) {
                 . 'فایل storage/installed.lock را پاک کنید. توجه: نصب مجدد دادهٔ موجود را دست نمی‌زند، '
                 . 'ولی این صفحه یک در باز است و نباید بی‌دلیل بازش کنید.',
         ]],
-    ], null);
+    ], null, [], 'رشن روی این هاست نصب شده است — کاری لازم نیست.');
     exit;
 }
 
@@ -197,7 +197,7 @@ if ($step === 'admin') {
                     . 'وارد شوید و از پنل مدیریت کل اضافه‌اش کنید. اگر رمز را فراموش کرده‌اید، '
                     . 'از صفحهٔ ورود با کد پیامکی وارد شوید.',
             ]],
-        ], null);
+        ], null, [], 'مدیر کل از قبل ساخته شده — این گام لازم نیست.');
         exit;
     }
 
@@ -758,8 +758,21 @@ function render_done(): void
 /**
  * @param array<string,array<int,array{label:string,status:string,value:string,hint:string}>> $groups
  */
-function render_shell(string $title, array $groups, ?string $nextUrl, array $errors = []): void
-{
+/**
+ * قالب مشترک صفحه‌های نصاب.
+ *
+ * $verdict را بدهید وقتی جملهٔ پیش‌فرض بی‌معنی است. صفحهٔ «قبلاً نصب
+ * شده» همین حالت بود: یک ردیف با وضعیت fail داشت، پس قالب می‌نوشت
+ * «۱ مورد باید پیش از نصب درست شود» — به کسی که نصبش تمام شده و فقط
+ * دوباره این صفحه را باز کرده.
+ */
+function render_shell(
+    string $title,
+    array $groups,
+    ?string $nextUrl,
+    array $errors = [],
+    ?string $verdict = null
+): void {
     $failures = 0;
     foreach ($groups as $rows) {
         foreach ($rows as $row) {
@@ -779,9 +792,13 @@ function render_shell(string $title, array $groups, ?string $nextUrl, array $err
       <?php endforeach; ?>
 
       <div class="verdict <?= $failures === 0 ? 'ok' : 'bad' ?>">
-        <?= $failures === 0
-            ? 'این هاست آمادهٔ نصب است.'
-            : $failures . ' مورد باید پیش از نصب درست شود (پایین با ✗ مشخص‌اند).' ?>
+        <?php if ($verdict !== null): ?>
+          <?= h($verdict) ?>
+        <?php else: ?>
+          <?= $failures === 0
+              ? 'این هاست آمادهٔ نصب است.'
+              : $failures . ' مورد باید پیش از نصب درست شود (پایین با ✗ مشخص‌اند).' ?>
+        <?php endif; ?>
       </div>
 
       <?php foreach ($groups as $group => $rows): ?>
