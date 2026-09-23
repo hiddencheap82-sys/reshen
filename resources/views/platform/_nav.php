@@ -16,6 +16,7 @@ $items = [
     'users' => ['کاربران', 'user'],
     'sms' => ['پیامک', 'message'],
     'activity' => ['فعالیت', 'clock'],
+    'design' => ['دیزاین', 'sparkle'],
 ];
 ?>
 <!--

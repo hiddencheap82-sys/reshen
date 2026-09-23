@@ -103,8 +103,16 @@
    * خواندن، باید پیدایش کند. پس رنگش با هیچ کنش دیگری مشترک نیست.
    * سبزِ ثابت است نه پالتی — در هر شش پالت همین سبز می‌ماند.
    */
+  /*
+   * ارتفاع پیش‌فرض، مثل دو دکمهٔ دیگر.
+   *
+   * تنها دکمه‌ای بود که ارتفاع نداشت و از متنش می‌گرفت. جاهای واقعیِ
+   * استفاده خودشان ‎h-11‎ می‌دادند، پس در برنامه مشکلی دیده نمی‌شد —
+   * ولی قرارداد سه دکمه یکی نبود، و صفحهٔ مرجع همین را لو داد: ۲۴
+   * پیکسل، نصفِ حداقلِ لمسی.
+   */
   .btn-done{
-    @apply inline-flex items-center justify-center gap-2 px-5
+    @apply inline-flex items-center justify-center gap-2 h-[50px] px-5
            font-bold text-white cursor-pointer select-none
            transition-all duration-200 ease-ios;
     border-radius:var(--radius-button);

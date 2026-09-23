@@ -103,7 +103,7 @@ $byCustomer = (int) ($counts['cancelled_by']['customer'] ?? 0);
       لینک صفحهٔ سالن را برای مشتری‌ها بفرست تا بتوانند خودشان سانس بگیرند.<br>
       ساعت کاری و طول سانس را در <a class="text-accent font-semibold" href="<?= e(url('panel/settings')) ?>">تنظیمات</a> مشخص کن.
     </p>
-    <a href="<?= e(url('panel/bookings/new')) ?>" class="btn-ink mt-4 inline-flex">
+    <a href="<?= e(url('panel/bookings/new')) ?>" class="btn-accent metal mt-4 inline-flex">
       <?= icon('plus', 'w-4 h-4') ?>
       رزرو دستی ثبت کن
     </a>

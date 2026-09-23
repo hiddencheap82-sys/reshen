@@ -233,6 +233,7 @@ tests/
 | `StylesheetTest` | CSS ساخته‌شده با کلاس‌های ویوها جور است |
 | `FlashMessageTest` | هیچ لایه‌ای پیام لحظه‌ای را بی‌صدا نمی‌بلعد |
 | `AvatarTest` | رنگ آواتار پایدار و خوانا می‌ماند |
+| `ColorContrastTest` | هیچ متنی زیر WCAG AA نیست |
 | `PasswordLoginTest` | رمز غلط وارد نمی‌شود و حدس زدنش محدود است |
 | `DatabaseClockTest` | ساعت MySQL و PHP یکی است |
 | `JalaliFormatTokensTest` | نشانهٔ تاریخِ ناشناخته بی‌صدا روی صفحه نمی‌ماند |

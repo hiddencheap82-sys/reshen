@@ -30,7 +30,7 @@
     <input id="address" type="text" name="address" placeholder="خیابان..."
       class="field field-lg">
   </div>
-  <button type="submit" class="btn-ink w-full">
+  <button type="submit" class="btn-accent metal w-full">
     ساخت سالن و شروع
   </button>
 </form>

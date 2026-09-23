@@ -23,7 +23,7 @@
   <input type="text" id="otp-code" name="code" inputmode="numeric" autocomplete="one-time-code"
     autofocus maxlength="5" placeholder="١٢٣٤٥"
     class="field field-lg text-center text-2xl tracking-[0.5em]">
-  <button type="submit" class="btn-ink w-full">
+  <button type="submit" class="btn-accent metal w-full">
     تأیید و ورود
   </button>
 </form>

@@ -69,7 +69,7 @@
       </div>
     </div>
   </div>
-  <button type="submit" class="btn-ink w-full">ذخیره</button>
+  <button type="submit" class="btn-accent metal w-full">ذخیره</button>
 </form>
 
 <?php if ($staff): ?>

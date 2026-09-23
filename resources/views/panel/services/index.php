@@ -1,7 +1,7 @@
 <?php /** @var array $services */ ?>
 <div class="flex items-center justify-between mb-5">
   <h1 class="page-title">خدمات</h1>
-  <a href="<?= url('panel/services/create') ?>" class="btn-ink h-11 text-sm px-4">+ افزودن</a>
+  <a href="<?= url('panel/services/create') ?>" class="btn-accent metal h-11 text-sm px-4">+ افزودن</a>
 </div>
 
 <?php if (empty($services)): ?>

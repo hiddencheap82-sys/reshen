@@ -369,7 +369,7 @@
              class="field">
     </div>
 
-    <button type="submit" class="btn-ink w-full">بستن این بازه</button>
+    <button type="submit" class="btn-accent metal w-full">بستن این بازه</button>
   </form>
 </div>
 

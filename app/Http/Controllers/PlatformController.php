@@ -446,6 +446,20 @@ final class PlatformController extends Controller
         return $this->withSuccess('رمز این کاربر عوض شد. خودتان به او اطلاع دهید.', '/platform/users');
     }
 
+    /**
+     * مرجع زندهٔ سیستم دیزاین.
+     *
+     * صفحه است نه سند، چون سند از روز دوم با کد فرق می‌کند و کسی
+     * نمی‌فهمد. این یکی همان CSS و همان مؤلفه‌های واقعی را رندر
+     * می‌کند: اگر چیزی بشکند، همین‌جا شکسته دیده می‌شود.
+     */
+    public function design(Request $request): Response
+    {
+        return $this->page('layouts.panel', 'platform.design', [
+            'title' => 'سیستم دیزاین',
+        ]);
+    }
+
     // ─── مصرف پیامک و گزارش فعالیت ───────────────────────────────────
 
     public function sms(Request $request): Response

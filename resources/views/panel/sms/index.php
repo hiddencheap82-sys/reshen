@@ -133,7 +133,7 @@ $total = count($rows);
           <form method="post" action="<?= e(url('panel/sms/register')) ?>">
             <?= csrf_field() ?>
             <input type="hidden" name="code" value="<?= e($code) ?>">
-            <button type="submit" class="btn-ink w-full h-11 text-[13px]">
+            <button type="submit" class="btn-accent metal w-full h-11 text-[13px]">
               <?= $r['registered'] !== null ? 'ثبت دوباره در ملی‌پیامک' : 'ثبت در ملی‌پیامک' ?>
             </button>
           </form>

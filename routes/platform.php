@@ -22,6 +22,8 @@ $router->group(['middleware' => [PlatformAdminRequired::class]], function ($rout
     $router->get('/platform/plans', [PlatformController::class, 'plans']);
     $router->get('/platform/invoices', [PlatformController::class, 'invoices']);
     $router->get('/platform/users', [PlatformController::class, 'users']);
+    // مرجع سیستم دیزاین — برای توسعه‌دهنده، نه آرایشگر.
+    $router->get('/platform/design', [PlatformController::class, 'design']);
     $router->get('/platform/sms', [PlatformController::class, 'sms']);
     $router->get('/platform/activity', [PlatformController::class, 'activity']);
     $router->get('/platform/impersonate/stop', [PlatformController::class, 'stopImpersonating']);

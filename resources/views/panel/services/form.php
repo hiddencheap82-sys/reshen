@@ -45,7 +45,7 @@ foreach ($overrides as $o) { $overrideMap[(int)$o['staff_id']] = $o; }
         class="field field-lg">
     </div>
   </div>
-  <button type="submit" class="btn-ink w-full">ذخیره</button>
+  <button type="submit" class="btn-accent metal w-full">ذخیره</button>
 </form>
 
 <?php if ($service && !empty($staff)): ?>

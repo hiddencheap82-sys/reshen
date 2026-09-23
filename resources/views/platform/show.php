@@ -50,7 +50,7 @@ $trialEnds = $salon['trial_ends_at'];
           این کار یعنی دیدن دادهٔ مشتری‌های یک کسب‌وکار دیگر، و باید
           حس کند که کار عادی‌ای نیست. در گزارش فعالیت هم ثبت می‌شود.
         -->
-        <button class="btn-ink w-full h-11 text-[13px]">ورود پشتیبانی به پنل این سالن</button>
+        <button class="btn-accent metal w-full h-11 text-[13px]">ورود پشتیبانی به پنل این سالن</button>
       </form>
 
       <form method="post" action="<?= e(url('platform/' . $salon['id'] . '/active')) ?>">

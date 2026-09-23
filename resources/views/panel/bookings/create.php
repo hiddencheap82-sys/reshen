@@ -94,7 +94,7 @@ foreach (array_keys($slots) as $time) {
       <?php endif; ?>
     </div>
 
-    <button type="submit" class="btn-ink w-full">نمایش سانس‌های آزاد</button>
+    <button type="submit" class="btn-accent metal w-full">نمایش سانس‌های آزاد</button>
     <p class="text-[12px] text-ink-400 text-center">
       مدت محاسبه‌شده: <span class="tabular-nums"><?= e(fa_num($duration)) ?> دقیقه</span>
     </p>

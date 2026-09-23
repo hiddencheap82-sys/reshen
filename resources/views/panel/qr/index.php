@@ -53,11 +53,11 @@
           <?= icon('printer', 'w-4 h-4') ?>
           چاپ برگه
         </button>
-        <a href="<?= e(url('panel/qr.svg')) ?>" class="btn-ink w-full" download>
+        <a href="<?= e(url('panel/qr.svg')) ?>" class="btn-accent metal w-full" download>
           دانلود برای چاپ (SVG)
         </a>
         <?php if ($pngAvailable): ?>
-          <a href="<?= e(url('panel/qr.png')) ?>" class="btn-ink w-full" download>
+          <a href="<?= e(url('panel/qr.png')) ?>" class="btn-accent metal w-full" download>
             دانلود برای واتساپ (PNG)
           </a>
         <?php endif; ?>
