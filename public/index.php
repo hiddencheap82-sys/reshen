@@ -27,3 +27,12 @@ require dirname(__DIR__) . '/routes/web.php';
 $request = new Request();
 $response = $router->dispatch($request);
 $response->send();
+
+/*
+ * کارهای دوره‌ای، بعد از اینکه پاسخ کاربر رفت.
+ *
+ * جای کرون را گرفته. صفحه هیچ کند نمی‌شود چون Scheduler اول اتصال
+ * را می‌بندد (fastcgi_finish_request) و بعد کار می‌کند — و هر خطایی
+ * را هم خودش می‌بلعد، چون کارِ پس‌زمینه حق ندارد صفحه را بشکند.
+ */
+App\Core\Scheduler::kickAfterResponse();

@@ -122,6 +122,31 @@ final class QueueNotificationService
         return trim(explode(' ', $name)[0]);
     }
 
+    /**
+     * چقدر دیر رفتنِ یادآور هنوز قابل قبول است؟
+     *
+     * جواب از *متنِ خودِ پیامک* درمی‌آید، نه از یک فرمول:
+     *
+     *   • `reminder_24h` می‌گوید «نوبت **فردا** ساعت …». اگر خیلی دیر
+     *     برود، «فردا» دروغ می‌شود. پس حداکثر دو ساعت.
+     *
+     *   • `reminder_2h` فقط می‌گوید «نوبت شما ساعت … است» — هیچ
+     *     مدتی را وعده نمی‌دهد، پس هر وقت پیش از نوبت برسد راست است.
+     *
+     * برای همین **کوتاه‌ترین یادآور هیچ مرز پایینی ندارد**: آخرین تور
+     * ایمنی است و دیر رسیدنش از نرسیدن بهتر.
+     *
+     * @return int|null دقیقه، یا null یعنی بدون مرز پایینی
+     */
+    private static function toleranceMinutes(int $hours, array $all): ?int
+    {
+        if ($all !== [] && $hours === (int) min($all)) {
+            return null;
+        }
+
+        return (int) max(15, min(120, $hours * 60 / 4));
+    }
+
     public function sendUpcomingReminders(): int
     {
         $hoursList = (array) Config::get('reshen.sms.reminder_hours_before', [24, 2]);
@@ -129,16 +154,45 @@ final class QueueNotificationService
 
         foreach ($hoursList as $hours) {
             $templateCode = "reminder_{$hours}h";
-            $target = (new DateTimeImmutable())->modify("+{$hours} hours");
-            $windowStart = $target->modify('-2 minutes')->format('Y-m-d H:i:s');
-            $windowEnd = $target->modify('+2 minutes')->format('Y-m-d H:i:s');
 
-            $rows = DB::select(
-                "SELECT a.*, s.name AS salon_name FROM appointments a JOIN salons s ON s.id = a.salon_id
-                 WHERE a.kind = 'booked' AND a.status = 'confirmed'
-                 AND a.scheduled_at BETWEEN ? AND ?",
-                [$windowStart, $windowEnd]
-            );
+            /*
+             * پنجره‌ای که با تأخیر هم می‌بندد، ولی دروغ نمی‌گوید.
+             *
+             * نسخهٔ قبلی دنبال نوبت‌هایی می‌گشت که دقیقاً در بازهٔ
+             * ±۲ دقیقه‌ایِ هدف باشند — پنجره‌ای ۴ دقیقه‌ای، در حالی
+             * که کرون هر ۵ دقیقه اجرا می‌شد. هر بار یک دقیقه شکاف
+             * می‌ماند و یادآورِ نوبت‌هایی که در آن یک دقیقه می‌افتادند
+             * **برای همیشه گم می‌شد** — نه دیر، اصلاً. یکی از هر پنج.
+             *
+             * راه‌حلِ ساده‌لوحانه این بود که شرط را «سررسید شده» کنیم.
+             * ولی آن‌وقت اگر زمان‌بند چند ساعت نخوابد و بعد بیدار شود،
+             * پیامکِ «۲۴ ساعت تا نوبتت» یک ساعت پیش از نوبت می‌رسید.
+             *
+             * پس پنجره ماند، ولی گشاد شد و فقط به عقب: یادآور تا
+             * «tolerance» دیر هم می‌رود، بیشتر از آن نه — چون متنش
+             * دیگر راست نیست. یادآور بعدی (۲ ساعته) پوششش می‌دهد.
+             *
+             * شرط created_at لازم است: کسی که سه ساعت پیش از نوبتش
+             * رزرو می‌کند نباید پیامکِ «۲۴ ساعت تا نوبتت» بگیرد.
+             */
+            $tolerance = self::toleranceMinutes((int) $hours, array_map('intval', $hoursList));
+
+            $sql = "SELECT a.*, s.name AS salon_name FROM appointments a JOIN salons s ON s.id = a.salon_id
+                     WHERE a.kind = 'booked' AND a.status = 'confirmed'
+                       AND a.scheduled_at > NOW()
+                       AND a.scheduled_at <= (NOW() + INTERVAL ? HOUR)
+                       AND a.created_at < (a.scheduled_at - INTERVAL ? HOUR)";
+            $args = [$hours, $hours];
+
+            if ($tolerance !== null) {
+                $sql .= ' AND a.scheduled_at > (NOW() + INTERVAL ? HOUR - INTERVAL ? MINUTE)';
+                $args[] = $hours;
+                $args[] = $tolerance;
+            }
+
+            $sql .= ' ORDER BY a.scheduled_at LIMIT 200';
+
+            $rows = DB::select($sql, $args);
 
             foreach ($rows as $appt) {
                 if ($this->notifier->alreadySent((int) $appt['id'], $templateCode)) {

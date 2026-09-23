@@ -179,8 +179,29 @@ if (!function_exists('toman')) {
 }
 
 if (!function_exists('fa_num')) {
-    function fa_num(int|string $value): string
+    /**
+     * عدد فارسی.
+     *
+     * اعشار هم قبول می‌کند، و این لازم است: دو سنجهٔ کلیدیِ پنل
+     * پلتفرم — «خطای تخمین» و «نرخ ثبت پایان» — با
+     * ‎round($x, 1)‎ حساب می‌شوند، یعنی float.
+     *
+     * پیش از این امضای تابع فقط ‎int|string‎ بود، پس PHP همان float
+     * را بی‌سروصدا به int تبدیل می‌کرد: ۹۸٫۲ می‌شد ۹۸. یعنی دقتی که
+     * کد عمداً حساب کرده بود، سرِ راهِ نمایش دور ریخته می‌شد — و روی
+     * PHP 8.1 یک Deprecated هم می‌داد که در حالت دیباگ وسط صفحه
+     * چاپ می‌شد.
+     *
+     * جداکنندهٔ اعشار «٫» است (U+066B)، نه نقطهٔ لاتین.
+     */
+    function fa_num(int|float|string $value): string
     {
+        if (is_float($value)) {
+            // صفرهای انتهایی حذف می‌شوند: ۹۸٫۲۰ → «۹۸٫۲»، ۹۸٫۰ → «۹۸»
+            $value = rtrim(rtrim(number_format($value, 2, '.', ''), '0'), '.');
+            $value = str_replace('.', '٫', $value);
+        }
+
         return Jalali::toPersianDigits((string) $value);
     }
 }

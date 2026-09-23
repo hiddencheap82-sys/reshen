@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Diagnostics;
 
 use App\Core\Config;
-use App\Core\Cron;
+use App\Core\Scheduler;
 use App\Core\DB;
 use App\Core\Migrator;
 use PDO;
@@ -279,17 +279,33 @@ final class HealthCheck
                 : '',
         ];
 
-        // کرون تنظیم‌نشده یکی از رایج‌ترین اشتباهات نصب است و علامتش
-        // این است که «هیچ پیامکی نمی‌رود» — بدون اینکه خطایی جایی ثبت شود.
-        $lastCron = Cron::lastRunAt();
-        $cronAgeHours = $lastCron === null ? null : (time() - $lastCron) / 3600;
+        /*
+         * زمان‌بند با هر درخواست وب تحریک می‌شود، پس «هرگز اجرا نشده»
+         * دیگر یعنی خرابی، نه فراموشیِ راه‌اندازی.
+         *
+         * آستانه‌ها: تا ۶ ساعت عادی است (سالن ممکن است شب و تعطیل
+         * بازدیدی نداشته باشد)، بیشتر از ۲۴ ساعت یعنی چیزی شکسته.
+         */
+        $lastRun = Scheduler::lastRunAt();
+        $ageHours = $lastRun === null ? null : (time() - $lastRun) / 3600;
         $rows[] = [
-            'label' => 'آخرین اجرای کرون',
-            'status' => $lastCron === null ? self::FAIL : ($cronAgeHours > 6 ? self::WARN : self::OK),
-            'value' => $lastCron === null ? 'هرگز' : jdate(date('Y-m-d H:i:s', $lastCron)),
-            'hint' => $lastCron === null
-                ? 'کرون هنوز یک بار هم اجرا نشده. تا تنظیم نشود، هیچ پیامک یادآوری ارسال نمی‌شود. راهنما: docs/40-deploy/01-cpanel.md'
-                : ($cronAgeHours > 6 ? 'بیش از ۶ ساعت است که کرون اجرا نشده. تنظیماتش را بررسی کنید.' : ''),
+            'label' => 'آخرین اجرای زمان‌بند',
+            'status' => match (true) {
+                $lastRun === null => self::WARN,
+                $ageHours > 24 => self::FAIL,
+                $ageHours > 6 => self::WARN,
+                default => self::OK,
+            },
+            'value' => $lastRun === null ? 'هرگز' : jdate(date('Y-m-d H:i:s', $lastRun)),
+            'hint' => match (true) {
+                $lastRun === null => 'هنوز هیچ کاری اجرا نشده. اگر سایت تازه نصب شده طبیعی است — '
+                    . 'با اولین بازدیدها خودش شروع می‌شود.',
+                $ageHours > 24 => 'بیش از یک روز است هیچ کاری اجرا نشده. یعنی یا سایت هیچ بازدیدی '
+                    . 'ندارد، یا زمان‌بند خطا می‌دهد. جدول scheduled_tasks ستون last_error دارد.',
+                $ageHours > 6 => 'چند ساعت است اجرا نشده. اگر سالن بسته بوده طبیعی است؛ '
+                    . 'زمان‌بند با بازدید وب تحریک می‌شود.',
+                default => '',
+            },
         ];
 
         // ‏.env نباید از وب قابل خواندن باشد. اینجا فقط یادآوری می‌کنیم؛

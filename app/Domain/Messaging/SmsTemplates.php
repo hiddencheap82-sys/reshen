@@ -57,14 +57,14 @@ final class SmsTemplates
             'vars' => ['name', 'salon', 'time'],
             'pattern' => "%name% عزیز، یادآوری نوبت فردا در %salon% ساعت %time%.",
             'critical' => false,
-            'note' => 'با کرون فرستاده می‌شود.',
+            'note' => 'زمان‌بند خودش می‌فرستد؛ تنظیمی لازم ندارد.',
         ],
         'reminder_2h' => [
             'title' => 'یادآوری دو ساعت قبل',
             'vars' => ['name', 'salon', 'time'],
             'pattern' => "%name% عزیز، نوبت شما در %salon% ساعت %time% است.",
             'critical' => false,
-            'note' => 'با کرون فرستاده می‌شود.',
+            'note' => 'زمان‌بند خودش می‌فرستد؛ تنظیمی لازم ندارد.',
         ],
         'queue_chair_ready' => [
             'title' => 'نوبتت رسید',
