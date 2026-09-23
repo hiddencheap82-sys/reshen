@@ -23,7 +23,7 @@
 <?php if ($slotLabel !== null): ?>
   <a href="<?= e(url('s/' . $salon['slug'])) ?>"
      class="rise glass rounded-2xl px-4 py-3 mb-5 flex items-center gap-3 tap">
-    <?= icon('calendar-days', 'w-4 h-4 text-ink-400 shrink-0') ?>
+    <?= icon('calendar', 'w-4 h-4 text-ink-400 shrink-0') ?>
     <span class="flex-1 min-w-0">
       <span class="block text-[12px] text-ink-500">وقت انتخابی</span>
       <span class="block text-[13px] font-bold text-ink-900 truncate"><?= e($slotLabel) ?></span>

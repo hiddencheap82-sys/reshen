@@ -57,6 +57,6 @@ $live = in_array($appointment['status'], ['confirmed','queued','in_chair'], true
 -->
 <a href="<?= e(url('me')) ?>"
    class="flex items-center justify-center gap-2 text-[12px] font-semibold text-ink-500 mt-5 py-3 tap">
-  <?= icon('calendar-days', 'w-4 h-4') ?>
+  <?= icon('calendar', 'w-4 h-4') ?>
   همهٔ نوبت‌های من
 </a>

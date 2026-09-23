@@ -35,7 +35,7 @@ $items = [
                 focus-visible:outline-2 focus-visible:outline-accent
                 <?= $on ? 'day-chip-on' : 'glass text-ink-700 hover:shadow-lift' ?>"
          <?= $on ? 'aria-current="page"' : '' ?>>
-        <?= icon($iconName, 'w-4 h-4') ?>
+        <?= nav_icon($iconName, $on, 'w-4 h-4') ?>
         <?= e($label) ?>
       </a>
     <?php endforeach; ?>

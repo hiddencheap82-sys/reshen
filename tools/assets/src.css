@@ -391,6 +391,41 @@ html.dark[data-theme="ruby"]{
     .sticky-action{background:var(--surface);backdrop-filter:none}
   }
 
+  /*
+   * نشانگر تب فعال در نوار پایین.
+   *
+   * سه نشانه با هم می‌گویند «اینجایی»: آیکون پرشده، رنگ لهجه، و این
+   * نقطه. یکی به‌تنهایی کافی نیست — رنگ لهجه در حالت روشن طلایی است
+   * و روی صفحهٔ کوچکِ زیر آفتاب از خاکستری جدا نمی‌شود، و تشخیصِ
+   * پر/خطی برای چشمی که عجله دارد سریع نیست.
+   *
+   * نقطه همیشه در جریان است (نه position:absolute) و فقط رنگ عوض
+   * می‌کند؛ اگر با ظاهر شدن جا باز می‌کرد، کل تب با هر رفت‌وبرگشت
+   * یک پیکسل بالا و پایین می‌پرید.
+   */
+  .tab-dot{
+    width:4px; height:4px; border-radius:9999px;
+    background:transparent;
+    transition:background-color .18s ease, transform .18s ease;
+    transform:scale(.6);
+  }
+  .tab-dot-on{ background:currentColor; transform:scale(1); }
+  @media (prefers-reduced-motion: reduce){
+    .tab-dot{transition:none}
+  }
+
+  /*
+   * فشردن هنگام لمس. اسنپ و هر اپ موبایلی این را دارد و نبودش باعث
+   * می‌شود کاربر روی شبکهٔ کند دوباره بزند — چون هیچ نشانه‌ای نگرفته
+   * که لمسش ثبت شده.
+   */
+  .tab-item{ transition:transform .12s ease; }
+  .tab-item:active{ transform:scale(.92); }
+  @media (prefers-reduced-motion: reduce){
+    .tab-item{transition:none}
+    .tab-item:active{transform:none}
+  }
+
   /* نوار شناور پایین — همان حسِ تب‌بار iOS */
   .glass-bar{
     background:var(--glass-solid);

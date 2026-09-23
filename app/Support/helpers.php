@@ -7,6 +7,23 @@ use App\Core\Session;
 use App\Support\Jalali;
 use App\Support\Money;
 
+if (!defined('FILLED_ICONS')) {
+    /**
+     * آیکون‌هایی که نسخهٔ پرشده دارند.
+     *
+     * فهرست دستی است تا هر بار رندر، فایل سپرایت خوانده و جست‌وجو
+     * نشود. `IconSpriteTest` نگه‌داشتنش را تضمین می‌کند: اگر نامی
+     * اینجا باشد و در سپرایت `-fill` نداشته باشد، تست قرمز می‌شود.
+     *
+     * define و نه const: بقیهٔ فایل هم با نگهبان نوشته شده تا دو بار
+     * include کردنش خطای مرگبار ندهد، و const داخل if مجاز نیست.
+     */
+    define('FILLED_ICONS', [
+        'calendar', 'chart', 'clock', 'cog', 'message', 'more', 'qr',
+        'queue', 'scissors', 'shield', 'tag', 'user', 'users', 'wallet',
+    ]);
+}
+
 if (!function_exists('e')) {
     function e(?string $value): string
     {
@@ -199,6 +216,24 @@ if (!function_exists('icon')) {
 
         return '<svg class="' . e($class) . '" ' . $aria . '>'
              . '<use href="#i-' . e($name) . '"></use></svg>';
+    }
+}
+
+if (!function_exists('nav_icon')) {
+    /**
+     * آیکون یک تب ناوبری: خطی وقتی نیستی، پرشده وقتی هستی.
+     *
+     * قراردادی است که هر اپلیکیشن موبایلی دارد و کاربر بدون این‌که
+     * فکر کند می‌خواندش. پیش از این تب فعال فقط رنگش عوض می‌شد، و
+     * روی صفحهٔ کوچک — با نور آفتاب یا چشمِ خسته — تفاوت رنگ لهجهٔ
+     * کم‌رنگ با خاکستری دیده نمی‌شد.
+     *
+     * اگر آیکون نسخهٔ پرشده نداشته باشد، همان خطی برمی‌گردد: نبودِ
+     * یک نسخه نباید تب را ناپدید کند.
+     */
+    function nav_icon(string $name, bool $active, string $class = 'w-5 h-5'): string
+    {
+        return icon($active && in_array($name, FILLED_ICONS, true) ? $name . '-fill' : $name, $class);
     }
 }
 

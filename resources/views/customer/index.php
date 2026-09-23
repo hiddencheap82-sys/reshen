@@ -78,7 +78,7 @@ $card = static function (array $a, bool $cancellable) use ($labels): void {
 
   <?php if (empty($upcoming)): ?>
     <div class="glass rounded-2xl py-10 px-5 text-center">
-      <?= icon('calendar-days', 'w-9 h-9 mx-auto text-ink-300 mb-3') ?>
+      <?= icon('calendar', 'w-9 h-9 mx-auto text-ink-300 mb-3') ?>
       <p class="text-sm font-semibold text-ink-600 mb-1">نوبتی در پیش نداری</p>
       <p class="text-[12px] text-ink-400">از لینک آرایشگاهت می‌توانی نوبت بگیری.</p>
     </div>

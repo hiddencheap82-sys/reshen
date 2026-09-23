@@ -75,7 +75,7 @@ $onPlatform = str_starts_with($currentPath, '/platform');
     <nav class="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
       <?php foreach ($visibleNav as $item): $active = str_starts_with($currentPath, url($item['href'] === '/panel' ? '/panel' : $item['href'])) && ($item['href']!=='/panel' || $currentPath===rtrim(url('/panel'),'/')); ?>
       <a href="<?= url($item['href']) ?>" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-ink-600 hover:bg-ink-50 <?= $active ? 'nav-active' : '' ?>">
-        <?= icon($item["icon"]) ?>
+        <?= nav_icon($item['icon'], $active) ?>
         <span><?= e($item['label']) ?></span>
       </a>
       <?php endforeach; ?>
@@ -192,7 +192,7 @@ $onPlatform = str_starts_with($currentPath, '/platform');
                       text-[12px] font-semibold <?= $isActive($item) ? 'text-accent' : 'text-ink-600' ?>"
                <?= $isActive($item) ? 'aria-current="page"' : '' ?>
                style="<?= $isActive($item) ? 'background:var(--accent-soft)' : '' ?>">
-              <?= icon($item['icon'], 'w-5 h-5 shrink-0') ?>
+              <?= nav_icon($item['icon'], $isActive($item), 'w-5 h-5 shrink-0') ?>
               <span class="max-w-full truncate px-1"><?= e($item['label']) ?></span>
             </a>
           <?php endforeach; ?>
@@ -204,11 +204,13 @@ $onPlatform = str_starts_with($currentPath, '/platform');
   <div class="glass-bar flex items-stretch h-16 px-1"
        style="padding-bottom:env(safe-area-inset-bottom,0px)">
     <?php foreach ($navPrimary as $item): ?>
+      <?php $on = $isActive($item); ?>
       <a href="<?= e(url($item['href'])) ?>"
-         class="flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 text-[12px]
-                <?= $isActive($item) ? 'text-accent font-bold' : 'text-ink-400' ?>"
-         <?= $isActive($item) ? 'aria-current="page"' : '' ?>>
-        <?= icon($item['icon'], 'w-5 h-5 shrink-0') ?>
+         class="tab-item flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 text-[12px]
+                <?= $on ? 'text-accent font-bold' : 'text-ink-400' ?>"
+         <?= $on ? 'aria-current="page"' : '' ?>>
+        <span class="tab-dot <?= $on ? 'tab-dot-on' : '' ?>" aria-hidden="true"></span>
+        <?= nav_icon($item['icon'], $on, 'w-5 h-5 shrink-0') ?>
         <span class="max-w-full truncate px-0.5"><?= e($item['label']) ?></span>
       </a>
     <?php endforeach; ?>
@@ -220,7 +222,8 @@ $onPlatform = str_starts_with($currentPath, '/platform');
               class="flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 text-[12px] cursor-pointer
                      <?= $restActive ? 'text-accent font-bold' : 'text-ink-400' ?>"
               aria-label="گزینه‌های بیشتر">
-        <?= icon('more', 'w-5 h-5') ?>
+        <span class="tab-dot <?= $restActive ? 'tab-dot-on' : '' ?>" aria-hidden="true"></span>
+        <?= nav_icon('more', $restActive, 'w-5 h-5') ?>
         <span>بیشتر</span>
       </button>
     <?php endif; ?>
