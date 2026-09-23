@@ -39,9 +39,46 @@ final class DB
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
             ]);
+
+            self::syncTimeZone(self::$pdo);
         }
 
         return self::$pdo;
+    }
+
+    /**
+     * ساعت MySQL را با ساعت PHP یکی می‌کند.
+     *
+     * بدون این، برنامه دو ساعتِ متفاوت دارد و هیچ‌کدام خطا نمی‌دهند.
+     * PHP روی ‎Asia/Tehran‎ است (‎app/bootstrap.php‎)، ولی MySQL روی هاست
+     * معمولاً UTC است. یعنی ‎NOW()‎ سه‌ساعت‌ونیم با ‎date()‎ فرق می‌کند، و
+     * هر کوئری‌ای که زمانِ نوشته‌شده با PHP را با ساعت MySQL می‌سنجد،
+     * بی‌صدا جواب غلط می‌دهد:
+     *
+     *   • محدودیت تلاش ورود هیچ‌وقت فعال نمی‌شد — پنجرهٔ ۱۵ دقیقه‌ای
+     *     هیچ ردیفی را نمی‌دید، پس رمز بی‌نهایت بار قابل حدس زدن بود.
+     *   • حفاظ رزرو (`BookingGuard`) و انقضای لینک ورود هم همین‌طور.
+     *   • «نوبتی که ساعتش گذشته» در داشبورد کم‌شمار می‌شد.
+     *
+     * چرا افست عددی و نه نام منطقه: ‎SET time_zone = 'Asia/Tehran'‎ به
+     * جدول‌های منطقهٔ زمانی MySQL نیاز دارد که روی هاست اشتراکی معمولاً
+     * پر نشده‌اند و دستور با خطا برمی‌گردد. افستِ ‎+03:30‎ همیشه کار
+     * می‌کند و از خودِ PHP خوانده می‌شود، پس اگر روزی منطقه عوض شد،
+     * همراهش عوض می‌شود.
+     *
+     * اگر هاست اجازهٔ ‎SET time_zone‎ ندهد، بی‌سروصدا رد می‌شویم: یک
+     * ساعتِ ناهماهنگ بهتر از برنامه‌ای است که اصلاً بالا نمی‌آید.
+     */
+    private static function syncTimeZone(PDO $pdo): void
+    {
+        $offset = (new \DateTimeImmutable('now'))->format('P'); // مثل +03:30
+
+        try {
+            $pdo->prepare('SET time_zone = ?')->execute([$offset]);
+        } catch (\Throwable $e) {
+            // هاست اجازه نداد. کوئری‌های وابسته به NOW() ممکن است
+            // جابه‌جا باشند؛ صفحهٔ doctor این را گزارش می‌دهد.
+        }
     }
 
     public static function statement(string $sql, array $bindings = []): PDOStatement

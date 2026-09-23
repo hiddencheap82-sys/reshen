@@ -32,7 +32,15 @@ $router->get('/logout', [AuthController::class, 'logout']);
 $router->get('/login/link/{token}', [AuthController::class, 'loginWithLink']);
 
 $router->group(['middleware' => [VerifyCsrf::class]], function ($router) {
-    $router->post('/login', [AuthController::class, 'sendOtp']);
+    /*
+     * ‎POST /login‎ حالا ورود با رمز است و کد پیامکی مسیر خودش را دارد.
+     *
+     * جای این دو عمدی است: فرمِ پیش‌فرضِ صفحه، رمز می‌خواهد، چون این
+     * صفحه ورودِ *کارکنان* است و آن‌ها روزی چند بار وارد می‌شوند.
+     * مشتری از ‎/me‎ وارد می‌شود که همچنان فقط کد پیامکی است.
+     */
+    $router->post('/login', [AuthController::class, 'loginWithPassword']);
+    $router->post('/login/otp', [AuthController::class, 'sendOtp']);
     $router->post('/login/verify', [AuthController::class, 'verify']);
 });
 

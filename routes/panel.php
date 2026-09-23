@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Core\Response;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\BookingsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SalonCustomersController;
@@ -22,6 +23,26 @@ use App\Http\Middleware\TenantRequired;
 use App\Http\Middleware\VerifyCsrf;
 
 /** @var \App\Core\Router $router */
+
+/*
+ * حساب کاربری — فقط ورود می‌خواهد، نه سالن و نه نقش.
+ *
+ * عمداً بیرون از TenantRequired است. مدیر کلی که نصاب ساخته عضو هیچ
+ * سالنی نیست؛ اگر این صفحه سالن بخواهد، او به «سالن تازه بساز»
+ * پرتاب می‌شود و هیچ‌وقت نمی‌تواند رمز خودش را عوض کند.
+ *
+ * و بیرون از OwnerManagerRequired هم هست: پذیرش و آرایشگر هم باید
+ * بتوانند رمز *خودشان* را عوض کنند، بی‌آنکه از صاحب سالن خواهش کنند.
+ */
+$router->group(['middleware' => [AuthRequired::class]], function ($router) {
+    $router->get('/panel/account', [AccountController::class, 'show']);
+
+    $router->group(['middleware' => [VerifyCsrf::class]], function ($router) {
+        $router->post('/panel/account/name', [AccountController::class, 'updateName']);
+        $router->post('/panel/account/password', [AccountController::class, 'updatePassword']);
+        $router->post('/panel/account/password/remove', [AccountController::class, 'removePassword']);
+    });
+});
 
 $router->group(['middleware' => [AuthRequired::class, TenantRequired::class]], function ($router) {
     $router->get('/panel', [QueueController::class, 'index']);

@@ -52,6 +52,18 @@ final class Auth
         DB::update('users', ['last_login_at' => date('Y-m-d H:i:s')], 'id = :id', ['id' => $userId]);
     }
 
+    /**
+     * حافظهٔ کاربر را دور می‌ریزد.
+     *
+     * بعد از عوض شدن نام یا رمز لازم است: بدون این، تا پایان همان
+     * درخواست، صفحه هنوز مقدار قبلی را نشان می‌دهد و کاربر فکر می‌کند
+     * تغییرش ذخیره نشده.
+     */
+    public static function forgetUserCache(): void
+    {
+        self::$userCache = null;
+    }
+
     public static function logout(): void
     {
         Session::destroy();

@@ -57,6 +57,20 @@ $step = $_GET['step'] ?? 'check';
 $errors = [];
 
 /*
+ * نصبِ نیمه‌کاره.
+ *
+ * اگر ‎.env‎ نوشته شده و جدول‌ها ساخته شده‌اند ولی هنوز مدیر کلی نیست،
+ * کاربر وسط راه رها کرده — مرورگر را بسته، یا برق رفته. بی این شرط،
+ * دوباره از گام یک شروع می‌شد و فرم دیتابیس را دوباره می‌خواست، در
+ * حالی که همه‌چیز آماده است و فقط یک حساب کم دارد.
+ */
+if ($step === 'check' && is_file(RESHEN_ROOT . '/.env')) {
+    if (users_table_ready() && !platform_admin_exists()) {
+        $step = 'admin';
+    }
+}
+
+/*
  * کاربر سه گام می‌بیند — بررسی محیط، اتصال دیتابیس، پایان — ولی ترتیب
  * کد همان نیست و نباید هم باشد: هر درخواست اول باید ببیند فرمی ارسال
  * شده یا نه. پس بلوک‌ها به ترتیبِ *تصمیم* می‌آیند، نه به ترتیبِ
@@ -116,9 +130,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_step'] ?? '') === 'config
             }
 
             if ($errors === []) {
-                @file_put_contents(LOCK_FILE, date('c') . "\n");
-                $_SESSION['install_done'] = true;
-                header('Location: ?step=done');
+                /*
+                 * قفل هنوز نوشته نمی‌شود.
+                 *
+                 * تا وقتی مدیر کل ساخته نشده، نصب تمام نیست — و اگر
+                 * همین‌جا قفل کنیم، کاربری که مرورگرش را ببندد با
+                 * سامانه‌ای می‌ماند که هیچ‌کس نمی‌تواند واردش شود و
+                 * صفحهٔ نصب هم دیگر باز نمی‌شود.
+                 */
+                $_SESSION['install_db_ready'] = true;
+                header('Location: ?step=admin');
                 exit;
             }
         }
@@ -126,9 +147,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_step'] ?? '') === 'config
     $step = 'config';
 }
 
-// ─── ب) کار تمام شده؟ صفحهٔ پایان ─────────────────────────────────
+// ─── ب) فرم مدیر کل ارسال شده؟ کاربر را بساز و قفل کن ─────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_step'] ?? '') === 'admin') {
+    if (!hash_equals((string) ($_SESSION['install_csrf'] ?? ''), (string) ($_POST['_csrf'] ?? ''))) {
+        $errors[] = 'نشست منقضی شده است. صفحه را تازه کنید و دوباره تلاش کنید.';
+    } else {
+        $errors = create_first_admin(
+            (string) ($_POST['admin_name'] ?? ''),
+            (string) ($_POST['admin_phone'] ?? ''),
+            (string) ($_POST['admin_password'] ?? ''),
+            (string) ($_POST['admin_password2'] ?? '')
+        );
+
+        if ($errors === []) {
+            @file_put_contents(LOCK_FILE, date('c') . "\n");
+            $_SESSION['install_done'] = true;
+            header('Location: ?step=done');
+            exit;
+        }
+    }
+    $step = 'admin';
+}
+
+// ─── پ) کار تمام شده؟ صفحهٔ پایان ─────────────────────────────────
 if ($step === 'done') {
     render_done();
+    exit;
+}
+
+// ─── ت) گام مدیر کل ───────────────────────────────────────────────
+if ($step === 'admin') {
+    $_SESSION['install_csrf'] ??= bin2hex(random_bytes(32));
+
+    /*
+     * اگر قبلاً مدیر کلی هست، این فرم نباید باز شود.
+     *
+     * وگرنه کسی که به install.php می‌رسد می‌تواند یک مدیر کلِ تازه
+     * بسازد و کل سامانه را بردارد — همان دری که وردپرس با فایل قفل
+     * می‌بندد، ولی اینجا یک لایه جلوتر هم بسته می‌شود چون قفل ممکن
+     * است دستی پاک شده باشد.
+     */
+    if (platform_admin_exists()) {
+        render_shell('نصب رشن', [
+            'بخش' => [[
+                'label' => 'مدیر کل',
+                'status' => 'fail',
+                'value' => 'از قبل وجود دارد',
+                'hint' => 'روی این سامانه مدیر کلی ثبت شده است. برای ساخت مدیر تازه، با همان حساب '
+                    . 'وارد شوید و از پنل مدیریت کل اضافه‌اش کنید. اگر رمز را فراموش کرده‌اید، '
+                    . 'از صفحهٔ ورود با کد پیامکی وارد شوید.',
+            ]],
+        ], null);
+        exit;
+    }
+
+    render_admin_form($errors, $_SESSION['install_csrf']);
     exit;
 }
 
@@ -419,7 +492,7 @@ function render_config_form(array $errors, string $csrf): void
     <?php render_head('نصب رشن — اتصال دیتابیس'); ?>
     <div class="wrap">
       <h1>رشن</h1>
-      <p class="sub">گام ۲ از ۳ — اتصال به دیتابیس</p>
+      <p class="sub">گام ۲ از ۴ — اتصال به دیتابیس</p>
 
       <?php foreach ($errors as $error): ?>
         <div class="alert"><?= h($error) ?></div>
@@ -462,9 +535,178 @@ function render_config_form(array $errors, string $csrf): void
             <small>اگر درست حدس زده شده، دست نزنید.</small>
           </label>
 
-          <button type="submit">ساخت جدول‌ها و پایان نصب</button>
+          <button type="submit">ساخت جدول‌ها و ادامه</button>
         </form>
       </div>
+    </div>
+    <?php render_foot();
+}
+
+/**
+ * برنامه را بالا می‌آورد تا بتوان با دیتابیس کار کرد.
+ *
+ * فقط در گام مدیر کل لازم است، و فقط وقتی ‎.env‎ نوشته شده. پیش از آن
+ * صدا زدنش یعنی همان خطای ۵۰۰ که این نصاب برای توضیحش ساخته شده.
+ */
+function boot_app(): void
+{
+    static $booted = false;
+    if ($booted) {
+        return;
+    }
+    require_once RESHEN_ROOT . '/app/bootstrap.php';
+    $booted = true;
+}
+
+/** جدول users ساخته شده؟ یعنی مهاجرت‌ها یک بار اجرا شده‌اند. */
+function users_table_ready(): bool
+{
+    try {
+        boot_app();
+        App\Core\DB::selectOne('SELECT id FROM users LIMIT 1');
+
+        return true;
+    } catch (Throwable $e) {
+        return false;
+    }
+}
+
+function platform_admin_exists(): bool
+{
+    try {
+        boot_app();
+        $row = App\Core\DB::selectOne('SELECT COUNT(*) AS c FROM users WHERE is_platform_admin = 1');
+
+        return (int) ($row['c'] ?? 0) > 0;
+    } catch (Throwable $e) {
+        // اگر جدولی نیست، یعنی هنوز مدیری هم نیست.
+        return false;
+    }
+}
+
+/**
+ * اولین مدیر کل — همان کاری که وردپرس در گام آخر نصب می‌کند.
+ *
+ * چرا اینجا و نه با یک اسکریپت خط فرمان: ‎tools/make_platform_admin.php‎
+ * وجود دارد ولی به SSH نیاز دارد، و هاست اشتراکی ایرانی معمولاً SSH
+ * ندارد. یعنی تا پیش از این، پنل مدیریت کل روی هاست واقعی عملاً
+ * دست‌نیافتنی بود.
+ *
+ * @return array<int,string> فهرست خطاها؛ خالی یعنی ساخته شد
+ */
+function create_first_admin(string $name, string $rawPhone, string $password, string $confirm): array
+{
+    $errors = [];
+    $name = trim($name);
+
+    if ($name === '') {
+        $errors[] = 'نام‌تان را بنویسید.';
+    }
+
+    boot_app();
+
+    $phone = App\Support\IranMobile::tryParse($rawPhone);
+    if ($phone === null) {
+        $errors[] = 'شمارهٔ موبایل نامعتبر است. مثل ۰۹۱۲۳۴۵۶۷۸۹ بنویسید.';
+    }
+
+    if ($password !== $confirm) {
+        $errors[] = 'دو رمز یکی نیستند.';
+    }
+
+    $weak = App\Domain\Identity\PasswordService::reject($password, $rawPhone);
+    if ($weak !== null) {
+        $errors[] = $weak;
+    }
+
+    if ($errors !== [] || $phone === null) {
+        return $errors;
+    }
+
+    if (platform_admin_exists()) {
+        return ['روی این سامانه از قبل مدیر کلی ثبت شده است.'];
+    }
+
+    try {
+        /*
+         * ممکن است این شماره از قبل کاربر باشد — مثلاً کسی که با کد
+         * پیامکی وارد شده و بعد تصمیم گرفته نصاب را کامل کند. در آن
+         * حالت همان کاربر ارتقا می‌یابد، نه اینکه رکورد دوم ساخته شود
+         * (شماره یکتاست و درج دوم خطا می‌داد).
+         */
+        $existing = App\Core\DB::selectOne('SELECT id FROM users WHERE phone = ?', [$phone->e164]);
+
+        if ($existing !== null) {
+            $userId = (int) $existing['id'];
+            App\Core\DB::update('users', [
+                'name' => $name,
+                'is_platform_admin' => 1,
+            ], 'id = :id', ['id' => $userId]);
+        } else {
+            $userId = (int) App\Core\DB::insert('users', [
+                'phone' => $phone->e164,
+                'name' => $name,
+                'is_platform_admin' => 1,
+            ]);
+        }
+
+        App\Domain\Identity\PasswordService::set($userId, $password);
+    } catch (Throwable $e) {
+        return ['ساخت کاربر ناموفق بود: ' . $e->getMessage()];
+    }
+
+    return [];
+}
+
+function render_admin_form(array $errors, string $csrf): void
+{
+    ?>
+    <?php render_head('نصب رشن — مدیر کل'); ?>
+    <div class="wrap">
+      <h1>رشن</h1>
+      <p class="sub">گام ۳ از ۴ — ساخت حساب مدیر کل</p>
+
+      <?php foreach ($errors as $error): ?>
+        <div class="alert"><?= h($error) ?></div>
+      <?php endforeach; ?>
+
+      <div class="card">
+        <p class="note">
+          این حساب به <strong>همه‌چیز</strong> دسترسی دارد: همهٔ سالن‌ها، پلن‌ها، صورتحساب‌ها
+          و کاربران. شمارهٔ موبایل شما همان نام کاربری‌تان است — چون بقیهٔ برنامه هم
+          آدم‌ها را با شماره می‌شناسد، نه با نام کاربری جدا.
+        </p>
+
+        <form method="post">
+          <input type="hidden" name="_step" value="admin">
+          <input type="hidden" name="_csrf" value="<?= h($csrf) ?>">
+
+          <label>نام و نام خانوادگی
+            <input name="admin_name" required autofocus placeholder="مثلاً: علی رضایی">
+          </label>
+
+          <label>شمارهٔ موبایل (نام کاربری)
+            <input name="admin_phone" dir="ltr" required inputmode="numeric" placeholder="09123456789">
+            <small>با همین شماره وارد می‌شوید، و اگر روزی رمز را فراموش کنید کد ورود به همین شماره می‌آید.</small>
+          </label>
+
+          <label>رمز عبور
+            <input name="admin_password" type="password" required minlength="8" dir="ltr">
+            <small>دست‌کم ۸ نویسه. چیزی بگذارید که خودتان یادتان بماند — اجبارِ «یک عدد و یک علامت» نداریم.</small>
+          </label>
+
+          <label>تکرار رمز عبور
+            <input name="admin_password2" type="password" required minlength="8" dir="ltr">
+          </label>
+
+          <button type="submit">ساخت حساب و پایان نصب</button>
+        </form>
+      </div>
+
+      <footer>
+        رمز را جایی امن یادداشت کنید. اگر فراموشش کنید، از صفحهٔ ورود با کد پیامکی
+        وارد می‌شوید و رمز تازه می‌گذارید — به شرطی که پیامک تنظیم شده باشد.
+      </footer>
     </div>
     <?php render_foot();
 }
@@ -475,15 +717,19 @@ function render_done(): void
     <?php render_head('نصب رشن — تمام شد'); ?>
     <div class="wrap">
       <h1>رشن</h1>
-      <p class="sub">گام ۳ از ۳ — نصب کامل شد</p>
+      <p class="sub">گام ۴ از ۴ — نصب کامل شد</p>
 
       <div class="verdict ok">نصب با موفقیت انجام شد.</div>
 
       <div class="card">
         <h2>حالا چه کنید</h2>
         <ol>
-          <li><strong>وارد شوید.</strong> صفحهٔ ورود را باز کنید و شمارهٔ موبایل خودتان را بزنید.
-              اولین کاربری که ثبت‌نام کند، صاحب سالن می‌شود.</li>
+          <li><strong>وارد شوید.</strong> با همان شمارهٔ موبایل و رمزی که الان ساختید.
+              این حساب مدیر کل است و به همه‌چیز دسترسی دارد: سالن‌ها، پلن‌ها، صورتحساب‌ها
+              و کاربران.</li>
+          <li><strong>سالن بسازید.</strong> از پنل مدیریت کل، یا با باز کردن
+              <code>/onboarding</code>. هر کسی که بعداً با شمارهٔ خودش وارد شود و سالن بسازد،
+              صاحب همان سالن می‌شود — نه مدیر کل.</li>
           <li><strong>پیامک را تنظیم کنید.</strong> تا وقتی <code>SMS_DRIVER</code> در فایل
               <code>.env</code> روی <code>log</code> باشد، هیچ پیامکی ارسال نمی‌شود و کد ورود
               فقط در <code>storage/logs/sms.log</code> نوشته می‌شود. برای سالن واقعی باید

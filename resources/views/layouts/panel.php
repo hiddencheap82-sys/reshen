@@ -21,20 +21,52 @@ $navItems = [
      * اصلاً نمی‌بینندش و تبِ اولشان همان «صف زنده» می‌ماند — چیزی که
      * واقعاً وسط کار لازمشان است.
      */
-    ['href' => '/panel/dashboard','label' => 'داشبورد',       'icon' => 'home',     'ability' => Access::MANAGE_SALON],
-    ['href' => '/panel',          'label' => 'صف زنده',       'icon' => 'queue',    'ability' => null],
-    ['href' => '/panel/bookings', 'label' => 'رزروها',        'icon' => 'calendar', 'ability' => null],
-    ['href' => '/panel/customers','label' => 'مشتریان',       'icon' => 'users',    'ability' => Access::VIEW_CUSTOMERS],
-    ['href' => '/panel/reports',  'label' => 'گزارش‌ها',       'icon' => 'chart',    'ability' => Access::MANAGE_SALON],
-    ['href' => '/panel/staff',    'label' => 'آرایشگرها',     'icon' => 'scissors', 'ability' => Access::MANAGE_SALON],
-    ['href' => '/panel/services', 'label' => 'خدمات',         'icon' => 'tag',      'ability' => Access::MANAGE_SALON],
-    ['href' => '/panel/qr',       'label' => 'کد QR',         'icon' => 'qr',       'ability' => null],
-    ['href' => '/panel/sms',      'label' => 'الگوی پیامک',   'icon' => 'message',  'ability' => Access::MANAGE_SALON],
-    ['href' => '/panel/settings', 'label' => 'تنظیمات سالن',  'icon' => 'cog',      'ability' => Access::MANAGE_SALON],
+    ['href' => '/panel/dashboard','label' => 'داشبورد',       'icon' => 'home',     'ability' => Access::MANAGE_SALON, 'needsSalon' => true],
+    ['href' => '/panel',          'label' => 'صف زنده',       'icon' => 'queue',    'ability' => null, 'needsSalon' => true],
+    ['href' => '/panel/bookings', 'label' => 'رزروها',        'icon' => 'calendar', 'ability' => null, 'needsSalon' => true],
+    ['href' => '/panel/customers','label' => 'مشتریان',       'icon' => 'users',    'ability' => Access::VIEW_CUSTOMERS, 'needsSalon' => true],
+    ['href' => '/panel/reports',  'label' => 'گزارش‌ها',       'icon' => 'chart',    'ability' => Access::MANAGE_SALON, 'needsSalon' => true],
+    ['href' => '/panel/staff',    'label' => 'آرایشگرها',     'icon' => 'scissors', 'ability' => Access::MANAGE_SALON, 'needsSalon' => true],
+    ['href' => '/panel/services', 'label' => 'خدمات',         'icon' => 'tag',      'ability' => Access::MANAGE_SALON, 'needsSalon' => true],
+    ['href' => '/panel/qr',       'label' => 'کد QR',         'icon' => 'qr',       'ability' => null, 'needsSalon' => true],
+    ['href' => '/panel/sms',      'label' => 'الگوی پیامک',   'icon' => 'message',  'ability' => Access::MANAGE_SALON, 'needsSalon' => true],
+    ['href' => '/panel/settings', 'label' => 'تنظیمات سالن',  'icon' => 'cog',      'ability' => Access::MANAGE_SALON, 'needsSalon' => true],
+    // حساب خودِ کاربر — برای همه، حتی آرایشگر و پذیرش.
+    ['href' => '/panel/account',  'label' => 'حساب کاربری',   'icon' => 'user',     'ability' => null, 'needsSalon' => false],
 ];
+/*
+ * کسی که عضو هیچ سالنی نیست، تبِ سالن نمی‌بیند.
+ *
+ * مدیر کلی که نصاب ساخته دقیقاً همین حالت است. بدون این شرط، نوار
+ * پایین «صف زنده» و «رزروها» را نشانش می‌داد و هر کدام را که می‌زد،
+ * TenantRequired پرتش می‌کرد به «سالن تازه بساز» — پنج تب که همه به
+ * یک جای اشتباه می‌روند.
+ */
+$hasSalon = Auth::memberships() !== [];
+
+/*
+ * و به‌جایش، چیزهایی که *بدون* سالن معنی دارند.
+ *
+ * وگرنه نوار پایین یک تبِ تنها می‌شد («حساب کاربری») و مدیر کل هیچ
+ * راهی به پنل خودش نداشت جز تایپ کردن نشانی.
+ */
+if (!$hasSalon) {
+    if (Auth::isPlatformAdmin()) {
+        array_unshift($navItems, [
+            'href' => '/platform', 'label' => 'مدیریت کل', 'icon' => 'shield',
+            'ability' => null, 'needsSalon' => false,
+        ]);
+    }
+    $navItems[] = [
+        'href' => '/onboarding', 'label' => 'سالن تازه', 'icon' => 'plus',
+        'ability' => null, 'needsSalon' => false,
+    ];
+}
+
 $visibleNav = array_values(array_filter(
     $navItems,
-    static fn ($i) => $i['ability'] === null || Access::allows($i['ability'])
+    static fn ($i) => ($i['needsSalon'] === false || $hasSalon)
+        && ($i['ability'] === null || Access::allows($i['ability']))
 ));
 $currentPath = '/' . trim($_SERVER['REQUEST_URI'] ?? '', '/');
 

@@ -32,6 +32,10 @@ $router->group(['middleware' => [PlatformAdminRequired::class]], function ($rout
         $router->post('/platform/invoices/{id}/pay', [PlatformController::class, 'payInvoice']);
         $router->post('/platform/invoices/{id}/cancel', [PlatformController::class, 'cancelInvoice']);
         $router->post('/platform/users/{id}/admin', [PlatformController::class, 'togglePlatformAdmin']);
+        // ساخت کاربر و بازنشانی رمز — جایگزین tools/make_platform_admin.php
+        // که به SSH نیاز داشت و روی هاست اشتراکی قابل اجرا نبود.
+        $router->post('/platform/users', [PlatformController::class, 'storeUser']);
+        $router->post('/platform/users/{id}/password', [PlatformController::class, 'resetUserPassword']);
 
         $router->post('/platform/{id}/impersonate', [PlatformController::class, 'impersonate']);
         $router->post('/platform/{id}/plan', [PlatformController::class, 'updatePlan']);

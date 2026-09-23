@@ -201,6 +201,31 @@ final class HealthCheck
                 'hint' => $utf8mb4 ? '' : 'باید utf8mb4 باشد وگرنه متن فارسی و اموجی خراب ذخیره می‌شود.',
             ];
 
+            /*
+             * ساعت دیتابیس با ساعت برنامه یکی است؟
+             *
+             * ‎DB::connection()‎ خودش هنگام اتصال ‎SET time_zone‎ می‌زند،
+             * ولی بعضی هاست‌ها اجازه‌اش را نمی‌دهند و آن دستور بی‌صدا
+             * رد می‌شود. آن‌وقت محدودیت تلاش ورود، انقضای لینک، و
+             * حفاظ رزرو همه غلط حساب می‌کنند بی‌آنکه چیزی خطا بدهد.
+             */
+            $dbNow = (string) (DB::selectOne('SELECT NOW() AS n')['n'] ?? '');
+            $drift = $dbNow === '' ? null : abs(strtotime($dbNow) - time());
+
+            $rows[] = [
+                'label' => 'هم‌ساعتیِ دیتابیس',
+                'status' => $drift === null ? self::WARN : ($drift <= 2 ? self::OK : self::FAIL),
+                'value' => $drift === null
+                    ? 'نامشخص'
+                    : ($drift <= 2 ? 'هم‌ساعت' : $drift . ' ثانیه اختلاف'),
+                'hint' => $drift !== null && $drift > 2
+                    ? 'ساعت MySQL با ساعت PHP یکی نیست. محدودیت تلاش ورود، انقضای لینک ورود و '
+                      . 'حفاظ رزرو به آن تکیه دارند و همه بی‌صدا غلط حساب می‌کنند. '
+                      . 'از میزبان بخواهید اجازهٔ «SET time_zone» را بدهد، یا منطقهٔ زمانی '
+                      . 'MySQL را روی همان APP_TIMEZONE بگذارد.'
+                    : '',
+            ];
+
             $pending = (new Migrator(BASE_PATH . '/database/migrations'))->pendingCount();
             $rows[] = [
                 'label' => 'مهاجرت‌های اجرانشده',

@@ -35,6 +35,8 @@ final class AuditLog
     public const INVOICE_CANCELLED = 'invoice_cancelled';
     public const PLATFORM_ADMIN_GRANTED = 'platform_admin_granted';
     public const PLATFORM_ADMIN_REVOKED = 'platform_admin_revoked';
+    public const USER_CREATED = 'user_created';
+    public const USER_PASSWORD_RESET = 'user_password_reset';
 
     /** عنوان فارسیِ هر کنش، برای صفحهٔ گزارش. */
     private const LABELS = [
@@ -47,6 +49,8 @@ final class AuditLog
         self::INVOICE_CANCELLED => 'لغو صورتحساب',
         self::PLATFORM_ADMIN_GRANTED => 'دادن دسترسی مدیر پلتفرم',
         self::PLATFORM_ADMIN_REVOKED => 'گرفتن دسترسی مدیر پلتفرم',
+        self::USER_CREATED => 'ساخت کاربر',
+        self::USER_PASSWORD_RESET => 'بازنشانی رمز کاربر',
     ];
 
     /**

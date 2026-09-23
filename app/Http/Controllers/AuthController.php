@@ -11,6 +11,7 @@ use App\Core\Response;
 use App\Core\Session;
 use App\Domain\Identity\LoginLinkService;
 use App\Domain\Identity\OtpService;
+use App\Domain\Identity\PasswordService;
 use App\Domain\Identity\UserRepository;
 use App\Support\IranMobile;
 
@@ -25,19 +26,56 @@ final class AuthController extends Controller
         return $this->page('layouts.auth', 'auth.login', ['error' => Session::flash('error'), 'title' => 'ورود']);
     }
 
+    /**
+     * ورود با شماره و رمز.
+     *
+     * راهِ اصلیِ کارکنان است. کد پیامکی سر جایش می‌ماند ولی برای کسی
+     * که روزی چند بار وارد می‌شود، هر بار صبر کردن پای گوشی یعنی
+     * برنامه را باز نکردن.
+     */
+    public function loginWithPassword(Request $request): Response
+    {
+        $result = PasswordService::attempt(
+            (string) $request->input('phone', ''),
+            (string) $request->input('password', ''),
+            $request->ip()
+        );
+
+        if (!$result['ok']) {
+            // شماره را برمی‌گردانیم تا کاربر دوباره تایپش نکند؛ رمز را نه.
+            Session::flash('_old', ['phone' => (string) $request->input('phone', '')]);
+
+            return $this->withError($result['error'] ?? 'ورود ناموفق بود.', '/login');
+        }
+
+        Auth::login((int) $result['user_id']);
+
+        return $this->afterLogin();
+    }
+
     public function sendOtp(Request $request): Response
     {
         $raw = (string) $request->input('phone', '');
         $phone = IranMobile::tryParse($raw);
 
         if ($phone === null) {
-            return $this->withError('شمارهٔ موبایل نامعتبر است.', '/login');
+            Session::flash('_old', ['phone' => $raw]);
+
+            return $this->withError(
+                $raw === ''
+                    ? 'اول شمارهٔ موبایل‌تان را بنویسید، بعد این دکمه را بزنید.'
+                    : 'شمارهٔ موبایل نامعتبر است.',
+                '/login'
+            );
         }
 
         $otp = new OtpService();
         $result = $otp->request($phone);
 
         if (!$result['ok']) {
+            // شماره را نگه می‌داریم تا فرم خالی برنگردد.
+            Session::flash('_old', ['phone' => $raw]);
+
             return $this->withError($result['error'] ?? 'خطا در ارسال کد', '/login');
         }
 
@@ -127,6 +165,19 @@ final class AuthController extends Controller
 
         if (count($memberships) > 1) {
             return $this->redirect('/salons');
+        }
+
+        /*
+         * مدیر کلی که عضو هیچ سالنی نیست، به پنل پلتفرم می‌رود نه به
+         * فرم ساخت سالن.
+         *
+         * این دقیقاً حالتِ مدیری است که نصاب ساخته: او سالن ندارد و
+         * قرار هم نیست داشته باشد — کارش نظارت بر همهٔ سالن‌هاست.
+         * فرستادنش به «سالن تازه بساز» یعنی گفتن «تو جای اشتباهی
+         * آمده‌ای» به کسی که صاحب کل سامانه است.
+         */
+        if (Auth::isPlatformAdmin()) {
+            return $this->redirect('/platform');
         }
 
         return $this->redirect('/onboarding');

@@ -8,10 +8,12 @@ use App\Core\Auth;
 use App\Core\DB;
 use App\Core\Request;
 use App\Core\Response;
+use App\Domain\Identity\PasswordService;
 use App\Domain\Platform\AuditLog;
 use App\Domain\Platform\InvoiceRepository;
 use App\Domain\Platform\PlanRepository;
 use App\Domain\Platform\SalonAdminRepository;
+use App\Support\IranMobile;
 use App\Support\Money;
 use DateTimeImmutable;
 
@@ -356,6 +358,92 @@ final class PlatformController extends Controller
             $making ? 'این کاربر حالا مدیر پلتفرم است.' : 'دسترسی مدیر پلتفرم گرفته شد.',
             '/platform/users'
         );
+    }
+
+    /**
+     * ساخت کاربر تازه، بدون نیاز به اینکه خودش وارد شده باشد.
+     *
+     * تا پیش از این، کاربر فقط وقتی وجود پیدا می‌کرد که یک بار با کد
+     * پیامکی وارد شود. یعنی مدیر نمی‌توانست پیش از شروع کار، حساب
+     * پذیرشِ تازه را آماده کند — و روی هاستی که پیامکش هنوز تنظیم
+     * نشده، اصلاً نمی‌توانست.
+     */
+    public function storeUser(Request $request): Response
+    {
+        $name = trim((string) $request->input('name', ''));
+        $rawPhone = (string) $request->input('phone', '');
+        $password = (string) $request->input('password', '');
+        $makeAdmin = $request->input('is_platform_admin') !== null;
+
+        $phone = IranMobile::tryParse($rawPhone);
+        if ($phone === null) {
+            return $this->withError('شمارهٔ موبایل نامعتبر است.', '/platform/users');
+        }
+
+        if (DB::selectOne('SELECT id FROM users WHERE phone = ?', [$phone->e164]) !== null) {
+            return $this->withError('کاربری با این شماره از قبل هست.', '/platform/users');
+        }
+
+        // رمز اختیاری است: کاربری که رمز ندارد با کد پیامکی وارد می‌شود.
+        if ($password !== '') {
+            $weak = PasswordService::reject($password, $rawPhone);
+            if ($weak !== null) {
+                return $this->withError($weak, '/platform/users');
+            }
+        }
+
+        $userId = (int) DB::insert('users', [
+            'phone' => $phone->e164,
+            'name' => $name !== '' ? $name : null,
+            'is_platform_admin' => $makeAdmin ? 1 : 0,
+        ]);
+
+        if ($password !== '') {
+            PasswordService::set($userId, $password);
+        }
+
+        AuditLog::record(AuditLog::USER_CREATED, null, 'user', $userId, [
+            'phone' => $phone->e164,
+            'platform_admin' => $makeAdmin,
+        ]);
+
+        return $this->withSuccess(
+            'کاربر ساخته شد' . ($password !== '' ? ' و رمزش گذاشته شد.' : ' — با کد پیامکی وارد می‌شود.'),
+            '/platform/users'
+        );
+    }
+
+    /**
+     * بازنشانی رمز یک کاربر.
+     *
+     * مدیر رمز تازه را می‌نویسد و شفاهی به صاحبش می‌دهد. جایگزینِ
+     * «فراموشی رمز» با ایمیل است، که نداریم چون ایمیل نداریم.
+     *
+     * رمز قبلی هرگز نمایش داده نمی‌شود و نمی‌تواند هم بشود — چیزی جز
+     * hash ذخیره نشده.
+     */
+    public function resetUserPassword(Request $request): Response
+    {
+        $id = (int) $request->param('id');
+        $user = DB::selectOne('SELECT id, phone FROM users WHERE id = ?', [$id]);
+
+        if ($user === null) {
+            return $this->withError('کاربر یافت نشد.', '/platform/users');
+        }
+
+        $password = (string) $request->input('password', '');
+        $weak = PasswordService::reject($password, (string) $user['phone']);
+        if ($weak !== null) {
+            return $this->withError($weak, '/platform/users');
+        }
+
+        PasswordService::set($id, $password);
+
+        AuditLog::record(AuditLog::USER_PASSWORD_RESET, null, 'user', $id, [
+            'phone' => $user['phone'],
+        ]);
+
+        return $this->withSuccess('رمز این کاربر عوض شد. خودتان به او اطلاع دهید.', '/platform/users');
     }
 
     // ─── مصرف پیامک و گزارش فعالیت ───────────────────────────────────
