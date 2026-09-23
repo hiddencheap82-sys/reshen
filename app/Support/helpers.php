@@ -19,7 +19,7 @@ if (!defined('FILLED_ICONS')) {
      * include کردنش خطای مرگبار ندهد، و const داخل if مجاز نیست.
      */
     define('FILLED_ICONS', [
-        'calendar', 'chart', 'clock', 'cog', 'message', 'more', 'qr',
+        'calendar', 'chart', 'clock', 'cog', 'home', 'message', 'more', 'qr',
         'queue', 'scissors', 'shield', 'tag', 'user', 'users', 'wallet',
     ]);
 }

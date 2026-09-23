@@ -16,6 +16,12 @@ if (Auth::isImpersonating()) {
  * ability برابر null یعنی هر کسی که عضو سالن است.
  */
 $navItems = [
+    /*
+     * داشبورد اول می‌آید ولی فقط برای صاحب و مدیر. آرایشگر و پذیرش
+     * اصلاً نمی‌بینندش و تبِ اولشان همان «صف زنده» می‌ماند — چیزی که
+     * واقعاً وسط کار لازمشان است.
+     */
+    ['href' => '/panel/dashboard','label' => 'داشبورد',       'icon' => 'home',     'ability' => Access::MANAGE_SALON],
     ['href' => '/panel',          'label' => 'صف زنده',       'icon' => 'queue',    'ability' => null],
     ['href' => '/panel/bookings', 'label' => 'رزروها',        'icon' => 'calendar', 'ability' => null],
     ['href' => '/panel/customers','label' => 'مشتریان',       'icon' => 'users',    'ability' => Access::VIEW_CUSTOMERS],

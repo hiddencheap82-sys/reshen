@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Core\Response;
 use App\Http\Controllers\BookingsController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SalonCustomersController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\QrController;
@@ -103,6 +104,11 @@ $router->group(['middleware' => [AuthRequired::class, TenantRequired::class]], f
             $router->post('/panel/services/{id}/override', [ServiceController::class, 'setOverride']);
             $router->post('/panel/services/{id}/toggle', [ServiceController::class, 'toggle']);
         });
+
+        // ─── داشبورد ─────────────────────────────────────────────────────────
+        // زیر همان گروهِ «صاحب و مدیر» است چون درآمد کل سالن را نشان
+        // می‌دهد، و آن را آرایشگر نباید ببیند (Access::VIEW_SALON_EARNINGS).
+        $router->get('/panel/dashboard', [DashboardController::class, 'index']);
 
         // ─── گزارش‌ها ─────────────────────────────────────────────────────────
         $router->get('/panel/reports', [ReportController::class, 'daily']);

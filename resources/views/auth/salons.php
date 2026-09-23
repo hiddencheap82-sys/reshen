@@ -5,7 +5,8 @@
 <div class="space-y-2">
 <?php foreach ($memberships as $m): ?>
   <a href="<?= url('salons/' . $m['salon_id'] . '/switch') ?>"
-     class="flex items-center justify-between rounded-xl border border-ink-200 hover:border-brand-300 hover:bg-gold-50 px-4 py-3 transition">
+     class="tap flex items-center justify-between rounded-xl border border-ink-200
+            hover:border-ink-300 hover:bg-ink-50 px-4 py-3 min-h-[44px] transition">
     <span class="font-medium text-ink-800"><?= e($m['salon_name']) ?></span>
     <span class="text-xs text-ink-400"><?= e(['owner'=>'صاحب سالن','manager'=>'مدیر','staff'=>'آرایشگر','reception'=>'پذیرش'][$m['role']] ?? $m['role']) ?></span>
   </a>

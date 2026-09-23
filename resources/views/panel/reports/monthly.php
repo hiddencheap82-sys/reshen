@@ -6,7 +6,12 @@ $maxDaily = max(array_map(fn($d) => (int)$d['total'], $dailySeries) ?: [1]);
 ?>
 <div class="flex items-center justify-between mb-5">
   <h1 class="page-title">گزارش ماهانه — <?= e($monthNames[$jm]) ?> <?= fa_num($jy) ?></h1>
-  <a href="<?= url('panel/reports') ?>" class="text-xs text-accent hover:underline">گزارش روزانه ←</a>
+  <a href="<?= e(url('panel/reports')) ?>"
+     class="glass h-11 inline-flex items-center gap-1.5 rounded-xl px-3.5
+            text-[12px] font-bold text-accent tap shrink-0">
+    <?= icon('chevron-start', 'w-3.5 h-3.5') ?>
+    گزارش روزانه
+  </a>
 </div>
 
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">

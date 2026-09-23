@@ -32,7 +32,8 @@ include __DIR__ . '/_nav.php';
           </span>
           <?php if ($log['salon_name'] !== null): ?>
             <a href="<?= e(url('platform/' . $log['salon_id'])) ?>"
-               class="text-[12px] text-accent truncate">— <?= e($log['salon_name']) ?></a>
+               class="tap inline-flex items-center min-h-[44px] -my-3 max-w-full
+                      text-[12px] text-accent truncate">— <?= e($log['salon_name']) ?></a>
           <?php endif; ?>
         </div>
 
