@@ -149,4 +149,63 @@ final class DocsMatchCodeTest extends TestCase
 
         $this->assertSame([], $wrong, 'سند می‌گوید این جدول‌ها در آن مهاجرت ساخته شده‌اند، ولی نیستند.');
     }
+
+    /**
+     * نام ردیف‌های صفحهٔ سلامت، همان‌هایی که در سند نوشته شده.
+     *
+     * چرا: وقتی کرون حذف شد، ردیف «آخرین اجرای کرون» شد «آخرین اجرای
+     * زمان‌بند» — ولی جدول عیب‌یابیِ راهنمای cPanel هنوز اسم قدیمی را
+     * می‌داد. کسی که پیامکش نمی‌رفت، دنبال ردیفی می‌گشت که وجود نداشت.
+     *
+     * قاعده: در هر خطی از سند که از `doctor` حرف می‌زند، هر عبارت داخل
+     * «» باید یک برچسبِ واقعی در HealthCheck باشد.
+     */
+    public function testDoctorRowNamesInDocsReallyExist(): void
+    {
+        $code = (string) file_get_contents(BASE_PATH . '/app/Domain/Diagnostics/HealthCheck.php');
+        preg_match_all("~'label' => '([^']+)'~u", $code, $m);
+        $labels = $m[1];
+        $this->assertNotEmpty($labels, 'هیچ برچسبی در HealthCheck پیدا نشد — الگوی جست‌وجو کهنه شده.');
+
+        $wrong = [];
+        $checked = 0;
+
+        foreach (self::docFiles() as $path) {
+            foreach (explode("\n", (string) file_get_contents($path)) as $no => $line) {
+                if (!str_contains($line, 'doctor')) {
+                    continue;
+                }
+
+                preg_match_all('~«([^»]+)»~u', $line, $q);
+
+                foreach ($q[1] as $phrase) {
+                    $checked++;
+
+                    if (!in_array($phrase, $labels, true)) {
+                        $wrong[] = basename($path) . ':' . ($no + 1) . ' → «' . $phrase . '»';
+                    }
+                }
+            }
+        }
+
+        $this->assertGreaterThan(0, $checked, 'هیچ ارجاعی به ردیف‌های doctor در سندها پیدا نشد.');
+        $this->assertSame([], $wrong, 'سند این ردیف‌ها را به doctor نسبت می‌دهد، ولی HealthCheck چنین برچسبی ندارد.');
+    }
+
+    /** @return list<string> همهٔ فایل‌های md زیر docs/ */
+    private static function docFiles(): array
+    {
+        $out = [];
+        $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(BASE_PATH . '/docs'));
+
+        foreach ($it as $file) {
+            if ($file->isFile() && $file->getExtension() === 'md') {
+                $out[] = $file->getPathname();
+            }
+        }
+
+        sort($out);
+
+        return $out;
+    }
 }
