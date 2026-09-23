@@ -9,6 +9,7 @@ use App\Core\Request;
 use App\Core\Response;
 use App\Domain\Access\Access;
 use App\Domain\Booking\BookingService;
+use App\Domain\Booking\NewBookings;
 use App\Domain\Catalog\ServiceRepository;
 use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Staff\StaffRepository;
@@ -55,8 +56,22 @@ final class BookingsController extends Controller
             $staffFilter
         );
 
+        /*
+         * رزروهای اینترنتیِ تازه — بالای فهرست، با نشانِ خودشان.
+         *
+         * پیش از «دیدم» شمرده می‌شود و بعدش علامت می‌خورد، تا همین
+         * بازدید هم آن‌ها را ببیند. اگر برعکس بود، آرایشگر نشانِ قرمز
+         * را می‌دید، صفحه را باز می‌کرد، و هیچ‌چیزِ برجسته‌ای نمی‌دید —
+         * که بدتر از نبودنِ نشان است.
+         */
+        $fresh = NewBookings::countFor($salonId, (int) Auth::id());
+        $recent = $fresh > 0 ? NewBookings::recent($salonId) : [];
+        NewBookings::markSeen($salonId, (int) Auth::id());
+
         return $this->page('layouts.panel', 'panel.bookings.index', [
             'title' => 'رزروها',
+            'freshCount' => $fresh,
+            'freshBookings' => $recent,
             'days' => $this->groupByDay($rows, $from, $to),
             'counts' => $repo->scheduledCounts($salonId, $from->format('Y-m-d'), $to->format('Y-m-d')),
             'from' => $from,

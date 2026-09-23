@@ -23,9 +23,16 @@ final class SmsNotifier
     /**
      * @param array<string,string|int> $vars متغیرهای الگو، با نام
      * @param bool|null $critical اگر null باشد از خود الگو خوانده می‌شود
+     * @param string|null $toPhone گیرنده، اگر مشتریِ همین نوبت نیست
      */
-    public function notify(int $salonId, array $appointment, string $templateCode, array $vars, ?bool $critical = null): bool
-    {
+    public function notify(
+        int $salonId,
+        array $appointment,
+        string $templateCode,
+        array $vars,
+        ?bool $critical = null,
+        ?string $toPhone = null
+    ): bool {
         if (!SmsTemplates::exists($templateCode)) {
             return false;
         }
@@ -35,7 +42,17 @@ final class SmsNotifier
         // جدول پیامک‌ها بماند و بعداً بشود فهمید چه چیزی برای مشتری رفت.
         $body = SmsTemplates::render($templateCode, $vars);
 
-        $toPhone = DB::selectOne('SELECT phone FROM customers WHERE id = ?', [$appointment['customer_id']])['phone'] ?? null;
+        /*
+         * پیش‌فرض، مشتریِ همین نوبت است. تنها استثنا خبر دادن به خودِ
+         * سالن است (`salon_new_booking`) که گیرنده‌اش شمارهٔ سالن است،
+         * نه مشتری — ولی همچنان به همین نوبت بسته می‌ماند تا در
+         * جدول پیامک‌ها بشود دید برای کدام رزرو رفته.
+         */
+        $toPhone ??= DB::selectOne(
+            'SELECT phone FROM customers WHERE id = ?',
+            [$appointment['customer_id']]
+        )['phone'] ?? null;
+
         if ($toPhone === null) {
             return false;
         }

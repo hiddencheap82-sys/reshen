@@ -141,7 +141,8 @@ foreach (array_keys($slots) as $time) {
               <div class="grid grid-cols-3 sm:grid-cols-4 gap-1.5">
                 <?php foreach ($times as $time): ?>
                   <label class="pick relative block tap">
-                    <input type="radio" name="time" value="<?= e($time) ?>" required class="sr-only">
+                    <input type="radio" name="time" value="<?= e($time) ?>" required class="sr-only"
+                           data-missing="اول سانس را انتخاب کن">
                     <span class="slot glass h-11 grid place-items-center rounded-xl text-[13px] font-bold
                                  text-ink-800 tabular-nums cursor-pointer transition-all duration-200"><?= e(fa_time($time)) ?></span>
                   </label>

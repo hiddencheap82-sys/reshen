@@ -84,6 +84,15 @@ $currentPath = '/' . trim($_SERVER['REQUEST_URI'] ?? '', '/');
  * سالن هم هست و باید بتواند برگردد.
  */
 $onPlatform = str_starts_with($currentPath, '/platform');
+
+/*
+ * نشانِ «نوبت تازه» روی تب رزروها.
+ *
+ * تنها جایی است که رزروِ اینترنتیِ روزهای بعد جلوی چشم می‌آید — «صف
+ * زنده» فقط امروز را دارد. یک کوئری شمارشی است و هر صفحه یک بار
+ * اجرا می‌شود.
+ */
+$newBookings = $hasSalon ? App\Domain\Booking\NewBookings::forCurrentUser() : 0;
 ?>
 <!doctype html>
 <html lang="fa" dir="rtl" data-font="<?= e((string) App\Core\Config::get('reshen.ui.font', 'vazirmatn')) ?>" <?= theme_attr(App\Core\Session::get('_salon_theme')) ?>>
@@ -117,7 +126,13 @@ $onPlatform = str_starts_with($currentPath, '/platform');
       <?php foreach ($visibleNav as $item): $active = str_starts_with($currentPath, url($item['href'] === '/panel' ? '/panel' : $item['href'])) && ($item['href']!=='/panel' || $currentPath===rtrim(url('/panel'),'/')); ?>
       <a href="<?= url($item['href']) ?>" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-ink-600 hover:bg-ink-50 <?= $active ? 'nav-active' : '' ?>">
         <?= nav_icon($item['icon'], $active) ?>
-        <span><?= e($item['label']) ?></span>
+        <span class="flex-1"><?= e($item['label']) ?></span>
+        <?php if ($item['href'] === '/panel/bookings' && $newBookings > 0): ?>
+          <span class="shrink-0 min-w-[20px] h-5 px-1.5 rounded-full grid place-items-center
+                       text-[11px] font-extrabold tabular-nums text-white on-tint"
+                style="background:var(--bad-strong)"
+                aria-label="<?= e(fa_num($newBookings)) ?> نوبت تازه"><?= e(fa_num($newBookings)) ?></span>
+        <?php endif; ?>
       </a>
       <?php endforeach; ?>
     </nav>
@@ -228,7 +243,14 @@ $onPlatform = str_starts_with($currentPath, '/platform');
                       text-[12px] font-semibold <?= $isActive($item) ? 'text-accent' : 'text-ink-600' ?>"
                <?= $isActive($item) ? 'aria-current="page"' : '' ?>
                style="<?= $isActive($item) ? 'background:var(--accent-soft)' : '' ?>">
-              <?= nav_icon($item['icon'], $isActive($item), 'w-5 h-5 shrink-0') ?>
+              <span class="relative">
+                <?= nav_icon($item['icon'], $isActive($item), 'w-5 h-5 shrink-0') ?>
+                <?php if ($item['href'] === '/panel/bookings' && $newBookings > 0): ?>
+                  <span class="absolute -top-1 -end-1.5 min-w-[16px] h-4 px-1 rounded-full grid place-items-center
+                               text-[10px] font-extrabold tabular-nums text-white on-tint"
+                        style="background:var(--bad-strong)"><?= e(fa_num($newBookings)) ?></span>
+                <?php endif; ?>
+              </span>
               <span class="max-w-full truncate px-1"><?= e($item['label']) ?></span>
             </a>
           <?php endforeach; ?>
@@ -246,7 +268,15 @@ $onPlatform = str_starts_with($currentPath, '/platform');
                 <?= $on ? 'text-accent font-bold' : 'text-ink-400' ?>"
          <?= $on ? 'aria-current="page"' : '' ?>>
         <span class="tab-dot <?= $on ? 'tab-dot-on' : '' ?>" aria-hidden="true"></span>
-        <?= nav_icon($item['icon'], $on, 'w-5 h-5 shrink-0') ?>
+        <span class="relative">
+          <?= nav_icon($item['icon'], $on, 'w-5 h-5 shrink-0') ?>
+          <?php if ($item['href'] === '/panel/bookings' && $newBookings > 0): ?>
+            <span class="absolute -top-1 -end-1.5 min-w-[16px] h-4 px-1 rounded-full grid place-items-center
+                         text-[10px] font-extrabold tabular-nums text-white on-tint"
+                  style="background:var(--bad-strong)"
+                  aria-label="<?= e(fa_num($newBookings)) ?> نوبت تازه"><?= e(fa_num($newBookings)) ?></span>
+          <?php endif; ?>
+        </span>
         <span class="max-w-full truncate px-0.5"><?= e($item['label']) ?></span>
       </a>
     <?php endforeach; ?>

@@ -11,6 +11,8 @@
  * @var bool $isToday
  * @var bool $onlyMine
  * @var array $staffList
+ * @var int $freshCount
+ * @var array $freshBookings
  */
 
 use App\Support\JalaliCalendar;
@@ -57,6 +59,49 @@ $totalRows = array_sum(array_map(static fn ($d) => count($d['rows']), $days));
        aria-label="دو هفتهٔ بعد"><?= icon('chevron-end', 'w-4 h-4') ?></a>
   </nav>
 </div>
+
+<?php if ($freshCount > 0 && $freshBookings !== []): ?>
+  <!--
+    رزروهای اینترنتیِ تازه.
+
+    چرا بالای صفحه و جدا از فهرست: نوبتی که مشتری برای هفتهٔ بعد
+    گرفته، لای چهارده روزِ فهرست گم می‌شود. این بلوک همان چیزی است
+    که نشانِ قرمزِ نوار به آن اشاره می‌کرد — و فقط همین یک بار دیده
+    می‌شود، چون باز کردن این صفحه یعنی «دیدم».
+  -->
+  <section class="glass rounded-2xl overflow-hidden mb-5 hairline-accent">
+    <div class="px-4 pt-4 pb-2 flex items-center gap-2">
+      <h2 class="card-title flex-1">
+        <?= e(fa_num($freshCount)) ?> نوبت تازه از اینترنت
+      </h2>
+      <span class="text-[11px] text-ink-400">از آخرین باری که اینجا بودی</span>
+    </div>
+
+    <?php foreach ($freshBookings as $b): ?>
+      <?php $at = new DateTimeImmutable((string) $b['scheduled_at']); ?>
+      <a href="<?= e(url('q/' . $b['public_token'])) ?>"
+         class="tap flex items-center gap-3 px-4 py-3 border-t hover:bg-ink-50"
+         style="border-color:var(--line)">
+        <span class="w-9 h-9 shrink-0 rounded-xl grid place-items-center text-accent"
+              style="background:var(--accent-soft)" aria-hidden="true">
+          <?= icon('calendar', 'w-4 h-4') ?>
+        </span>
+        <span class="flex-1 min-w-0">
+          <span class="block text-[13px] font-bold text-ink-900 truncate">
+            <?= e($b['customer_name'] ?? $b['customer_phone'] ?? 'مشتری') ?>
+          </span>
+          <span class="block text-[12px] text-ink-500 tabular-nums">
+            <?= e(JalaliCalendar::humanDate($at)) ?> · <?= e(fa_time($at->format('H:i'))) ?>
+            <?php if (($b['staff_name'] ?? '') !== ''): ?>
+              · <?= e($b['staff_name']) ?>
+            <?php endif; ?>
+          </span>
+        </span>
+        <?= icon('chevron-end', 'w-4 h-4 text-ink-400 shrink-0') ?>
+      </a>
+    <?php endforeach; ?>
+  </section>
+<?php endif; ?>
 
 <dl class="grid grid-cols-3 gap-2 mb-5">
   <?php foreach ([

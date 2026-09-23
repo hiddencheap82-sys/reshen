@@ -551,6 +551,27 @@ html.dark[data-theme="ruby"]{
   /* همان، با رنگ خطا: کارتی که خبر بد می‌دهد از دور هم پیداست */
   .hairline-bad{box-shadow:inset 0 2px 0 0 var(--bad-strong)}
 
+  /*
+   * گروهی که باید از آن انتخاب شود ولی نشده.
+   *
+   * وقتی دکمه بدون انتخاب زده می‌شود، این کلاس یک لحظه روی گروه
+   * می‌نشیند تا چشم برود همان‌جا. مرورگر خودش نمی‌تواند این کار را
+   * بکند چون ورودی‌ها sr-only‌اند و حباب خطا جایی برای نشستن ندارد.
+   */
+  .needs-pick{
+    border-radius:var(--radius-card, 16px);
+    outline:2px solid var(--bad-strong);
+    outline-offset:6px;
+    animation:needs-pick-pulse .5s ease-out 2;
+  }
+  @keyframes needs-pick-pulse{
+    0%,100%{outline-color:var(--bad-strong)}
+    50%{outline-color:transparent}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .needs-pick{animation:none}
+  }
+
   /* ابزارهای رنگِ پالت — ویوها این‌ها را می‌نویسند، نه رنگ ثابت */
   .bg-accent{background-color:var(--accent)}
   .bg-accent-soft{background-color:var(--accent-soft)}

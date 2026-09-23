@@ -163,7 +163,8 @@ echo App\Core\View::render('components.jalali-calendar', [
               <div class="grid grid-cols-3 gap-2">
                 <?php foreach ($times as $time): $index++; ?>
                   <label class="pick relative block tap rise rise-<?= min((int) ceil($index / 6), 5) ?>">
-                    <input type="radio" name="time" value="<?= e($time) ?>" required class="sr-only">
+                    <input type="radio" name="time" value="<?= e($time) ?>" required class="sr-only"
+                           data-missing="اول یک ساعت را انتخاب کن">
                     <span class="slot glass h-12 grid place-items-center rounded-xl
                                  text-sm font-bold text-ink-800 tabular-nums cursor-pointer
                                  transition-all duration-200 ease-out-soft hover:shadow-lift">

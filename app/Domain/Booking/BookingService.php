@@ -134,6 +134,7 @@ final class BookingService
 
         $appointment = $appointments->find($salonId, $appointmentId);
         $this->sendConfirmation($salonId, $appointment, $customer);
+        $this->tellTheSalon($salonId, $appointment, $customer);
 
         return $appointment;
     }
@@ -179,5 +180,64 @@ final class BookingService
             'date' => JalaliCalendar::humanDate($at),
             'time' => Clock::hm($at->format('H:i')),
         ]);
+    }
+
+    /**
+     * خبر دادن به خودِ سالن.
+     *
+     * چرا: صفحهٔ «صف زنده» فقط امروز را نشان می‌دهد. نوبتی که مشتری
+     * برای هفتهٔ بعد گرفته، تا وقتی کسی خودش به «رزروها» سر نزند دیده
+     * نمی‌شود — و آرایشگری که تازه از دفترچه آمده، به سیستمی که
+     * ساکت است اعتماد نمی‌کند.
+     *
+     * فقط برای رزرو اینترنتی معنی دارد. نوبتی که خودِ سالن پشت
+     * پیشخوان ثبت کرده، خبر دادن ندارد — آرایشگر همان لحظه آنجا
+     * بوده. اینجا همه‌شان اینترنتی‌اند چون `createBooking` فقط از
+     * مسیر عمومی صدا زده می‌شود؛ رزرو دستی مسیر خودش را دارد.
+     *
+     * ستون `salon_notified_at` جلوی پیامک تکراری را می‌گیرد: بدون
+     * آن، هر بار که این متد به هر دلیلی دوباره اجرا شود، هم پول
+     * می‌رود هم آرایشگر دو بار خبردار می‌شود.
+     */
+    private function tellTheSalon(int $salonId, array $appointment, array $customer): void
+    {
+        $salon = DB::selectOne('SELECT phone FROM salons WHERE id = ?', [$salonId]);
+        $salonPhone = trim((string) ($salon['phone'] ?? ''));
+
+        // شمارهٔ سالن اختیاری است. نبودنش یعنی این خبر نمی‌رود — که
+        // صفحهٔ تنظیمات هم همین را می‌گوید.
+        if ($salonPhone === '') {
+            return;
+        }
+
+        if ($appointment['salon_notified_at'] !== null) {
+            return;
+        }
+
+        $at = new DateTimeImmutable($appointment['scheduled_at']);
+
+        $sent = (new SmsNotifier())->notify(
+            $salonId,
+            $appointment,
+            'salon_new_booking',
+            [
+                'name' => (string) ($customer['name'] ?? '') !== ''
+                    ? (string) $customer['name']
+                    : (string) $customer['phone'],
+                'date' => JalaliCalendar::humanDate($at),
+                'time' => Clock::hm($at->format('H:i')),
+            ],
+            null,
+            $salonPhone
+        );
+
+        if ($sent) {
+            DB::update(
+                'appointments',
+                ['salon_notified_at' => date('Y-m-d H:i:s')],
+                'id = :id',
+                ['id' => $appointment['id']]
+            );
+        }
     }
 }
