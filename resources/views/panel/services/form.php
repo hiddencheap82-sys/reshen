@@ -19,7 +19,7 @@ foreach ($overrides as $o) { $overrideMap[(int)$o['staff_id']] = $o; }
   <div>
     <label class="block text-sm text-ink-600 mb-1.5" for="name">نام خدمت</label>
     <input id="name" type="text" name="name" required value="<?= e($service['name'] ?? '') ?>" placeholder="اصلاح مو"
-      class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent">
+      class="field field-lg">
   </div>
   <div>
     <label for="svc-desc" class="block text-sm text-ink-600 mb-1.5">
@@ -27,8 +27,7 @@ foreach ($overrides as $o) { $overrideMap[(int)$o['staff_id']] = $o; }
     </label>
     <textarea name="description" id="svc-desc" rows="2" maxlength="300"
       placeholder="مثلاً: شست‌وشو، اصلاح با ماشین و قیچی، حالت‌دهی"
-      class="w-full rounded-xl border border-ink-200 bg-transparent px-4 py-3 text-sm leading-relaxed
-             focus:outline-none focus:ring-2 focus:ring-accent"><?= e($service['description'] ?? '') ?></textarea>
+      class="field leading-relaxed"><?= e($service['description'] ?? '') ?></textarea>
     <p class="text-[12px] text-ink-400 mt-1.5">
       در «منوی خدمات» که مشتری می‌بیند نمایش داده می‌شود.
     </p>
@@ -38,12 +37,12 @@ foreach ($overrides as $o) { $overrideMap[(int)$o['staff_id']] = $o; }
     <div>
       <label class="block text-sm text-ink-600 mb-1.5" for="duration_minutes">مدت (دقیقه)</label>
       <input id="duration_minutes" inputmode="numeric" type="number" name="duration_minutes" value="<?= e((string)($service['duration_minutes'] ?? 30)) ?>"
-        class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent">
+        class="field field-lg">
     </div>
     <div>
       <label class="block text-sm text-ink-600 mb-1.5" for="price_toman">قیمت (تومان)</label>
       <input id="price_toman" inputmode="numeric" type="number" name="price_toman" value="<?= e((string)($service ? App\Support\Money::fromRials((int)$service['price'])->toToman() : 0)) ?>"
-        class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent">
+        class="field field-lg">
     </div>
   </div>
   <button type="submit" class="btn-ink w-full">ذخیره</button>

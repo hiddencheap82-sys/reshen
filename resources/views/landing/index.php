@@ -37,7 +37,7 @@
           <?php endif; ?>
         </span>
       </span>
-      <?= icon('chevron-end', 'w-4 h-4 text-ink-300') ?>
+      <?= icon('chevron-end', 'w-4 h-4 text-ink-400') ?>
     </a>
   </section>
 <?php endif; ?>
@@ -46,7 +46,7 @@
   <section class="mb-5">
     <a href="<?= e(url('platform')) ?>"
        class="tap glass rounded-2xl p-4 flex items-center gap-3 hover:shadow-lift transition-shadow">
-      <span class="w-11 h-11 shrink-0 rounded-xl grid place-items-center text-amber-600"
+      <span class="w-11 h-11 shrink-0 rounded-xl grid place-items-center text-warn"
             style="background:var(--accent-soft)" aria-hidden="true">
         <?= icon('shield', 'w-5 h-5') ?>
       </span>
@@ -54,7 +54,7 @@
         <span class="block text-[14px] font-bold text-ink-900">پنل پلتفرم</span>
         <span class="block text-[12px] text-ink-400">همهٔ سالن‌ها، پلن‌ها و صورتحساب‌ها</span>
       </span>
-      <?= icon('chevron-end', 'w-4 h-4 text-ink-300') ?>
+      <?= icon('chevron-end', 'w-4 h-4 text-ink-400') ?>
     </a>
   </section>
 <?php endif; ?>
@@ -85,7 +85,7 @@
             : 'با شمارهٔ موبایلت وارد شو' ?>
       </span>
     </span>
-    <?= icon('chevron-end', 'w-4 h-4 text-ink-300') ?>
+    <?= icon('chevron-end', 'w-4 h-4 text-ink-400') ?>
   </a>
 
   <!-- صاحب سالن -->
@@ -102,7 +102,7 @@
           <?= $salonCount === 0 ? 'اولین سالن را همین‌جا بساز' : 'صف، نوبت‌ها و مشتری‌ها' ?>
         </span>
       </span>
-      <?= icon('chevron-end', 'w-4 h-4 text-ink-300') ?>
+      <?= icon('chevron-end', 'w-4 h-4 text-ink-400') ?>
     </a>
   <?php endif; ?>
 

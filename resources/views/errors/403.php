@@ -17,7 +17,7 @@
 <body class="min-h-dvh grid place-items-center px-5" style="background:var(--bg)">
   <main class="w-full max-w-sm text-center">
     <div class="glass rounded-2xl px-6 py-10">
-      <?= icon('shield', 'w-10 h-10 mx-auto text-ink-300 mb-4') ?>
+      <?= icon('shield', 'w-10 h-10 mx-auto text-ink-400 mb-4') ?>
       <h1 class="text-[16px] font-extrabold text-ink-900 mb-1.5">دسترسی ندارید</h1>
       <p class="text-[13px] text-ink-500 leading-relaxed mb-6">
         این بخش برای حساب شما باز نیست. اگر فکر می‌کنید اشتباهی شده،

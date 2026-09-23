@@ -11,8 +11,8 @@ include __DIR__ . '/_nav.php';
 
 $statusNames = [
     'pending' => ['در انتظار', 'text-ink-600', 'var(--fill-secondary)'],
-    'paid' => ['پرداخت شد', 'text-emerald-700', '#ECFDF5'],
-    'overdue' => ['معوق', 'text-red-700', '#FEF2F2'],
+    'paid' => ['پرداخت شد', 'text-ok', 'var(--ok-soft)'],
+    'overdue' => ['معوق', 'text-bad', 'var(--bad-soft)'],
     'cancelled' => ['لغو شد', 'text-ink-400', 'var(--fill-secondary)'],
 ];
 ?>

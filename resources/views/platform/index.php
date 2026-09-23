@@ -33,8 +33,8 @@ $paid = $invoiceTotals['paid'] ?? ['count' => 0, 'total' => 0];
     <?php if ($overdue['count'] > 0): ?>
       <a href="<?= e(url('platform/invoices?status=overdue')) ?>"
          class="tap flex items-center gap-3 rounded-xl px-3 py-2.5 mb-2 hover:bg-ink-50">
-        <span class="w-9 h-9 shrink-0 rounded-xl grid place-items-center text-red-600"
-              style="background:#FEF2F2" aria-hidden="true"><?= icon('wallet', 'w-4 h-4') ?></span>
+        <span class="w-9 h-9 shrink-0 rounded-xl grid place-items-center text-bad"
+              style="background:var(--bad-soft)" aria-hidden="true"><?= icon('wallet', 'w-4 h-4') ?></span>
         <span class="flex-1 min-w-0">
           <span class="block text-[13px] font-bold text-ink-900">
             <?= e(fa_num($overdue['count'])) ?> صورتحساب معوق
@@ -43,14 +43,14 @@ $paid = $invoiceTotals['paid'] ?? ['count' => 0, 'total' => 0];
             جمعاً <?= e(App\Support\Money::fromRials((int) $overdue['total'])->formatToman()) ?>
           </span>
         </span>
-        <?= icon('chevron-end', 'w-4 h-4 text-ink-300') ?>
+        <?= icon('chevron-end', 'w-4 h-4 text-ink-400') ?>
       </a>
     <?php endif; ?>
 
     <?php foreach (array_slice($quiet, 0, 5) as $s): ?>
       <a href="<?= e(url('platform/' . $s['id'])) ?>"
          class="tap flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-ink-50">
-        <span class="w-9 h-9 shrink-0 rounded-xl grid place-items-center text-amber-600"
+        <span class="w-9 h-9 shrink-0 rounded-xl grid place-items-center text-warn"
               style="background:var(--accent-soft)" aria-hidden="true"><?= icon('alert', 'w-4 h-4') ?></span>
         <span class="flex-1 min-w-0">
           <span class="block text-[13px] font-bold text-ink-900 truncate"><?= e($s['name']) ?></span>
@@ -62,7 +62,7 @@ $paid = $invoiceTotals['paid'] ?? ['count' => 0, 'total' => 0];
             <?php endif; ?>
           </span>
         </span>
-        <?= icon('chevron-end', 'w-4 h-4 text-ink-300') ?>
+        <?= icon('chevron-end', 'w-4 h-4 text-ink-400') ?>
       </a>
     <?php endforeach; ?>
 
@@ -107,7 +107,7 @@ $paid = $invoiceTotals['paid'] ?? ['count' => 0, 'total' => 0];
 <div class="grid grid-cols-2 gap-3 mb-5">
   <div class="glass rounded-2xl p-4">
     <div class="text-2xl font-extrabold tabular-nums
-                <?= $metrics['mae_minutes'] !== null && $metrics['mae_minutes'] > 12 ? 'text-red-500' : 'text-emerald-600' ?>">
+                <?= $metrics['mae_minutes'] !== null && $metrics['mae_minutes'] > 12 ? 'text-bad' : 'text-ok' ?>">
       <?= $metrics['mae_minutes'] !== null ? e(fa_num($metrics['mae_minutes'])) : '—' ?>
     </div>
     <div class="text-[12px] text-ink-500 mt-1">خطای تخمین (دقیقه)</div>
@@ -115,7 +115,7 @@ $paid = $invoiceTotals['paid'] ?? ['count' => 0, 'total' => 0];
   </div>
   <div class="glass rounded-2xl p-4">
     <div class="text-2xl font-extrabold tabular-nums
-                <?= $metrics['end_registration_rate'] !== null && $metrics['end_registration_rate'] < 70 ? 'text-red-500' : 'text-emerald-600' ?>">
+                <?= $metrics['end_registration_rate'] !== null && $metrics['end_registration_rate'] < 70 ? 'text-bad' : 'text-ok' ?>">
       <?= $metrics['end_registration_rate'] !== null ? e(fa_num($metrics['end_registration_rate'])) . '٪' : '—' ?>
     </div>
     <div class="text-[12px] text-ink-500 mt-1">نرخ ثبت پایان</div>
@@ -130,9 +130,9 @@ $paid = $invoiceTotals['paid'] ?? ['count' => 0, 'total' => 0];
        class="tap inline-flex items-center h-11 px-2 -me-2 text-[12px] font-bold text-accent">همه</a>
   </div>
   <div class="grid grid-cols-3 gap-3 text-center">
-    <?php foreach ([['پرداخت‌شده', $paid, 'text-emerald-600'],
+    <?php foreach ([['پرداخت‌شده', $paid, 'text-ok'],
                     ['در انتظار', $pending, 'text-ink-700'],
-                    ['معوق', $overdue, 'text-red-600']] as [$label, $bucket, $tone]): ?>
+                    ['معوق', $overdue, 'text-bad']] as [$label, $bucket, $tone]): ?>
       <div>
         <div class="text-[15px] font-extrabold tabular-nums <?= $tone ?>">
           <?= e(App\Support\Money::fromRials((int) $bucket['total'])->formatToman()) ?>

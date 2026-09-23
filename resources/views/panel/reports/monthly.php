@@ -28,8 +28,8 @@ $maxDaily = max(array_map(fn($d) => (int)$d['total'], $dailySeries) ?: [1]);
     <div class="text-[12px] text-ink-400 mt-1">انعام</div>
   </div>
   <div class="bg-green-50 rounded-2xl border border-green-100 p-4 text-center">
-    <div class="text-2xl font-extrabold text-green-800"><?= fa_num($rescued['count']) ?></div>
-    <div class="text-[12px] text-green-800 mt-1">نجات‌یافته با یادآور</div>
+    <div class="text-2xl font-extrabold text-ok"><?= fa_num($rescued['count']) ?></div>
+    <div class="text-[12px] text-ok mt-1">نجات‌یافته با یادآور</div>
   </div>
 </div>
 

@@ -120,7 +120,7 @@ $onPlatform = str_starts_with($currentPath, '/platform');
     </nav>
     <div class="p-3 border-t border-ink-100">
       <?php if (Auth::isPlatformAdmin()): ?>
-      <a href="<?= url('platform') ?>" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-amber-600 hover:bg-amber-50">
+      <a href="<?= url('platform') ?>" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-warn hover:bg-amber-50">
         <?= icon('shield', 'w-5 h-5') ?>
         پنل پلتفرم
       </a>
@@ -159,7 +159,7 @@ $onPlatform = str_starts_with($currentPath, '/platform');
     </header>
 
     <?php if (Auth::isImpersonating()): ?>
-      <div class="bg-amber-500 text-white text-xs px-4 py-2 flex items-center justify-between">
+      <div class="bg-amber-700 text-white on-tint text-[13px] px-4 py-2.5 flex items-center justify-between gap-2">
         <span>حالت پشتیبانی — در حال مشاهدهٔ «<?= e($salonName) ?>»</span>
         <a href="<?= url('platform/impersonate/stop') ?>" class="underline font-bold">خروج</a>
       </div>

@@ -36,8 +36,7 @@
     <label for="bk-phone" class="block text-[12px] font-bold text-ink-600 mb-1.5">شمارهٔ موبایل</label>
     <input type="tel" name="phone" id="bk-phone" required dir="ltr" autofocus
            inputmode="numeric" autocomplete="tel" placeholder="۰۹۱۲۳۴۵۶۷۸۹"
-           class="w-full h-12 rounded-xl border border-ink-200 bg-transparent px-4 text-left text-[17px]
-                  tracking-wider tabular-nums focus:outline-none focus:ring-2 focus:ring-accent">
+           class="field field-lg text-left tracking-wider tabular-nums">
     <p class="text-[12px] text-ink-400 mt-1.5">برای یادآوری نوبت و خبر دادن وقتی نوبتت نزدیک شد.</p>
   </div>
 
@@ -46,8 +45,7 @@
       نام <span class="font-normal text-ink-400">(اختیاری)</span>
     </label>
     <input type="text" name="name" id="bk-name" autocomplete="name"
-           class="w-full h-12 rounded-xl border border-ink-200 bg-transparent px-4 text-[14px]
-                  focus:outline-none focus:ring-2 focus:ring-accent">
+           class="field field-lg">
   </div>
 
 <?php

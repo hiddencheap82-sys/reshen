@@ -80,13 +80,13 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
         <label for="walkin-name" class="sr-only">نام مشتری (اختیاری)</label>
         <input type="text" id="walkin-name" name="name" placeholder="نام مشتری (اختیاری)"
                autocomplete="name"
-               class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm">
+               class="field">
       </div>
       <div>
         <label for="walkin-phone" class="sr-only">شمارهٔ موبایل (اختیاری)</label>
         <input inputmode="numeric" type="tel" id="walkin-phone" name="phone" dir="ltr"
                autocomplete="tel" placeholder="شمارهٔ موبایل (اختیاری)"
-               class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm text-left">
+               class="field text-left">
       </div>
     </div>
     <div>
@@ -101,7 +101,7 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
     </div>
     <div>
       <label class="block text-xs text-ink-500 mb-1.5">آرایشگر</label>
-      <select id="staff_id" name="staff_id" class="rounded-xl border border-ink-200 px-3 py-2.5 text-sm">
+      <select id="staff_id" name="staff_id" class="field">
         <option value="">فرقی نمی‌کند (کمترین صف)</option>
         <?php foreach ($staffList as $st): ?>
         <option value="<?= (int)$st['id'] ?>"><?= e($st['name']) ?></option>
@@ -167,7 +167,7 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
              aria-label="صف <?= e($group['staff']['name']) ?>">
 
       <header class="px-4 py-3 flex items-center gap-2.5 border-b" style="border-color:var(--line)">
-        <span class="w-8 h-8 rounded-lg grid place-items-center text-[12px] font-extrabold text-white shrink-0"
+        <span class="w-8 h-8 rounded-lg grid place-items-center text-[12px] font-extrabold text-white on-tint shrink-0"
               style="background:<?= e($group['staff']['color'] ?: '#57534E') ?>" aria-hidden="true">
           <?= e(mb_substr($group['staff']['name'], 0, 1)) ?>
         </span>
@@ -255,8 +255,8 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
             <form method="post" action="<?= e(url('panel/queue/' . $row['id'] . '/cancel')) ?>"
                   onsubmit="return confirm('این نوبت لغو شود؟')">
               <?= csrf_field() ?>
-              <button class="h-11 min-w-11 px-3.5 rounded-xl text-[12px] font-semibold text-red-600
-                             hover:bg-red-50 transition-colors cursor-pointer
+              <button class="h-11 min-w-11 px-3.5 rounded-xl text-[12px] font-semibold text-bad
+                             hover:bg-bad-soft transition-colors cursor-pointer
                              focus-visible:outline-2 focus-visible:outline-red-500"
                       aria-label="لغو نوبت <?= e($row['customer_name'] ?: 'مشتری') ?>">لغو</button>
             </form>

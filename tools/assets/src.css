@@ -46,8 +46,9 @@
      * را صاحب سالن عوض می‌کند، ولی «انجام شد» و «نشد» نباید با سلیقهٔ
      * او رنگ عوض کنند.
      */
-    --ok-soft:#ECFDF5;  --ok-strong:#065F46;
-    --bad-soft:#FEF2F2; --bad-strong:#B91C1C;
+    --ok-soft:#ECFDF5;   --ok-strong:#065F46;
+    --bad-soft:#FEF2F2;  --bad-strong:#B91C1C;
+    --warn-soft:#FFFBEB; --warn-strong:#B45309;
   }
   html.dark{
       --bg:#0A151E; --surface:#102431; --line:#1C3446;
@@ -59,8 +60,9 @@
       --fill-secondary:rgb(120 120 128 / .32);
       --fill-tertiary:rgb(118 118 128 / .24);
       /* در تاریکی زمینه تیره و متن روشن می‌شود، نه برعکسِ کم‌رنگ. */
-      --ok-soft:#10312A;  --ok-strong:#6EE7B7;
-      --bad-soft:#3B1A1A; --bad-strong:#FCA5A5;
+      --ok-soft:#10312A;   --ok-strong:#6EE7B7;
+      --bad-soft:#3B1A1A;  --bad-strong:#FCA5A5;
+      --warn-soft:#332818; --warn-strong:#FCD34D;
     }
   body{
     font-family:var(--font-sans);
@@ -606,6 +608,92 @@ html.dark .text-ink-600, html.dark .text-ink-500{color:#A8C0CE}
 html.dark .text-ink-400{color:#94AEBE}
 html.dark .text-ink-300{color:#4E6C80}
 html.dark .text-white{color:#E9F1F6}
+/*
+ * متنی که روی رنگِ *اشباع* می‌نشیند — آواتار، چیپ آرایشگر، نشان‌ها.
+ *
+ * آن رنگ بین حالت روشن و تیره عوض نمی‌شود (سبزِ آرایشگر همان سبز
+ * می‌ماند)، پس متنش هم نباید عوض شود. بدون این، ‎.text-white‎ در حالت
+ * تیره به ‎#E9F1F6‎ وارونه می‌شد و کنتراست روی همان سبز از ۴٫۷ به ۴٫۲
+ * می‌افتاد — یعنی زیر AA، بی‌آنکه چیزی خطا بدهد.
+ *
+ * دو قاعده لازم است نه یکی: قاعدهٔ وارونه‌کننده ‎html.dark .text-white‎
+ * است و ویژگی‌مندی‌اش از یک کلاسِ تنها بیشتر است.
+ */
+/*
+ * «خوب» و «بد» به‌صورت معنایی، نه با پلهٔ ثابتِ تیلویند.
+ *
+ * ‎text-emerald-600‎ روی سفید ۳٫۷۷ است و ‎text-red-500‎ هم ۳٫۷۶ — هر دو
+ * زیر AA برای متن کوچک. و در حالت تیره بدتر می‌شوند، چون رنگ ثابت
+ * می‌ماند و زمینه تیره می‌شود.
+ *
+ * این دو با تم برمی‌گردند: روشن‌مود تیره‌شان می‌کند، تیره‌مود
+ * روشن‌شان. هر دو حالت بالای ۴٫۵.
+ */
+/*
+ * ‎<summary>‎ یک دکمه است، پس باید اندازهٔ دکمه باشد.
+ *
+ * پیش‌فرض مرورگر ارتفاعش را از متن می‌گیرد — روی متن ۱۲ پیکسلی یعنی
+ * هدفی ۱۸ پیکسلی، کمتر از نصفِ حداقلِ ۴۴. چون همه‌جای برنامه از
+ * ‎<details>‎ برای «بیشتر» و «تنظیمات پیشرفته» استفاده می‌شود، این را
+ * یک بار اینجا درست می‌کنیم نه در هر ویو.
+ */
+summary{ min-height:44px; display:flex; align-items:center; }
+/* summaryهایی که عمداً پنهان‌اند (شیت ناوبری) از این قاعده بیرون. */
+summary.list-none:empty{ min-height:0; display:revert; }
+
+/*
+ * ورودی فرم — یک تعریف، همه‌جا.
+ *
+ * پیش از این همان استایل در ۳۲ جا کپی شده بود، در یازده نسخهٔ کمی
+ * متفاوت: بعضی ‎px-3 py-2.5 text-sm‎، بعضی ‎px-4 py-3‎، و — مهم‌تر —
+ * **نُه‌تای‌شان هیچ حلقهٔ فوکوسی نداشتند**. یعنی کاربری که با کیبورد
+ * حرکت می‌کند نمی‌دید کجاست.
+ *
+ * ارتفاع ۴۴ پیکسل هم اینجا تضمین می‌شود، نه در هر ویو؛ پایین‌تر از آن
+ * انگشت روی گوشی درست نمی‌گیردش.
+ */
+.field{
+  width:100%;
+  min-height:44px;
+  padding:.625rem .75rem;
+  font-size:13px;
+  line-height:1.5;
+  border-radius:var(--radius-control);
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--text);
+  transition:border-color .15s ease, box-shadow .15s ease;
+}
+.field:focus{
+  outline:none;
+  border-color:var(--accent);
+  box-shadow:0 0 0 2px var(--accent-glass, rgba(161,98,7,.2));
+}
+.field::placeholder{ color:var(--text-dim); opacity:.7 }
+/* اندازهٔ بزرگ‌تر، برای شماره و کد که باید درشت خوانده شوند. */
+.field-lg{ font-size:1.0625rem; min-height:48px; padding:.75rem 1rem }
+
+.text-ok{color:var(--ok-strong)}
+.text-bad{color:var(--bad-strong)}
+.text-warn{color:var(--warn-strong)}
+.bg-ok-soft{background-color:var(--ok-soft)}
+.bg-bad-soft{background-color:var(--bad-soft)}
+.bg-warn-soft{background-color:var(--warn-soft)}
+/*
+ * حالت hover دستی نوشته می‌شود: این دو کلاسِ خودمانند، نه ابزارِ
+ * تیلویند، پس تیلویند برایشان ‎hover:‎ نمی‌سازد و ‎hover:text-bad‎
+ * بی‌صدا بی‌اثر می‌ماند.
+ */
+.hover\:bg-ok-soft:hover{background-color:var(--ok-soft)}
+.hover\:bg-bad-soft:hover{background-color:var(--bad-soft)}
+.hover\:bg-warn-soft:hover{background-color:var(--warn-soft)}
+.hover\:text-ok:hover{color:var(--ok-strong)}
+.hover\:text-bad:hover{color:var(--bad-strong)}
+.hover\:text-warn:hover{color:var(--warn-strong)}
+
+.on-tint{color:#fff}
+html.dark .on-tint{color:#fff}
+
 /* طلایی در زمینهٔ تیره باید روشن‌تر باشد تا کنتراست حفظ شود */
   html.dark .text-gold-700, html.dark .text-gold-600{color:#FBBF24}
 /* سطوح */

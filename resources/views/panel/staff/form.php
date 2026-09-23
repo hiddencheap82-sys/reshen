@@ -10,20 +10,20 @@
   <div>
     <label class="block text-sm text-ink-600 mb-1.5" for="name">نام</label>
     <input id="name" type="text" name="name" required value="<?= e($staff['name'] ?? '') ?>"
-      class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent">
+      class="field field-lg">
   </div>
   <?php if (!$staff): ?>
   <div>
     <label class="block text-sm text-ink-600 mb-1.5" for="phone">شمارهٔ موبایل (برای ورود آرایشگر به پنل — اختیاری)</label>
     <input id="phone" inputmode="numeric" type="tel" name="phone" dir="ltr" placeholder="09123456789"
-      class="w-full rounded-xl border border-ink-200 px-4 py-3 text-left focus:outline-none focus:ring-2 focus:ring-accent">
+      class="field field-lg text-left">
   </div>
   <?php endif; ?>
   <div class="space-y-4">
     <div>
       <label class="block text-sm text-ink-600 mb-1.5" for="commission_percent">درصد پیش‌فرض تسویه</label>
       <input id="commission_percent" inputmode="numeric" type="number" step="0.1" name="commission_percent" value="<?= e((string)($staff['commission_percent'] ?? '')) ?>" placeholder="۵۰"
-        class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent">
+        class="field field-lg">
     </div>
     <div>
       <label class="block text-sm text-ink-600 mb-1.5">رنگ نمایشی</label>

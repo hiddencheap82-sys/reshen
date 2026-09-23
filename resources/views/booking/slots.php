@@ -117,7 +117,7 @@ echo App\Core\View::render('components.jalali-calendar', [
 
   <?php if (empty($slots)): ?>
     <div class="glass rounded-2xl py-12 px-5 text-center">
-      <?= icon('calendar-x', 'w-10 h-10 mx-auto text-ink-300 mb-3') ?>
+      <?= icon('calendar-x', 'w-10 h-10 mx-auto text-ink-400 mb-3') ?>
       <p class="text-sm font-semibold text-ink-600 mb-1">این روز سانس آزادی ندارد</p>
       <p class="text-[12px] text-ink-400">روز دیگری را از نوار بالا انتخاب کنید.</p>
     </div>

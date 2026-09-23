@@ -12,8 +12,8 @@
 $roleNames = ['owner' => 'صاحب', 'manager' => 'مدیر', 'staff' => 'آرایشگر', 'reception' => 'پذیرش'];
 $statusNames = [
     'pending' => ['در انتظار', 'text-ink-600', 'var(--fill-secondary)'],
-    'paid' => ['پرداخت شد', 'text-emerald-700', '#ECFDF5'],
-    'overdue' => ['معوق', 'text-red-700', '#FEF2F2'],
+    'paid' => ['پرداخت شد', 'text-ok', 'var(--ok-soft)'],
+    'overdue' => ['معوق', 'text-bad', 'var(--bad-soft)'],
     'cancelled' => ['لغو شد', 'text-ink-400', 'var(--fill-secondary)'],
 ];
 $trialEnds = $salon['trial_ends_at'];
@@ -56,7 +56,7 @@ $trialEnds = $salon['trial_ends_at'];
       <form method="post" action="<?= e(url('platform/' . $salon['id'] . '/active')) ?>">
         <?= csrf_field() ?>
         <button class="tap w-full h-11 rounded-xl text-[13px] font-bold
-                       <?= $salon['is_active'] ? 'text-red-600 hover:bg-red-50' : 'text-emerald-700 hover:bg-emerald-50' ?>">
+                       <?= $salon['is_active'] ? 'text-bad hover:bg-bad-soft' : 'text-ok hover:bg-ok-soft' ?>">
           <?= $salon['is_active'] ? 'غیرفعال کردن سالن' : 'فعال کردن سالن' ?>
         </button>
       </form>
@@ -75,8 +75,7 @@ $trialEnds = $salon['trial_ends_at'];
       <div>
         <label for="plan-code" class="block text-[13px] font-semibold text-ink-800 mb-1.5">پلن</label>
         <select id="plan-code" name="plan_code"
-                class="w-full h-11 rounded-xl border border-ink-200 px-3 text-[13px]
-                       focus:outline-none focus:ring-2 focus:ring-accent">
+                class="field">
           <?php foreach ($plans as $p): ?>
             <option value="<?= e($p['code']) ?>" <?= $p['code'] === $salon['plan_code'] ? 'selected' : '' ?>>
               <?= e($p['name']) ?>
@@ -92,8 +91,7 @@ $trialEnds = $salon['trial_ends_at'];
         <label for="plan-seats" class="block text-[13px] font-semibold text-ink-800 mb-1.5">تعداد صندلی</label>
         <input type="number" inputmode="numeric" id="plan-seats" name="seats" min="1" max="99"
                value="<?= e((string) $salon['seats']) ?>"
-               class="w-full h-11 rounded-xl border border-ink-200 px-3 text-[13px] tabular-nums
-                      focus:outline-none focus:ring-2 focus:ring-accent">
+               class="field tabular-nums">
       </div>
 
       <div>
@@ -117,7 +115,7 @@ $trialEnds = $salon['trial_ends_at'];
           بدون مهلت
         </label>
         <?php if ($salon['plan_code'] === 'trial' && $trialEnds === null): ?>
-          <p class="text-[12px] text-amber-700 mt-1.5">
+          <p class="text-[12px] text-warn mt-1.5">
             این سالن در پلن آزمایشی است و مهلتی ندارد — یعنی برای همیشه رایگان.
           </p>
         <?php endif; ?>

@@ -24,11 +24,11 @@ use App\Support\Money;
     <div>
       <label class="block text-sm text-ink-600 mb-1.5" for="amount_toman">مبلغ کل (تومان)</label>
       <input id="amount_toman" inputmode="numeric" type="number" name="amount_toman" value="<?= (int) Money::fromRials($amount)->toToman() ?>"
-        class="w-full rounded-xl border border-ink-200 px-4 py-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-accent">
+        class="field field-lg font-bold">
     </div>
     <div>
       <label class="block text-sm text-ink-600 mb-1.5" for="tip_toman">انعام (اختیاری)</label>
-      <input id="tip_toman" inputmode="numeric" type="number" name="tip_toman" value="0" class="w-full rounded-xl border border-ink-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent">
+      <input id="tip_toman" inputmode="numeric" type="number" name="tip_toman" value="0" class="field field-lg">
     </div>
     <div>
       <label class="block text-sm text-ink-600 mb-2">روش پرداخت</label>
@@ -41,6 +41,6 @@ use App\Support\Money;
         <?php endforeach; ?>
       </div>
     </div>
-    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-lg rounded-xl py-4">ثبت پرداخت</button>
+    <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white on-tint font-extrabold text-lg rounded-xl py-4 tap">ثبت پرداخت</button>
   </form>
 </div>

@@ -12,14 +12,13 @@
           aria-hidden="true"><?= icon('search', 'w-4 h-4') ?></span>
     <input type="search" id="customer-search" name="q" value="<?= e($q) ?>"
       placeholder="جستجو با نام یا شماره..." enterkeyhint="search"
-      class="w-full h-12 rounded-xl border border-ink-200 ps-10 pe-4 text-sm
-             focus:outline-none focus:ring-2 focus:ring-accent">
+      class="field ps-10 pe-4">
   </div>
 </form>
 
 <?php if (empty($customers)): ?>
   <div class="glass rounded-2xl p-10 text-center">
-    <span class="w-12 h-12 mx-auto mb-3 rounded-2xl grid place-items-center text-ink-300"
+    <span class="w-12 h-12 mx-auto mb-3 rounded-2xl grid place-items-center text-ink-400"
           style="background:var(--fill-secondary)" aria-hidden="true"><?= icon('users', 'w-6 h-6') ?></span>
     <p class="text-[13px] text-ink-500">
       <?= $q === '' ? 'هنوز مشتری‌ای ثبت نشده.' : 'با «' . e($q) . '» چیزی پیدا نشد.' ?>
@@ -53,7 +52,7 @@
         <span class="block text-[12px] text-ink-400 tabular-nums"><?= e(jdate($c['last_visit_at'], 'Y/m/d')) ?></span>
       <?php endif; ?>
     </span>
-    <?= icon('chevron-end', 'w-4 h-4 text-ink-300 shrink-0') ?>
+    <?= icon('chevron-end', 'w-4 h-4 text-ink-400 shrink-0') ?>
   </a>
   <?php endforeach; ?>
 </div>

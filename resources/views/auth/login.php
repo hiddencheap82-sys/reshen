@@ -22,8 +22,7 @@
            autocomplete="username" placeholder="۰۹۱۲۳۴۵۶۷۸۹"
            value="<?= e((string) old('phone')) ?>"
            <?= old('phone') === '' ? 'autofocus' : '' ?>
-           class="w-full h-12 rounded-xl border border-ink-200 px-4 text-left ltr text-lg tracking-wider
-                  focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
+           class="field field-lg text-left ltr tracking-wider">
   </div>
 
   <div>
@@ -35,8 +34,7 @@
     <div class="relative">
       <input id="password" type="password" name="password" autocomplete="current-password"
              <?= old('phone') !== '' ? 'autofocus' : '' ?>
-             class="w-full h-12 rounded-xl border border-ink-200 ps-4 pe-12 text-[15px]
-                    focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
+             class="field field-lg ps-4 pe-12">
       <button type="button" id="pw-toggle" hidden
               class="absolute inset-y-0 end-0 w-12 grid place-items-center text-ink-400
                      rounded-xl cursor-pointer focus-visible:outline-2 focus-visible:outline-accent"

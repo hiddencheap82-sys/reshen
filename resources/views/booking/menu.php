@@ -25,7 +25,7 @@ $shortest = $services === [] ? 0 : min(array_map(static fn ($s) => (int) $s['dur
 
 <?php if ($services === []): ?>
   <div class="glass rounded-2xl py-12 px-5 text-center rise rise-1">
-    <?= icon('scissors', 'w-10 h-10 mx-auto text-ink-300 mb-3') ?>
+    <?= icon('scissors', 'w-10 h-10 mx-auto text-ink-400 mb-3') ?>
     <p class="text-sm font-semibold text-ink-600">هنوز خدمتی تعریف نشده</p>
     <?php if (!empty($salon['phone'])): ?>
       <a href="tel:<?= e($salon['phone']) ?>" class="btn-ink mt-4 inline-flex">تماس با سالن</a>

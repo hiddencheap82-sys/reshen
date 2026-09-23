@@ -47,8 +47,7 @@ foreach (array_keys($slots) as $time) {
     <div>
       <label for="staff-pick" class="block text-[12px] font-bold text-ink-600 mb-2">۲. آرایشگر</label>
       <select name="staff_id" id="staff-pick"
-              class="w-full h-11 rounded-xl border border-ink-200 bg-transparent px-3 text-[13px]
-                     focus:outline-none focus:ring-2 focus:ring-accent">
+              class="field">
         <option value="">هر آرایشگری که آزاد باشد</option>
         <?php foreach ($staffList as $st): ?>
           <option value="<?= (int) $st['id'] ?>" <?= $staffId === (int) $st['id'] ? 'selected' : '' ?>>
@@ -72,9 +71,14 @@ foreach (array_keys($slots) as $time) {
             <label class="pick block relative tap">
               <input type="checkbox" name="service_ids[]" value="<?= (int) $s['id'] ?>" class="sr-only"
                      <?= in_array((int) $s['id'], $serviceIds, true) ? 'checked' : '' ?>>
-              <span class="pick-card flex items-center gap-2.5 rounded-xl px-3 py-2.5
-                           transition-all duration-200 ease-out-soft cursor-pointer"
-                    style="background:var(--accent-soft)">
+              <!--
+                خنثی تا وقتی انتخاب نشده. با پس‌زمینهٔ لهجه، پنج خدمتِ
+                انتخاب‌نشده شبیه پنج خدمتِ انتخاب‌شده دیده می‌شدند و
+                رنگ لهجه معنایش را از دست می‌داد. صفحهٔ عمومی رزرو از
+                اول درست بود؛ این یکی جا مانده بود.
+              -->
+              <span class="pick-card glass flex items-center gap-2.5 rounded-xl px-3 py-2.5
+                           transition-all duration-200 ease-out-soft cursor-pointer">
                 <span class="pick-box w-5 h-5 shrink-0 rounded-md border-2 border-ink-300 grid place-items-center"
                       aria-hidden="true">
                   <?= icon('check', 'pick-tick w-3 h-3 opacity-0 transition-opacity duration-200') ?>
@@ -111,7 +115,7 @@ foreach (array_keys($slots) as $time) {
       <span class="block text-[12px] font-bold text-ink-600 mb-2">۴. سانس</span>
 
       <?php if ($slots === []): ?>
-        <div class="rounded-xl py-8 px-4 text-center" style="background:var(--accent-soft)">
+        <div class="rounded-xl py-8 px-4 text-center" style="background:var(--fill-secondary)">
           <?= icon('calendar-x', 'w-7 h-7 mx-auto text-ink-400 mb-2') ?>
           <p class="text-[13px] font-bold text-ink-700">
             <?= $isClosed ? 'این روز سانس آزادی ندارد.' : 'اول خدمت را انتخاب کن.' ?>
@@ -138,9 +142,8 @@ foreach (array_keys($slots) as $time) {
                 <?php foreach ($times as $time): ?>
                   <label class="pick relative block tap">
                     <input type="radio" name="time" value="<?= e($time) ?>" required class="sr-only">
-                    <span class="slot h-11 grid place-items-center rounded-xl text-[13px] font-bold
-                                 text-ink-800 tabular-nums cursor-pointer transition-all duration-200"
-                          style="background:var(--accent-soft)"><?= e(fa_time($time)) ?></span>
+                    <span class="slot glass h-11 grid place-items-center rounded-xl text-[13px] font-bold
+                                 text-ink-800 tabular-nums cursor-pointer transition-all duration-200"><?= e(fa_time($time)) ?></span>
                   </label>
                 <?php endforeach; ?>
               </div>
@@ -156,11 +159,9 @@ foreach (array_keys($slots) as $time) {
       <span class="block text-[12px] font-bold text-ink-600">۵. مشتری</span>
       <input type="tel" name="phone" inputmode="numeric" dir="ltr" required
              placeholder="۰۹۱۲۳۴۵۶۷۸۹" aria-label="شمارهٔ موبایل مشتری"
-             class="w-full h-11 rounded-xl border border-ink-200 bg-transparent px-3 text-left text-[14px]
-                    tabular-nums focus:outline-none focus:ring-2 focus:ring-accent">
+             class="field text-left tabular-nums">
       <input type="text" name="name" placeholder="نام (اختیاری)" aria-label="نام مشتری"
-             class="w-full h-11 rounded-xl border border-ink-200 bg-transparent px-3 text-[13px]
-                    focus:outline-none focus:ring-2 focus:ring-accent">
+             class="field">
       <p class="text-[12px] text-ink-400 leading-relaxed">
         شماره لازم است تا پیامک تأیید برایش برود و بتواند نوبتش را پیگیری کند.
       </p>

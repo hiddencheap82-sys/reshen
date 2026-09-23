@@ -39,8 +39,7 @@
       <div>
         <label for="account-name" class="block text-[13px] font-semibold text-ink-800 mb-1.5">نام</label>
         <input id="account-name" name="name" value="<?= e($user['name'] ?? '') ?>" required
-               class="w-full h-11 rounded-xl border border-ink-200 px-3 text-[13px]
-                      focus:outline-none focus:ring-2 focus:ring-accent">
+               class="field">
       </div>
       <button type="submit" class="btn-accent metal w-full h-11 text-[13px]">ذخیرهٔ نام</button>
     </form>
@@ -64,8 +63,7 @@
           <label for="current-password" class="block text-[13px] font-semibold text-ink-800 mb-1.5">رمز فعلی</label>
           <input id="current-password" type="password" name="current_password" required
                  autocomplete="current-password"
-                 class="w-full h-11 rounded-xl border border-ink-200 px-3 text-[13px]
-                        focus:outline-none focus:ring-2 focus:ring-accent">
+                 class="field">
         </div>
       <?php endif; ?>
 
@@ -73,8 +71,7 @@
         <label for="new-password" class="block text-[13px] font-semibold text-ink-800 mb-1.5">رمز تازه</label>
         <input id="new-password" type="password" name="new_password" required minlength="8"
                autocomplete="new-password"
-               class="w-full h-11 rounded-xl border border-ink-200 px-3 text-[13px]
-                      focus:outline-none focus:ring-2 focus:ring-accent">
+               class="field">
         <p class="text-[12px] text-ink-400 mt-1">
           دست‌کم <?= e(fa_num(App\Domain\Identity\PasswordService::MIN_LENGTH)) ?> نویسه.
         </p>
@@ -84,8 +81,7 @@
         <label for="new-password2" class="block text-[13px] font-semibold text-ink-800 mb-1.5">تکرار رمز تازه</label>
         <input id="new-password2" type="password" name="new_password2" required minlength="8"
                autocomplete="new-password"
-               class="w-full h-11 rounded-xl border border-ink-200 px-3 text-[13px]
-                      focus:outline-none focus:ring-2 focus:ring-accent">
+               class="field">
       </div>
 
       <button type="submit" class="btn-accent metal w-full h-11 text-[13px]">
@@ -111,9 +107,8 @@
           </p>
           <input type="password" name="current_password" required placeholder="رمز فعلی"
                  aria-label="رمز فعلی برای برداشتن رمز"
-                 class="w-full h-11 rounded-xl border border-ink-200 px-3 text-[13px]
-                        focus:outline-none focus:ring-2 focus:ring-accent">
-          <button type="submit" class="tap w-full h-11 rounded-xl text-[13px] font-bold text-red-600 hover:bg-red-50">
+                 class="field">
+          <button type="submit" class="tap w-full h-11 rounded-xl text-[13px] font-bold text-bad hover:bg-bad-soft">
             برداشتن رمز
           </button>
         </form>

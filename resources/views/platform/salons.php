@@ -17,12 +17,10 @@ include __DIR__ . '/_nav.php';
   <label for="salon-q" class="sr-only">جستجوی سالن</label>
   <input type="search" id="salon-q" name="q" value="<?= e($q) ?>"
          placeholder="نام، نشانی یا شهر"
-         class="flex-1 min-w-0 h-11 rounded-xl border border-ink-200 px-3 text-[13px]
-                focus:outline-none focus:ring-2 focus:ring-accent">
+         class="field flex-1 min-w-0">
   <label for="salon-status" class="sr-only">وضعیت</label>
   <select id="salon-status" name="status"
-          class="h-11 rounded-xl border border-ink-200 px-2 text-[13px]
-                 focus:outline-none focus:ring-2 focus:ring-accent">
+          class="field">
     <option value="">همه</option>
     <option value="active" <?= $status === 'active' ? 'selected' : '' ?>>فعال</option>
     <option value="inactive" <?= $status === 'inactive' ? 'selected' : '' ?>>غیرفعال</option>
@@ -53,7 +51,7 @@ include __DIR__ . '/_nav.php';
           </span>
           <span class="block text-[12px] text-ink-400 mt-0.5">
             <?php if ($s['last_booking_at'] === null): ?>
-              <span class="text-amber-600">هنوز نوبتی ثبت نکرده</span>
+              <span class="text-warn">هنوز نوبتی ثبت نکرده</span>
             <?php else: ?>
               <?= e(fa_num((int) $s['bookings_30d'])) ?> نوبت در ۳۰ روز ·
               آخرین: <?= e(jdate($s['last_booking_at'], 'Y/m/d')) ?>

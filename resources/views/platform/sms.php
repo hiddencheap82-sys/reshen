@@ -58,7 +58,7 @@ include __DIR__ . '/_nav.php';
             <?= e(fa_num((int) $row['total'])) ?>
           </span>
           <span class="block text-[12px] tabular-nums
-                       <?= (int) $row['failed'] > 0 ? 'text-red-600' : 'text-ink-400' ?>">
+                       <?= (int) $row['failed'] > 0 ? 'text-bad' : 'text-ink-400' ?>">
             <?= (int) $row['failed'] > 0
                 ? e(fa_num((int) $row['failed'])) . ' ناموفق'
                 : 'همه رسید' ?>

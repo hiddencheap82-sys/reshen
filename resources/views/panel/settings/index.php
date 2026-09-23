@@ -75,21 +75,21 @@
       </div>
       <div>
         <label for="salon-name" class="block text-xs text-ink-500 mb-1">نام سالن</label>
-        <input id="salon-name" type="text" name="name" value="<?= e($salon['name']) ?>" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
+        <input id="salon-name" type="text" name="name" value="<?= e($salon['name']) ?>" class="field">
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="block text-xs text-ink-500 mb-1" for="city">شهر</label>
-          <input id="city" type="text" name="city" value="<?= e($salon['city'] ?? '') ?>" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
+          <input id="city" type="text" name="city" value="<?= e($salon['city'] ?? '') ?>" class="field">
         </div>
         <div>
           <label class="block text-xs text-ink-500 mb-1" for="phone">تلفن</label>
-          <input id="phone" type="tel" inputmode="numeric" autocomplete="tel" dir="ltr" name="phone" value="<?= e($salon['phone'] ?? '') ?>" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm text-left focus:outline-none focus:ring-2 focus:ring-accent">
+          <input id="phone" type="tel" inputmode="numeric" autocomplete="tel" dir="ltr" name="phone" value="<?= e($salon['phone'] ?? '') ?>" class="field text-left">
         </div>
       </div>
       <div>
         <label class="block text-xs text-ink-500 mb-1" for="address">آدرس</label>
-        <input id="address" type="text" name="address" value="<?= e($salon['address'] ?? '') ?>" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
+        <input id="address" type="text" name="address" value="<?= e($salon['address'] ?? '') ?>" class="field">
       </div>
 
       <div>
@@ -121,12 +121,12 @@
         </label>
         <div class="flex items-stretch rounded-xl overflow-hidden ring-1 ring-ink-200 bg-white
                     focus-within:ring-2 focus-within:ring-accent" dir="ltr">
-          <span class="flex items-center px-2.5 text-[12px] text-ink-400 bg-ink-50 shrink-0 code">
+          <span class="flex items-center min-h-[44px] px-2.5 text-[12px] text-ink-400 bg-ink-50 shrink-0 code">
             <?= e(rtrim(url('s'), '/')) ?>/
           </span>
           <input type="text" id="salon-slug" name="slug" dir="ltr"
                  value="<?= e($salon['slug']) ?>"
-                 class="flex-1 min-w-0 px-2.5 py-2.5 text-[13px] code bg-transparent
+                 class="flex-1 min-w-0 min-h-[44px] px-2.5 text-[13px] code bg-transparent
                         border-0 outline-none"
                  autocomplete="off" spellcheck="false">
         </div>
@@ -154,8 +154,7 @@
       <div>
         <label for="slot-step" class="block text-xs font-bold text-ink-600 mb-1.5">طول هر سانس</label>
         <select name="slot_step_minutes" id="slot-step"
-                class="w-full h-11 rounded-xl border border-ink-200 bg-transparent px-3 text-sm
-                       focus:outline-none focus:ring-2 focus:ring-accent">
+                class="field">
           <?php $step = (int) ($salon['slot_step_minutes'] ?? 15); ?>
           <?php foreach ([10, 15, 20, 30, 45, 60] as $m): ?>
             <option value="<?= $m ?>" <?= $m === $step ? 'selected' : '' ?>>
@@ -253,7 +252,7 @@
         <form method="post" action="<?= e(url('panel/settings/holidays/' . $h['id'] . '/remove')) ?>">
           <?= csrf_field() ?>
           <button class="w-11 h-11 grid place-items-center rounded-lg text-ink-400
-                         hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer
+                         hover:text-bad hover:bg-bad-soft transition-colors cursor-pointer
                          focus-visible:outline-2 focus-visible:outline-accent"
                   aria-label="حذف تعطیلی <?= e($h['jalali_label']) ?>">
             <?= icon('x', 'w-4 h-4') ?>
@@ -325,7 +324,7 @@
           </div>
           <form method="post" action="<?= e(url('panel/settings/timeoff/' . (int) $off['id'] . '/remove')) ?>">
             <?= csrf_field() ?>
-            <button type="submit" class="w-11 h-11 grid place-items-center rounded-xl text-ink-400 hover:text-red-700 tap"
+            <button type="submit" class="w-11 h-11 grid place-items-center rounded-xl text-ink-400 hover:text-bad tap"
                     aria-label="باز کردن این بازه">
               <?= icon('x', 'w-4 h-4') ?>
             </button>
@@ -356,7 +355,7 @@
 
     <div>
       <label class="block text-xs text-ink-500 mb-1">برای چه کسی</label>
-      <select id="off_staff_id" name="off_staff_id" class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
+      <select id="off_staff_id" name="off_staff_id" class="field">
         <option value="">کل آرایشگاه</option>
         <?php foreach ($staffList as $st): ?>
           <option value="<?= (int) $st['id'] ?>"><?= e($st['name']) ?></option>
@@ -367,7 +366,7 @@
     <div>
       <label class="block text-xs text-ink-500 mb-1" for="off_reason">دلیل (اختیاری)</label>
       <input id="off_reason" type="text" name="off_reason" maxlength="150" placeholder="مثلاً: عروسی"
-             class="w-full rounded-xl border border-ink-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
+             class="field">
     </div>
 
     <button type="submit" class="btn-ink w-full">بستن این بازه</button>

@@ -41,7 +41,7 @@ include __DIR__ . '/_nav.php';
           <?= e($log['actor_name'] ?? 'سیستم') ?>
           <span class="code" dir="ltr"><?= e(fa_num($log['actor_phone'] ?? '')) ?></span>
           <?php if (is_array($meta) && $meta !== []): ?>
-            <span class="text-ink-300">·</span>
+            <span class="text-ink-400">·</span>
             <?php foreach ($meta as $k => $v): ?>
               <span class="code"><?= e((string) $k) ?>=<?= e(is_scalar($v) ? (string) $v : json_encode($v, JSON_UNESCAPED_UNICODE)) ?></span>
             <?php endforeach; ?>

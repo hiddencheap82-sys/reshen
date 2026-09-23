@@ -29,14 +29,12 @@ include __DIR__ . '/_nav.php';
       <div>
         <label for="new-user-name" class="block text-[13px] font-semibold text-ink-800 mb-1.5">نام</label>
         <input id="new-user-name" name="name"
-               class="w-full h-11 rounded-xl border border-ink-200 px-3 text-[13px]
-                      focus:outline-none focus:ring-2 focus:ring-accent">
+               class="field">
       </div>
       <div>
         <label for="new-user-phone" class="block text-[13px] font-semibold text-ink-800 mb-1.5">شمارهٔ موبایل</label>
         <input id="new-user-phone" name="phone" required dir="ltr" inputmode="numeric" placeholder="09123456789"
-               class="w-full h-11 rounded-xl border border-ink-200 px-3 text-[13px] text-left
-                      focus:outline-none focus:ring-2 focus:ring-accent">
+               class="field text-left">
       </div>
     </div>
     <div>
@@ -44,8 +42,7 @@ include __DIR__ . '/_nav.php';
         رمز عبور <span class="font-normal text-ink-400">— اختیاری</span>
       </label>
       <input id="new-user-password" name="password" type="password" dir="ltr" autocomplete="new-password"
-             class="w-full h-11 rounded-xl border border-ink-200 px-3 text-[13px]
-                    focus:outline-none focus:ring-2 focus:ring-accent">
+             class="field">
       <p class="text-[12px] text-ink-400 mt-1 leading-relaxed">
         خالی بگذارید تا این کاربر فقط با کد پیامکی وارد شود. اگر رمز بگذارید، خودتان باید به او بگویید.
       </p>
@@ -61,8 +58,7 @@ include __DIR__ . '/_nav.php';
 <form method="get" action="<?= e(url('platform/users')) ?>" class="flex gap-2 mb-4">
   <label for="user-q" class="sr-only">جستجوی کاربر</label>
   <input type="search" id="user-q" name="q" value="<?= e($q) ?>" placeholder="شماره یا نام"
-         class="flex-1 min-w-0 h-11 rounded-xl border border-ink-200 px-3 text-[13px]
-                focus:outline-none focus:ring-2 focus:ring-accent">
+         class="field flex-1 min-w-0">
   <button type="submit" class="btn-ink h-11 px-4 text-[13px]">جستجو</button>
 </form>
 
@@ -94,7 +90,7 @@ include __DIR__ . '/_nav.php';
           <form method="post" action="<?= e(url('platform/users/' . $u['id'] . '/admin')) ?>">
             <?= csrf_field() ?>
             <button class="tap h-11 px-3 rounded-lg text-[12px] font-bold
-                           <?= $u['is_platform_admin'] ? 'text-red-600 hover:bg-red-50' : 'text-accent hover:bg-ink-100' ?>">
+                           <?= $u['is_platform_admin'] ? 'text-bad hover:bg-bad-soft' : 'text-accent hover:bg-ink-100' ?>">
               <?= $u['is_platform_admin'] ? 'گرفتن دسترسی مدیر پلتفرم' : 'مدیر پلتفرم کن' ?>
             </button>
           </form>
@@ -114,8 +110,7 @@ include __DIR__ . '/_nav.php';
               <label for="pw-<?= (int) $u['id'] ?>" class="sr-only">رمز تازه برای <?= e($u['name'] ?? $u['phone']) ?></label>
               <input id="pw-<?= (int) $u['id'] ?>" name="password" type="password" required minlength="8"
                      dir="ltr" autocomplete="new-password" placeholder="رمز تازه"
-                     class="flex-1 min-w-0 h-11 rounded-xl border border-ink-200 px-3 text-[13px]
-                            focus:outline-none focus:ring-2 focus:ring-accent">
+                     class="field flex-1 min-w-0">
               <button type="submit" class="btn-ink h-11 px-4 text-[12px] shrink-0">ذخیره</button>
             </form>
           </details>

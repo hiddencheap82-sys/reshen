@@ -62,7 +62,7 @@
                        transition-colors duration-200" aria-hidden="true">
             <?= icon('check', 'pick-tick w-3.5 h-3.5 opacity-0 transition-opacity duration-200') ?>
           </span>
-          <span class="w-9 h-9 shrink-0 rounded-full grid place-items-center text-white text-[13px] font-bold"
+          <span class="w-9 h-9 shrink-0 rounded-full grid place-items-center text-white on-tint text-[13px] font-bold"
                 style="background:<?= e($st['color']) ?>" aria-hidden="true">
             <?= e(mb_substr($st['name'], 0, 1)) ?>
           </span>

@@ -87,7 +87,7 @@ $atMin = $minMonth !== null
             <?php if (!$cell['available']): ?>
               <button type="button" disabled aria-label="<?= e($aria) ?>"
                       class="h-11 min-h-[44px] rounded-xl text-sm tabular-nums cursor-not-allowed
-                             text-ink-300 <?= $cell['isToday'] ? 'ring-1 ring-ink-200' : '' ?>">
+                             text-ink-400 <?= $cell['isToday'] ? 'ring-1 ring-ink-200' : '' ?>">
                 <?= e(fa_num($cell['jday'])) ?>
               </button>
             <?php else: ?>

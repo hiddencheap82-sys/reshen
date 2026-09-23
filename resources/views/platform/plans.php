@@ -60,7 +60,7 @@ $features = [
       <ul class="flex flex-wrap gap-1.5">
         <?php foreach ($features as $key => $label): ?>
           <li class="text-[12px] rounded-lg px-2 py-1
-                     <?= $p[$key] ? 'bg-ink-100 text-ink-700' : 'text-ink-300' ?>">
+                     <?= $p[$key] ? 'bg-ink-100 text-ink-700' : 'text-ink-400' ?>">
             <?= $p[$key] ? '✓' : '—' ?> <?= e($label) ?>
           </li>
         <?php endforeach; ?>

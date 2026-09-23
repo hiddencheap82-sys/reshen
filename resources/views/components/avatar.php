@@ -49,5 +49,5 @@ if (!empty($avatarColor)) {
 }
 ?>
 <span class="<?= e($avatarSize) ?> shrink-0 rounded-xl grid place-items-center
-             font-extrabold text-white select-none"
+             font-extrabold text-white on-tint select-none"
       style="background:<?= e($avatarBg) ?>" aria-hidden="true"><?= e($avatarLetter) ?></span>

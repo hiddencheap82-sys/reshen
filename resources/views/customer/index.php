@@ -10,7 +10,7 @@ use App\Support\JalaliCalendar;
 
 $labels = [
     'confirmed' => ['رزرو شده', 'text-ink-700'],
-    'queued'    => ['در صف',    'text-amber-700'],
+    'queued'    => ['در صف',    'text-warn'],
     'in_chair'  => ['روی صندلی', 'text-green-700'],
     'completed' => ['انجام شد', 'text-ink-500'],
     'cancelled' => ['لغو شده',  'text-ink-400'],
@@ -60,7 +60,7 @@ $card = static function (array $a, bool $cancellable) use ($labels): void {
                 onsubmit="return confirm('این نوبت لغو شود؟')">
             <?= csrf_field() ?>
             <button type="submit"
-                    class="w-full h-11 rounded-xl text-[12px] font-semibold text-red-700 border border-red-100 bg-red-50 tap">
+                    class="w-full h-11 rounded-xl text-[12px] font-semibold text-bad border border-red-100 bg-bad-soft tap">
               لغو نوبت
             </button>
           </form>
@@ -78,7 +78,7 @@ $card = static function (array $a, bool $cancellable) use ($labels): void {
 
   <?php if (empty($upcoming)): ?>
     <div class="glass rounded-2xl py-10 px-5 text-center">
-      <?= icon('calendar', 'w-9 h-9 mx-auto text-ink-300 mb-3') ?>
+      <?= icon('calendar', 'w-9 h-9 mx-auto text-ink-400 mb-3') ?>
       <p class="text-sm font-semibold text-ink-600 mb-1">نوبتی در پیش نداری</p>
       <p class="text-[12px] text-ink-400">از لینک آرایشگاهت می‌توانی نوبت بگیری.</p>
     </div>

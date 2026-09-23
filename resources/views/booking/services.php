@@ -35,7 +35,7 @@
 
 <?php if (empty($services)): ?>
   <div class="glass rounded-2xl py-12 px-5 text-center">
-    <?= icon('scissors', 'w-10 h-10 mx-auto text-ink-300 mb-3') ?>
+    <?= icon('scissors', 'w-10 h-10 mx-auto text-ink-400 mb-3') ?>
     <p class="text-sm font-semibold text-ink-600">هنوز خدمتی تعریف نشده</p>
     <p class="text-[12px] text-ink-400 mt-1">با خود آرایشگاه تماس بگیرید.</p>
   </div>

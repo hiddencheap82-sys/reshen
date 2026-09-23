@@ -60,13 +60,13 @@ $growth = $prevWeekTotal > 0 ? (int) round(($weekTotal - $prevWeekTotal) / $prev
     <?php
     $rows = [];
     if ($attention['unpaid'] > 0) {
-        $rows[] = ['wallet', 'text-red-600', '#FEF2F2',
+        $rows[] = ['wallet', 'text-bad', 'var(--bad-soft)',
             fa_num($attention['unpaid']) . ' نوبت تمام‌شده، تسویه‌نشده',
             'کار انجام شده ولی پولش ثبت نشده — گزارش فروش امروز کم‌تر از واقعیت است.',
             url('panel')];
     }
     if ($attention['stale'] > 0) {
-        $rows[] = ['clock', 'text-amber-600', 'var(--accent-soft)',
+        $rows[] = ['clock', 'text-warn', 'var(--accent-soft)',
             fa_num($attention['stale']) . ' نوبت که ساعتش گذشته و هنوز در صف است',
             'یا مشتری نیامده و کسی «غیبت» نزده، یا کار شروع شده و ثبت نشده. تا ثبت نشود موتور تخمین چیزی یاد نمی‌گیرد.',
             url('panel')];
@@ -86,7 +86,7 @@ $growth = $prevWeekTotal > 0 ? (int) round(($weekTotal - $prevWeekTotal) / $prev
           <span class="block text-[13px] font-bold text-ink-900"><?= e($title) ?></span>
           <span class="block text-[12px] text-ink-400 leading-relaxed mt-0.5"><?= e($note) ?></span>
         </span>
-        <?= icon('chevron-end', 'w-4 h-4 text-ink-300 mt-2.5') ?>
+        <?= icon('chevron-end', 'w-4 h-4 text-ink-400 mt-2.5') ?>
       </a>
     <?php endforeach; ?>
   </section>
@@ -116,7 +116,7 @@ $growth = $prevWeekTotal > 0 ? (int) round(($weekTotal - $prevWeekTotal) / $prev
         <?php endif; ?>
       </span>
     </span>
-    <?= icon('chevron-end', 'w-4 h-4 text-ink-300') ?>
+    <?= icon('chevron-end', 'w-4 h-4 text-ink-400') ?>
   </a>
 <?php endif; ?>
 
@@ -153,7 +153,7 @@ $growth = $prevWeekTotal > 0 ? (int) round(($weekTotal - $prevWeekTotal) / $prev
       <span class="text-[13px] font-extrabold text-ink-800 tabular-nums"><?= e(toman($weekTotal)) ?></span>
     </div>
     <?php if ($growth !== null): ?>
-      <p class="text-[12px] mb-3 <?= $growth >= 0 ? 'text-emerald-600' : 'text-red-500' ?>">
+      <p class="text-[12px] mb-3 <?= $growth >= 0 ? 'text-ok' : 'text-bad' ?>">
         <?= $growth >= 0 ? '▲' : '▼' ?>
         <?= e(fa_num(abs($growth))) ?>٪ نسبت به هفتهٔ قبل
         <span class="text-ink-400">(<?= e(toman($prevWeekTotal)) ?>)</span>
@@ -186,7 +186,7 @@ $growth = $prevWeekTotal > 0 ? (int) round(($weekTotal - $prevWeekTotal) / $prev
       <?php foreach ($days as $d): ?>
         <div class="flex-1 text-center min-w-0">
           <div class="text-[11px] text-ink-400 truncate"><?= e(mb_substr($d['weekday'], 0, 1)) ?></div>
-          <div class="text-[11px] text-ink-300 tabular-nums"><?= e($d['label']) ?></div>
+          <div class="text-[11px] text-ink-400 tabular-nums"><?= e($d['label']) ?></div>
         </div>
       <?php endforeach; ?>
     </div>

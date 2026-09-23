@@ -12,7 +12,7 @@
 <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
   <?php foreach ($staff as $s): ?>
   <a href="<?= url('panel/staff/' . $s['id'] . '/edit') ?>" class="glass rounded-2xl p-4 flex items-center gap-3 hover:shadow-sm transition <?= !$s['is_active'] ? 'opacity-50' : '' ?>">
-    <div class="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold shrink-0" style="background:<?= e($s['color']) ?>"><?= e(mb_substr($s['name'],0,1)) ?></div>
+    <div class="w-11 h-11 rounded-full flex items-center justify-center text-white on-tint font-bold shrink-0" style="background:<?= e($s['color']) ?>"><?= e(mb_substr($s['name'],0,1)) ?></div>
     <div class="min-w-0">
       <div class="font-bold text-ink-800 truncate"><?= e($s['name']) ?></div>
       <div class="text-xs text-ink-400"><?= $s['commission_percent'] !== null ? fa_num($s['commission_percent']) . '٪ درصد' : 'بدون درصد پیش‌فرض' ?></div>
