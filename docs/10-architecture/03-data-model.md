@@ -223,36 +223,57 @@ UNIQUE(`salon_id`,`phone`)
 
 ---
 
-## ۸. ترتیب مهاجرت‌ها
+## ۸. مهاجرت‌ها — آنچه واقعاً هست
+
+> این فهرست پیش‌تر برنامهٔ *قبل از نوشتن کد* بود و با واقعیت نمی‌خواند:
+> جدول‌ها موقع ساخت در فایل‌های کمتری جمع شدند. حالا همان چیزی است که
+> در `database/migrations/` هست.
 
 ```
-0001 create_users_table
-0002 create_cities_districts_holidays_tables
-0003 create_salons_table
-0004 create_salon_user_table
-0005 create_staff_table
-0006 create_services_and_staff_service_tables
-0007 create_customers_table
-0008 create_customer_preferences_and_photos_tables
-0009 create_working_hours_and_time_offs_tables
-0010 create_appointments_table              ← محوری
-0011 create_appointment_items_table
-0012 create_duration_stats_table            ← موتور ETA
-0013 create_payments_table
-0014 create_sms_tables
-0015 create_audit_logs_table
---- فاز ۲ ---
-0020 create_waitlist_entries_table
-0021 create_staff_payouts_tables
-0022 create_reviews_table
-0023 add_trust_score_to_customers
-0024 create_platform_billing_tables
---- فاز ۳ ---
-0030 create_products_and_sales_tables
-0031 create_loyalty_tables
-0032 create_subscription_tables
-0033 create_branches_table
+0001 identity              کاربر، سالن، عضویت، کد ورود
+0002 staff_catalog         آرایشگر، خدمت، ساعت کاری، مرخصی
+0003 customers             پرونده، ترجیحات
+0004 appointments          ★ رکورد محوری + آمار طول خدمت (موتور ETA)
+0005 payments              پرداخت و انعام
+0006 messaging             پیامک، الگو، صف ارسال
+0007 loyalty_reviews       وفاداری، نظرات، اشتراک مشتری — هنوز کد ندارند
+0008 platform              پلن، اشتراک، صورتحساب، رد پا
+0009 otp_rate_limit        سقف درخواست کد
+0010 fix_otp_expiry
+0011 salon_theme           پالت رنگ سالن
+0012 sessions_and_breaks   طول سانس و استراحت
+0013 service_description
+0014 salon_logo
+0015 booking_ip            برای تشخیص سوءاستفاده
+0016 staff_color_contrast  ★ رنگ آرایشگر را به پالتِ خوانا برد
+0017 cancelled_by          چه کسی لغو کرد
+0018 sms_patterns          شناسهٔ الگوی ثبت‌شده در سامانهٔ اپراتور
+0019 seed_plans            پنج پلن از سند قیمت‌گذاری
+0020 user_passwords        ★ رمز عبور + سقف تلاش ورود
 ```
+
+### جدول‌هایی که هنوز کد ندارند
+
+شش جدول ساخته شده که هیچ‌کدام هنوز کدی ندارند:
+
+| جدول | کجا ساخته شده | فیچرِ نقشهٔ راه |
+|---|---|---|
+| `waitlist_entries` | `0004` | A17 لیست انتظار خودکار |
+| `products` | `0005` | فروش ژل و واکس |
+| `staff_payouts` | `0005` | D06 تسویهٔ صندلی |
+| `loyalty_cards` | `0007` | کارت «۱۰ تا بزن، یکی مهمون ما» |
+| `reviews` | `0007` | B12 نظرسنجی — از فاز ۲ جمع، در فاز ۴ نمایش |
+| `subscription_plans` | `0007` | اشتراک ماهانهٔ مشتری |
+
+(`product_sales` و `loyalty_stamps` که در بخش ۷ همین سند نام برده
+شده‌اند، هنوز ساخته **نشده‌اند**.)
+
+**عمدی است، نه فراموش‌شده.** ساختنشان از همان اول یعنی وقتی فیچر
+نوشته شود، مهاجرتی روی دادهٔ واقعیِ مشتری اجرا نمی‌شود. بهایش این است
+که چند جدول خالی روی هاست می‌نشینند — که هزینه‌اش صفر است.
+
+اگر تصمیم گرفتید فیچری ساخته نمی‌شود، جدولش را هم پاک کنید؛ جدولِ
+خالیِ بی‌برنامه، از جدولِ خالیِ برنامه‌دار بدتر است.
 
 ---
 
