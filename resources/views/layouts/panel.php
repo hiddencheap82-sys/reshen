@@ -132,17 +132,12 @@ $onPlatform = str_starts_with($currentPath, '/platform');
         <a href="<?= url('platform/impersonate/stop') ?>" class="underline font-bold">خروج</a>
       </div>
     <?php endif; ?>
-    <?php if ($success = flash('success')): ?>
-      <div class="bg-emerald-50 text-emerald-700 text-sm px-4 py-2.5 border-b border-emerald-100"><?= e($success) ?></div>
-    <?php endif; ?>
-    <?php if ($error = flash('error')): ?>
-      <div class="bg-red-50 text-red-700 text-sm px-4 py-2.5 border-b border-red-100"><?= e($error) ?></div>
-    <?php endif; ?>
 
     <main class="flex-1 p-4 md:p-6 md:pb-6"
           <?php if (!$onPlatform): ?>
           style="padding-bottom:calc(5.5rem + env(safe-area-inset-bottom,0px))"
           <?php endif; ?>>
+      <?php include BASE_PATH . '/resources/views/components/flash.php'; ?>
       <?= $content ?>
     </main>
   </div>

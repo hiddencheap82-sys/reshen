@@ -12,13 +12,6 @@
  */
 ?>
 
-<?php if ($error = flash('error')): ?>
-  <div role="alert"
-       class="flex items-start gap-2 bg-red-50 text-red-800 text-sm rounded-xl px-4 py-3 mb-4 border border-red-100">
-    <?= icon('alert', 'w-4 h-4 mt-0.5 shrink-0') ?>
-    <span><?= e($error) ?></span>
-  </div>
-<?php endif; ?>
 
 <?php if ($slotLabel !== null): ?>
   <a href="<?= e(url('s/' . $salon['slug'])) ?>"

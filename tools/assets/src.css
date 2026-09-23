@@ -41,6 +41,13 @@
     --fill-primary:rgb(120 120 128 / .20);
     --fill-secondary:rgb(120 120 128 / .12);
     --fill-tertiary:rgb(118 118 128 / .08);
+    /*
+     * موفقیت و خطا. مستقل از رنگ لهجه‌اند و باید بمانند: پالت لهجه
+     * را صاحب سالن عوض می‌کند، ولی «انجام شد» و «نشد» نباید با سلیقهٔ
+     * او رنگ عوض کنند.
+     */
+    --ok-soft:#ECFDF5;  --ok-strong:#065F46;
+    --bad-soft:#FEF2F2; --bad-strong:#B91C1C;
   }
   html.dark{
       --bg:#0A151E; --surface:#102431; --line:#1C3446;
@@ -51,6 +58,9 @@
       --fill-primary:rgb(120 120 128 / .36);
       --fill-secondary:rgb(120 120 128 / .32);
       --fill-tertiary:rgb(118 118 128 / .24);
+      /* در تاریکی زمینه تیره و متن روشن می‌شود، نه برعکسِ کم‌رنگ. */
+      --ok-soft:#10312A;  --ok-strong:#6EE7B7;
+      --bad-soft:#3B1A1A; --bad-strong:#FCA5A5;
     }
   body{
     font-family:var(--font-sans);
@@ -424,6 +434,52 @@ html.dark[data-theme="ruby"]{
   @media (prefers-reduced-motion: reduce){
     .tab-item{transition:none}
     .tab-item:active{transform:none}
+  }
+
+  /*
+   * پیام لحظه‌ای.
+   *
+   * حالت پایه در جریان صفحه است تا بدون جاوااسکریپت هم چیزی سر جایش
+   * باشد؛ ‎.flash-float‎ را خود اسکریپت اضافه می‌کند.
+   */
+  .flash-stack{ display:flex; flex-direction:column; gap:.5rem; margin-bottom:1rem; }
+  .flash-stack.flash-float{
+    position:fixed; z-index:40; margin:0;
+    inset-inline:1rem;
+    /* بالای نوار ناوبری می‌نشیند، نه پشتش. */
+    bottom:calc(4.5rem + env(safe-area-inset-bottom, 0px));
+    pointer-events:none;
+  }
+  @media (min-width:768px){
+    .flash-stack.flash-float{ bottom:1.5rem; inset-inline-start:auto; max-width:26rem; }
+  }
+  .flash{
+    display:flex; align-items:flex-start; gap:.5rem;
+    border-radius:.875rem; padding:.75rem 1rem;
+    pointer-events:auto;
+  }
+  .flash-stack.flash-float .flash{
+    box-shadow:0 8px 28px -8px rgb(0 0 0 / .28);
+    animation:flash-in .22s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  /*
+   * رنگ‌ها از توکن‌های سطح می‌آیند نه از پالت ثابت، وگرنه در حالت
+   * تیره یک کارت روشنِ تندِ ناجور وسط صفحه می‌نشست.
+   */
+  .flash-success{ background:var(--ok-soft); color:var(--ok-strong); }
+  .flash-error{ background:var(--bad-soft); color:var(--bad-strong); }
+  .flash-x{
+    flex-shrink:0; width:1.75rem; height:1.75rem; margin:-.25rem -.5rem -.25rem 0;
+    display:grid; place-items:center; border-radius:.5rem;
+    color:currentColor; opacity:.6; cursor:pointer;
+  }
+  .flash-x:hover{ opacity:1; }
+  .flash-out{ animation:flash-out .2s ease forwards; }
+  @keyframes flash-in{ from{ opacity:0; transform:translateY(10px) } to{ opacity:1; transform:none } }
+  @keyframes flash-out{ to{ opacity:0; transform:translateY(6px) } }
+  @media (prefers-reduced-motion: reduce){
+    .flash-stack.flash-float .flash{ animation:none }
+    .flash-out{ animation:none; opacity:0 }
   }
 
   /* نوار شناور پایین — همان حسِ تب‌بار iOS */

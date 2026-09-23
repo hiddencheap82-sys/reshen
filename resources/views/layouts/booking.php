@@ -134,7 +134,8 @@ $step = $step ?? null;
   <?php endif; ?>
 
   <main class="flex-1 px-5 py-5">
-    <?= $content ?>
+    <?php include BASE_PATH . '/resources/views/components/flash.php'; ?>
+<?= $content ?>
   </main>
 
   <footer class="text-center pb-5 pt-2">

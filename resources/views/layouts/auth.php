@@ -34,7 +34,8 @@
     <p class="text-xs text-ink-400 mt-1">زمانِ راست می‌گوید</p>
   </div>
   <div class="glass rounded-2xl p-6">
-    <?= $content ?>
+    <?php include BASE_PATH . '/resources/views/components/flash.php'; ?>
+<?= $content ?>
   </div>
 </div>
 </body>

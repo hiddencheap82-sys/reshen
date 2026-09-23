@@ -45,13 +45,7 @@
   </header>
 
   <main class="flex-1 px-5 pb-6">
-    <?php if ($ok = flash('success')): ?>
-      <div role="status"
-           class="flex items-start gap-2 bg-green-50 text-green-800 text-sm rounded-xl px-4 py-3 mb-4 border border-green-100">
-        <?= icon('check', 'w-4 h-4 mt-0.5 shrink-0') ?>
-        <span><?= e($ok) ?></span>
-      </div>
-    <?php endif; ?>
+    <?php include BASE_PATH . '/resources/views/components/flash.php'; ?>
 
     <?= $content ?>
   </main>

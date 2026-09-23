@@ -35,7 +35,8 @@
     </span>
   </div>
 
-  <main class="flex-1"><?= $content ?></main>
+  <main class="flex-1"><?php include BASE_PATH . '/resources/views/components/flash.php'; ?>
+<?= $content ?></main>
 </div>
 </body>
 </html>
