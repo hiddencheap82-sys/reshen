@@ -195,6 +195,89 @@ final class BarberLoopTest extends TestCase
         self::assertSame('مشتری روی صندلیِ رضا نشست.', $_SESSION['_flash']['success'] ?? null);
     }
 
+    // ─── صندلی و رزرو ───────────────────────────────────────────────
+
+    private function booking(string $scheduledAt): int
+    {
+        $customerId = (int) DB::insert('customers', [
+            'salon_id' => $this->salonId, 'name' => 'رزروی', 'phone' => '+98912' . random_int(1000000, 9999999),
+        ]);
+        $id = (int) DB::insert('appointments', [
+            'salon_id' => $this->salonId, 'public_token' => bin2hex(random_bytes(6)),
+            'customer_id' => $customerId, 'staff_id' => $this->staffId,
+            'kind' => 'booked', 'status' => 'confirmed', 'scheduled_at' => $scheduledAt,
+        ]);
+        DB::insert('appointment_items', [
+            'salon_id' => $this->salonId, 'appointment_id' => $id,
+            'service_id' => $this->serviceId, 'price' => 2500000, 'duration_minutes' => 30,
+        ]);
+
+        return $id;
+    }
+
+    private function walkIn(): array
+    {
+        return (new \App\Domain\Queue\QueueService())->addWalkin($this->salonId, 'حضوری', null, $this->staffId, [$this->serviceId]);
+    }
+
+    private function statusOf(int $id): string
+    {
+        return (string) DB::selectOne('SELECT status FROM appointments WHERE id = ?', [$id])['status'];
+    }
+
+    /**
+     * رزروِ هفت دقیقهٔ دیگر، صندلی را نگه می‌دارد.
+     *
+     * همان صحنه‌ای که نصبِ تازه نشان داد: حضوریِ ۱۲:۰۸ روی صندلی نشست و
+     * مشتریِ رزروِ ۱۲:۱۵ باید ۲۳ دقیقه منتظر می‌ماند، در حالی که تخمینِ
+     * صف رزرو را اول نشان می‌داد.
+     */
+    public function test_a_walk_in_is_not_seated_over_a_booking_that_is_due(): void
+    {
+        $this->booking(date('Y-m-d H:i:s', time() + 7 * 60));
+
+        $walkIn = $this->walkIn();
+
+        self::assertSame('queued', $this->statusOf((int) $walkIn['id']));
+    }
+
+    public function test_a_walk_in_is_seated_when_the_next_booking_is_hours_away(): void
+    {
+        if ((int) date('H') >= 21) {
+            self::markTestSkipped('رزروِ دو ساعت بعد به فردا می‌افتد.');
+        }
+        $this->booking(date('Y-m-d H:i:s', time() + 2 * 3600));
+
+        $walkIn = $this->walkIn();
+
+        self::assertSame('in_chair', $this->statusOf((int) $walkIn['id']));
+    }
+
+    /** غیبتِ ثبت‌نشده صندلی را قفل نمی‌کند. */
+    public function test_a_late_booking_does_not_block_the_chair(): void
+    {
+        if ((int) date('H') < 1) {
+            self::markTestSkipped('رزروِ یک ساعت پیش مالِ دیروز است.');
+        }
+        $this->booking(date('Y-m-d H:i:s', time() - 3600));
+
+        $walkIn = $this->walkIn();
+
+        self::assertSame('in_chair', $this->statusOf((int) $walkIn['id']));
+    }
+
+    /** بعد از «تمام شد» هم همین قاعده: نفرِ بعدیِ حاضر، مگر رزرو نوبتش باشد. */
+    public function test_finishing_does_not_seat_a_walk_in_over_a_due_booking(): void
+    {
+        $inChair = $this->appointment('in_chair');
+        $waiting = $this->appointment('queued', 'منتظر');
+        $this->booking(date('Y-m-d H:i:s', time() + 5 * 60));
+
+        (new \App\Domain\Queue\QueueService())->completeService($this->salonId, $inChair);
+
+        self::assertSame('queued', $this->statusOf($waiting));
+    }
+
     // ─── زبانِ پنل ──────────────────────────────────────────────────
 
     /** «نوبت بعدی توست» جملهٔ مشتری است؛ پنل از پرچمش «نفر بعدی» می‌سازد. */

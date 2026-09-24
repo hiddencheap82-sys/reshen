@@ -29,18 +29,24 @@ final class NewBookings
      * چند رزروِ آینده از آخرین باری که این کاربر «رزروها» را باز
      * کرده، ثبت شده است.
      *
-     * کاربرِ تازه (که هیچ‌وقت ندیده) صفر می‌گیرد، نه «همه». وگرنه
-     * اولین ورودش با نشانِ «۴۷ نوبت تازه» روبه‌رو می‌شود که هیچ
-     * معنایی ندارد.
+     * کاربری که هیچ‌وقت ندیده، از *روزِ عضویتش* شمرده می‌شود — نه از
+     * همیشه، نه از هیچ‌وقت.
+     *
+     * «از همیشه» یعنی پذیرشِ تازهٔ یک سالنِ پرکار، اولین روز با نشانِ
+     * «۴۷ نوبت تازه» روبه‌رو شود که هیچ معنایی ندارد. «از هیچ‌وقت» —
+     * رفتارِ قبلی — یعنی صاحبِ سالنِ *تازه* اولین رزروهای اینترنتی‌اش را
+     * نبیند، چون هنوز یک بار هم «رزروها» را باز نکرده بود؛ همان
+     * رزروهایی که بیش از همه منتظرشان است. نصبِ تازه همین را نشان داد.
      */
     public static function countFor(int $salonId, int $userId): int
     {
         $row = DB::selectOne(
-            'SELECT bookings_seen_at FROM salon_user WHERE salon_id = ? AND user_id = ?',
+            'SELECT COALESCE(bookings_seen_at, created_at) AS seen
+               FROM salon_user WHERE salon_id = ? AND user_id = ?',
             [$salonId, $userId]
         );
 
-        if ($row === null || $row['bookings_seen_at'] === null) {
+        if ($row === null || $row['seen'] === null) {
             return 0;
         }
 
@@ -52,7 +58,7 @@ final class NewBookings
                 AND status = 'confirmed'
                 AND scheduled_at > NOW()
                 AND created_at > ?",
-            [$salonId, $row['bookings_seen_at']]
+            [$salonId, $row['seen']]
         );
 
         return (int) ($count['c'] ?? 0);

@@ -83,17 +83,37 @@ final class NewBookingAwarenessTest extends TestCase
     // ─── شمارش ───────────────────────────────────────────────────────
 
     /**
-     * کاربری که هیچ‌وقت صفحهٔ رزروها را باز نکرده، صفر می‌بیند.
+     * رزروهای پیش از عضویت، برای عضوِ تازه «تازه» نیستند.
      *
-     * عمدی است: اگر «همه» را می‌شمرد، اولین ورودِ یک سالنِ پرکار با
-     * نشانِ «۴۷ نوبت تازه» روبه‌رو می‌شد که هیچ معنایی ندارد و از
-     * همان روز اول نادیده گرفته می‌شود.
+     * اگر «همه» شمرده می‌شد، اولین ورودِ پذیرشِ تازهٔ یک سالنِ پرکار با
+     * نشانِ «۴۷ نوبت تازه» روبه‌رو می‌شد که هیچ معنایی ندارد و از همان
+     * روز اول نادیده گرفته می‌شود.
      */
-    public function test_a_user_who_never_looked_sees_no_badge(): void
+    public function test_bookings_from_before_joining_are_not_new(): void
     {
-        $this->book();
+        $id = $this->book();
+        DB::update('appointments', ['created_at' => date('Y-m-d H:i:s', strtotime('-2 days'))], 'id = :id', ['id' => $id]);
 
         self::assertSame(0, NewBookings::countFor($this->salonId, $this->ownerId));
+    }
+
+    /**
+     * صاحبِ سالنِ تازه، اولین رزروش را می‌بیند — حتی اگر هنوز یک بار هم
+     * «رزروها» را باز نکرده باشد.
+     *
+     * پیش‌تر «هیچ‌وقت ندیده» یعنی صفر، و همین صاحبِ سالنی را که تازه
+     * راه افتاده بود از اولین رزروهای اینترنتی‌اش بی‌خبر می‌گذاشت.
+     */
+    public function test_a_new_owner_sees_their_first_booking(): void
+    {
+        DB::statement(
+            'UPDATE salon_user SET created_at = ? WHERE salon_id = ? AND user_id = ?',
+            [date('Y-m-d H:i:s', strtotime('-1 hour')), $this->salonId, $this->ownerId]
+        );
+
+        $this->book();
+
+        self::assertSame(1, NewBookings::countFor($this->salonId, $this->ownerId));
     }
 
     public function test_bookings_made_after_the_last_look_are_counted(): void

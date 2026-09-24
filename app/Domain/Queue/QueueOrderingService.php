@@ -41,7 +41,7 @@ final class QueueOrderingService
                 continue;
             }
 
-            if ($appt['kind'] === 'booked' && $appt['scheduled_at'] !== null && $this->withinPriorityWindow($appt['scheduled_at'], $now, $windowMinutes)) {
+            if ($this->hasPriority($appt, $now, $windowMinutes)) {
                 $priorityBooked[] = $appt;
 
                 continue;
@@ -59,6 +59,23 @@ final class QueueOrderingService
         });
 
         return array_merge($inChair, $priorityBooked, $rest);
+    }
+
+    /**
+     * این نوبت همین حالا بر حضوری‌ها مقدم است؟
+     *
+     * عمومی است چون صندلی هم باید همین را بپرسد (QueueService::
+     * autoStartIfChairFree): اگر ترتیبِ صف یک چیز بگوید و نشاندنِ
+     * خودکار چیز دیگر، تخمینی که مشتری می‌بیند دروغ می‌شود.
+     */
+    public function hasPriority(array $appt, ?DateTimeImmutable $now = null, ?int $windowMinutes = null): bool
+    {
+        $now ??= new DateTimeImmutable();
+        $windowMinutes ??= (int) Config::get('reshen.queue.priority_window_minutes', 10);
+
+        return ($appt['kind'] ?? '') === 'booked'
+            && !empty($appt['scheduled_at'])
+            && $this->withinPriorityWindow((string) $appt['scheduled_at'], $now, $windowMinutes);
     }
 
     private function withinPriorityWindow(string $scheduledAt, DateTimeImmutable $now, int $windowMinutes): bool

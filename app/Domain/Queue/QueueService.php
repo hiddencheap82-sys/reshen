@@ -174,12 +174,33 @@ final class QueueService
             return;
         }
 
-        $queue = $this->appointments->activeForStaff($salonId, $staffId);
-        $queue = array_filter($queue, static fn ($a) => $a['status'] === 'queued');
-        $ordered = $this->ordering->order(array_values($queue));
+        /*
+         * همان ترتیبی که تخمین و پنل نشان می‌دهند — با رزروهای امروز.
+         *
+         * پیش‌تر فقط حاضرها (queued) مرتب می‌شدند. رزروی که در بازهٔ
+         * اولویتش بود ولی مشتری‌اش هنوز نرسیده بود، دیده نمی‌شد و حضوریِ
+         * تازه روی صندلی می‌نشست: ساعت ۱۲:۰۸، هفت دقیقه پیش از رزروِ
+         * ۱۲:۱۵، با خدمتی نیم‌ساعته. تخمینِ صف می‌گفت «اول رزرو»، صندلی
+         * می‌گفت «اول حضوری» — و مشتریِ سرِ وقت ۲۳ دقیقه منتظر می‌ماند.
+         *
+         * حالا اولین *حاضر* نشانده می‌شود، مگر رزروی همین حالا نوبتش
+         * باشد؛ آن‌وقت صندلی منتظرِ او می‌ماند و آرایشگر اگر خواست، با
+         * «شروع» حضوری را جلو می‌اندازد. رزروِ دیرکرده (بیرون از بازه)
+         * جلوی کسی را نمی‌گیرد — وگرنه یک غیبتِ ثبت‌نشده، صندلی را تا
+         * آخر شب قفل می‌کرد.
+         */
+        $now = new DateTimeImmutable();
+        $ordered = $this->ordering->order($this->appointments->activeForStaff($salonId, $staffId), $now);
 
-        if ($ordered !== []) {
-            $this->startService($salonId, (int) $ordered[0]['id']);
+        foreach ($ordered as $appt) {
+            if ($appt['status'] === 'queued') {
+                $this->startService($salonId, (int) $appt['id']);
+
+                return;
+            }
+            if ($this->ordering->hasPriority($appt, $now)) {
+                return;
+            }
         }
     }
 
