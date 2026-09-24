@@ -4,7 +4,8 @@
  *
  * @var array $salon
  * @var bool $needsVerification
- * @var ?array $summary  خلاصهٔ انتخاب‌ها
+ * @var ?array $summary   خلاصهٔ انتخاب‌ها
+ * @var array  $editLinks برچسب ← نشانیِ گامِ همان انتخاب
  */
 ?>
 <h1 class="text-[15px] font-extrabold text-ink-900 mb-1">شمارهٔ تماست را بگو</h1>
@@ -23,7 +24,14 @@
     <?php foreach ($summary as $label => $value): ?>
       <div class="flex items-baseline justify-between gap-3 text-[12.5px]">
         <span class="text-ink-400 shrink-0"><?= e($label) ?></span>
-        <span class="font-bold text-ink-800 text-left"><?= e($value) ?></span>
+        <span class="flex items-baseline gap-2 min-w-0">
+          <span class="font-bold text-ink-800 text-left"><?= e($value) ?></span>
+          <?php if (isset($editLinks[$label])): ?>
+            <a href="<?= e(url($editLinks[$label])) ?>"
+               class="tap shrink-0 text-[12px] font-semibold text-accent px-1 -my-2 py-2"
+               aria-label="تغییر <?= e($label) ?>">تغییر</a>
+          <?php endif; ?>
+        </span>
       </div>
     <?php endforeach; ?>
   </div>

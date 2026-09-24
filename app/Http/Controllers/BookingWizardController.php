@@ -128,12 +128,52 @@ final class BookingWizardController extends Controller
             }
             $this->setWizard($salon['slug'], ['service_ids' => $serviceIds]);
 
+            /*
+             * گامِ «آرایشگر» فقط وقتی معنی دارد که انتخابی باشد.
+             *
+             * بیشتر آرایشگاه‌های مردانه یک یا دو صندلی دارند. وقتی در آن
+             * ساعت فقط یک نفر آزاد است، پرسیدنِ «کدام آرایشگر؟» یک صفحهٔ
+             * کامل است با یک گزینه — و هر صفحهٔ اضافه، بخشی از مشتری‌ها
+             * را می‌ریزد. «هرکسی» و «همان یک نفر» اینجا یکی‌اند، پس رد
+             * کردنش هیچ چیزی را از مشتری نمی‌گیرد.
+             *
+             * خلاصهٔ گام آخر نامِ آرایشگر را نشان می‌دهد، پس مشتری
+             * می‌بیند با چه کسی نوبت دارد.
+             */
+            $wizard = $this->wizard($salon['slug']);
+            $free = $this->staffFreeAtSlot($salon, $wizard);
+
+            if ($free === []) {
+                return $this->withError(
+                    'این ساعت همین الان پر شد. لطفاً ساعت دیگری انتخاب کنید.',
+                    '/s/' . $salon['slug']
+                );
+            }
+
+            if (count($free) === 1) {
+                $this->setWizard($salon['slug'], [
+                    'staff_id' => (int) array_key_first($free),
+                    'staff_skipped' => true,
+                ]);
+
+                return $this->redirect('/s/' . $salon['slug'] . '/phone');
+            }
+
+            /*
+             * آرایشگرِ قبلی پاک می‌شود. اگر مشتری از خلاصهٔ گام آخر
+             * برگشته و ساعت را عوض کرده، آرایشگری که قبلاً انتخاب کرده
+             * شاید در ساعتِ تازه آزاد نباشد — و ثبتِ نهایی با خطای
+             * «این بازه دیگر آزاد نیست» او را به اول مسیر پرت می‌کرد.
+             */
+            $this->setWizard($salon['slug'], ['staff_skipped' => false, 'staff_id' => null]);
+
             return $this->redirect('/s/' . $salon['slug'] . '/staff');
         }
 
         return $this->page('layouts.booking', 'booking.services', [
             'title' => 'انتخاب خدمت',
             'step' => 2,
+            'steps' => $this->stepTitles($salon),
             'salon' => $salon,
             'services' => (new ServiceRepository())->all((int) $salon['id'], true),
             'slotLabel' => $this->slotLabel($wizard),
@@ -191,6 +231,7 @@ final class BookingWizardController extends Controller
         return $this->page('layouts.booking', 'booking.staff', [
             'title' => 'انتخاب آرایشگر',
             'step' => 3,
+            'steps' => $this->stepTitles($salon),
             'salon' => $salon,
             'staff' => array_values($free),
             'slotLabel' => $this->slotLabel($wizard),
@@ -307,6 +348,7 @@ final class BookingWizardController extends Controller
             'days' => $days,
             'title' => $salon['name'],
             'step' => $step,
+            'steps' => $this->stepTitles($salon),
             'salon' => $salon,
             'calendar' => JalaliCalendar::month($viewYear, $viewMonth, $dayStates),
             'minMonth' => ['year' => $todayJy, 'month' => $todayJm],
@@ -554,12 +596,29 @@ final class BookingWizardController extends Controller
             return $this->redirect('/s/' . $salon['slug'] . '/verify');
         }
 
+        $steps = $this->stepTitles($salon);
+
         return $this->page('layouts.booking', 'booking.phone', [
             'title' => 'شمارهٔ موبایل',
-            'step' => 4,
+            'step' => count($steps),
+            'steps' => $steps,
+            'backTo' => !empty($wizard['staff_skipped'])
+                ? '/s/' . $salon['slug'] . '/services'
+                : '/s/' . $salon['slug'] . '/staff',
             'salon' => $salon,
             'needsVerification' => (bool) Config::get('reshen.booking.verify_phone', false),
             'summary' => $this->wizardSummary($salon, $wizard),
+            /*
+             * هر ردیفِ خلاصه به گامِ خودش برمی‌گردد. مشتری‌ای که همین
+             * حالا فهمیده خدمت را اشتباه زده، نباید دکمهٔ «بازگشت»
+             * مرورگر را دو بار بزند و امیدوار باشد انتخاب‌هایش بمانند.
+             * انتخاب‌ها در نشست‌اند و با این پیوندها از دست نمی‌روند.
+             */
+            'editLinks' => array_filter([
+                'زمان' => '/s/' . $salon['slug'],
+                'خدمت' => '/s/' . $salon['slug'] . '/services',
+                'آرایشگر' => empty($wizard['staff_skipped']) ? '/s/' . $salon['slug'] . '/staff' : null,
+            ]),
         ]);
     }
 
@@ -635,6 +694,13 @@ final class BookingWizardController extends Controller
             if ($staff !== null) {
                 $summary['آرایشگر'] = $staff['name'];
             }
+        } elseif (array_key_exists('staff_id', $wizard)) {
+            /*
+             * «هرکسی که آزاد است» هم یک انتخاب است و باید دیده شود.
+             * بدون این ردیف، مشتری‌ای که آرایشگرِ خاصی را می‌خواسته و
+             * اشتباهی رد شده، تا روز نوبت نمی‌فهمد.
+             */
+            $summary['آرایشگر'] = 'هرکسی که آزاد باشد';
         }
 
         $date = new DateTimeImmutable($wizard['date']);
@@ -681,6 +747,33 @@ final class BookingWizardController extends Controller
         Session::forget($this->wizardKey($slug));
 
         return $this->redirect('/q/' . $appointment['public_token']);
+    }
+
+    /**
+     * برچسب گام‌ها برای نوار پیشرفت.
+     *
+     * سالنی که فقط یک آرایشگر فعال دارد، هیچ‌وقت گام «آرایشگر» را
+     * نمی‌بیند — پس نوار هم نباید چهار گام بگوید و بعد سه گام برود.
+     * مشتری‌ای که منتظر گامی است که نمی‌آید، فکر می‌کند چیزی خراب شده.
+     *
+     * برای سالنِ چندآرایشگری، نوار چهار گام می‌ماند حتی وقتی در یک
+     * ساعتِ خاص فقط یک نفر آزاد است: آن‌جا گام «آرایشگر» پُر‌شده
+     * (سبز) نشان داده می‌شود، که راست است — انتخاب شده، فقط خودکار.
+     *
+     * @return string[]
+     */
+    private function stepTitles(array $salon): array
+    {
+        $last = Config::get('reshen.booking.verify_phone', false) ? 'تأیید' : 'ثبت';
+
+        $activeStaff = (int) (DB::selectOne(
+            'SELECT COUNT(*) AS c FROM staff WHERE salon_id = ? AND is_active = 1',
+            [(int) $salon['id']]
+        )['c'] ?? 0);
+
+        return $activeStaff <= 1
+            ? ['زمان', 'خدمت', $last]
+            : ['زمان', 'خدمت', 'آرایشگر', $last];
     }
 
     private function salonOrFail(string $slug): ?array
