@@ -66,19 +66,10 @@ final class Scheduler
             }],
 
             'بستن نوبت‌های رهاشده' => [900, static function (): string {
-                /*
-                 * نوبتی که سالن بسته شده و هنوز در صف مانده، باید غیبت
-                 * ثبت شود — وگرنه فردا در صف ظاهر می‌شود و ترتیب را
-                 * به هم می‌ریزد.
-                 */
-                $affected = DB::statement(
-                    "UPDATE appointments
-                        SET status = 'no_show', updated_at = NOW()
-                      WHERE status IN ('queued', 'confirmed')
-                        AND COALESCE(scheduled_at, queued_at) < (NOW() - INTERVAL 1 DAY)"
-                )->rowCount();
+                // قاعده و دلیلش در خودِ LeftoverCloser است.
+                $closed = (new \App\Domain\Queue\LeftoverCloser())->run();
 
-                return "{$affected} نوبت";
+                return "{$closed['no_show']} غیبت، {$closed['completed']} صندلیِ جامانده";
             }],
 
             'پاک‌سازی' => [3600, static function (): string {

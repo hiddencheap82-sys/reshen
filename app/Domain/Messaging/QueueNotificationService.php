@@ -67,9 +67,27 @@ final class QueueNotificationService
 
             $minutesUntil = max(0, (int) round(($e['start_p50']->getTimestamp() - $now->getTimestamp()) / 60));
 
-            // "عقب افتادیم" — ETA slipped more than the threshold since the last one we told them.
-            if ($appt['estimated_start_at'] !== null) {
-                $previousMinutes = (int) round((strtotime($appt['estimated_start_at']) - $now->getTimestamp()) / 60);
+            $isBooked = ($appt['kind'] ?? '') === 'booked' && !empty($appt['scheduled_at']);
+
+            /*
+             * «عقب افتادیم» — تخمین از آخرین چیزی که به مشتری گفته‌ایم
+             * بیش از آستانه جلو رفته.
+             *
+             * برای نوبتِ رزروشده، مبنا «دیرترینِ» تخمینِ قبلی و ساعتِ
+             * رزرو است. دیر بودن یعنی دیرتر از چیزی که به او قول
+             * داده‌ایم — و ساعت رزرو خودش یک قول است. بدون این، نوبت‌هایی
+             * که تخمینشان پیش از این اصلاح به‌غلط «الان» ذخیره شده بود،
+             * بار اول یک پیامکِ «عقبیم» دروغ می‌گرفتند، در حالی که درست
+             * سر وقتشان بودند.
+             */
+            $baseline = $appt['estimated_start_at'] !== null ? strtotime((string) $appt['estimated_start_at']) : null;
+            if ($isBooked) {
+                $booked = strtotime((string) $appt['scheduled_at']);
+                $baseline = $baseline === null ? $booked : max($baseline, $booked);
+            }
+
+            if ($baseline !== null) {
+                $previousMinutes = (int) round(($baseline - $now->getTimestamp()) / 60);
                 if ($minutesUntil - $previousMinutes >= $delayThreshold) {
                     $this->notifier->notify($salonId, $appt, 'queue_delayed', [
                         'name' => $this->firstName($appt),
@@ -84,8 +102,18 @@ final class QueueNotificationService
                 'position_snapshot' => $rank,
             ]);
 
-            // "صندلی آماده‌ست" — became next in line (right after whoever's in the chair).
-            if ($rank === 0 && !$this->notifier->alreadySent((int) $appt['id'], 'queue_chair_ready')) {
+            /*
+             * «نوبت بعدی شماست، لطفاً بیایید.»
+             *
+             * برای مراجعهٔ حضوری — که همین حالا در سالن نشسته — اول
+             * صف بودن کافی است. ولی مشتریِ رزروی در خانه است، و «بیایید»
+             * فقط وقتی راست است که ساعتش نزدیک باشد. اول صف بودنِ کسی
+             * که ساعت ۶ رزرو کرده، ساعت ۳ هیچ معنایی ندارد.
+             */
+            $bookedNotYetDue = $isBooked && $minutesUntil > $imminentHigh;
+
+            if ($rank === 0 && !$bookedNotYetDue
+                && !$this->notifier->alreadySent((int) $appt['id'], 'queue_chair_ready')) {
                 $this->notifier->notify($salonId, $appt, 'queue_chair_ready', [
                     'name' => $this->firstName($appt),
                     'staff' => $staff['name'],

@@ -102,12 +102,35 @@ final class AppointmentRepository
         return $out;
     }
 
+    /**
+     * صفِ امروزِ یک آرایشگر.
+     *
+     * «امروز» عمدی است. پیش‌تر هر رزروِ تأییدشده — حتی هفتهٔ بعد —
+     * اینجا می‌آمد، و سه جا را خراب می‌کرد:
+     *
+     *   ۱. «صف زنده» در پنل، رزروهای روزهای بعد را پشت صف امروز نشان
+     *      می‌داد، با ساعت‌هایی مثل ۰۰:۲۰ و ۰۱:۰۵ بامداد.
+     *   ۲. کارت نوبتِ مشتریِ هفتهٔ بعد، جایگاهش را در صف امروز حساب
+     *      می‌کرد و اگر اول بود «نوبت بعدی توست» می‌گفت.
+     *   ۳. رزروِ دیروزی که هرگز بسته نشد (غیبت ثبت نشد)، برای همیشه
+     *      اول صف می‌نشست و تخمینِ همه را به اندازهٔ خودش عقب می‌برد.
+     *
+     * رزروهای روزهای دیگر جایشان صفحهٔ «رزروها» است. کسی که همین حالا
+     * در صف یا روی صندلی است، از هر روزی که باشد، می‌ماند.
+     *
+     * CURDATE() با ساعت PHP یکی است چون DB::syncTimeZone منطقهٔ زمانی
+     * نشست را هنگام اتصال تنظیم می‌کند.
+     */
     public function activeForStaff(int $salonId, int $staffId): array
     {
         return DB::select(
             "SELECT a.*, c.name AS customer_name, c.phone AS customer_phone
              FROM appointments a JOIN customers c ON c.id = a.customer_id
-             WHERE a.salon_id = ? AND a.staff_id = ? AND a.status IN ('confirmed','queued','in_chair')
+             WHERE a.salon_id = ? AND a.staff_id = ?
+               AND (
+                    a.status IN ('queued','in_chair')
+                    OR (a.status = 'confirmed' AND DATE(a.scheduled_at) = CURDATE())
+               )
              ORDER BY a.id",
             [$salonId, $staffId]
         );

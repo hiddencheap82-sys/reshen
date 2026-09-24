@@ -89,8 +89,36 @@ final class EtaEngine
             } else {
                 $startP50 = $cursorP50;
                 $startP80 = $cursorP80;
-                $cursorP50 = $cursorP50->modify('+' . (int) round($expected['p50'] + $bufferMinutes) . ' minutes');
-                $cursorP80 = $cursorP80->modify('+' . (int) round($expected['p80'] + $bufferMinutes) . ' minutes');
+
+                /*
+                 * نوبتِ رزروشده پیش از ساعتِ خودش شروع نمی‌شود.
+                 *
+                 * پیش‌تر زنجیره فقط از «الان» جلو می‌رفت. نتیجه‌اش:
+                 * مشتری‌ای که ساعت ۶ عصر رزرو کرده، وقتی صف ساعت ۳ خالی
+                 * بود تخمینِ «ساعت ۳» می‌گرفت — و چون اولِ صف بود،
+                 * پیامکِ «نوبت بعدی شماست، لطفاً بیایید» سه ساعت زودتر
+                 * برایش می‌رفت. آن پیامک «ضروری» است و ساعت سکوت را هم
+                 * رد می‌کند؛ یعنی رزروِ فردا صبح می‌توانست نیمه‌شب
+                 * «بیایید» بگیرد. نوبتِ هفتهٔ بعد هم تخمینش را «امروز»
+                 * می‌گرفت، و کارت نوبتِ خودِ مشتری همان را نشانش می‌داد.
+                 *
+                 * آرایشگر بین دو نوبت بیکار نمی‌ماند: مراجعهٔ حضوری‌ای که
+                 * زودتر برسد، به ترتیبِ رسیدن جلوتر می‌نشیند — ترتیب را
+                 * QueueOrderingService تعیین می‌کند، نه اینجا.
+                 */
+                if (($appt['kind'] ?? '') === 'booked' && !empty($appt['scheduled_at'])) {
+                    $scheduled = new DateTimeImmutable((string) $appt['scheduled_at']);
+
+                    if ($scheduled > $startP50) {
+                        $startP50 = $scheduled;
+                    }
+                    if ($scheduled > $startP80) {
+                        $startP80 = $scheduled;
+                    }
+                }
+
+                $cursorP50 = $startP50->modify('+' . (int) round($expected['p50'] + $bufferMinutes) . ' minutes');
+                $cursorP80 = $startP80->modify('+' . (int) round($expected['p80'] + $bufferMinutes) . ' minutes');
             }
 
             $results[(int) $appt['id']] = [
@@ -160,16 +188,24 @@ final class EtaEngine
     /** Human display text per doc 8.6 "قواعد نمایش". */
     public function displayText(int $position, DateTimeImmutable $startP50, DateTimeImmutable $startP80, DateTimeImmutable $now): array
     {
-        if ($position === 0) {
-            return ['text' => 'نوبت بعدی توست', 'rough' => false];
-        }
-
         $minutesP50 = max(0, (int) round(($startP50->getTimestamp() - $now->getTimestamp()) / 60));
         $minutesP80 = max($minutesP50, (int) round(($startP80->getTimestamp() - $now->getTimestamp()) / 60));
 
         $imminent = (int) Config::get('reshen.display.imminent_threshold_minutes', 15);
         $far = (int) Config::get('reshen.display.far_threshold_minutes', 60);
         $maxWindow = (int) Config::get('reshen.display.max_window_minutes', 25);
+
+        /*
+         * «نوبت بعدی توست» فقط وقتی که واقعاً نزدیک است.
+         *
+         * اول صف بودن کافی نیست: مشتری‌ای که ساعت ۶ رزرو کرده و ساعت ۳
+         * کسی جلویش نیست، «اول» است ولی سه ساعت مانده. پیش‌تر کارتش
+         * همین جمله را می‌گفت. برای مراجعهٔ حضوری فرقی نمی‌کند: اولِ صفِ
+         * حضوری همیشه همین حالا شروع می‌شود.
+         */
+        if ($position === 0 && $minutesP50 < $imminent) {
+            return ['text' => 'نوبت بعدی توست', 'rough' => false];
+        }
 
         if ($minutesP50 < $imminent) {
             return ['text' => "حدود {$this->fa($minutesP50)} دقیقهٔ دیگر", 'rough' => false];
@@ -191,7 +227,24 @@ final class EtaEngine
             ? (clone $startP50)->modify('+' . $maxWindow . ' minutes')->format('H:i')
             : $startP80->format('H:i');
 
-        return ['text' => "حدود ساعت {$this->fa($timeFrom)} تا {$this->fa($timeToStr)}", 'rough' => $rough];
+        /*
+         * ساعتِ بی‌تاریخ یعنی «امروز». اگر تخمین به روز دیگری افتاده —
+         * صف شب از نیمه‌شب گذشته — بدون تاریخ، «حدود ساعت ۰۰:۲۰» را
+         * همه ساعت ۰۰:۲۰ دیشب می‌خوانند.
+         */
+        $day = $startP50->format('Y-m-d') === $now->format('Y-m-d')
+            ? ''
+            : \App\Support\JalaliCalendar::relativeDate($startP50, $now->setTime(0, 0)) . '، ';
+
+        /*
+         * نوبتِ رزروی که صف جلویش خالی است، هر دو سرِ بازه‌اش همان ساعتِ
+         * رزرو است. «۱۶:۰۰ تا ۱۶:۰۰» درست است ولی آدم را مکث می‌اندازد.
+         */
+        if ($timeFrom === $timeToStr) {
+            return ['text' => "{$day}ساعت {$this->fa($timeFrom)}", 'rough' => false];
+        }
+
+        return ['text' => "{$day}حدود ساعت {$this->fa($timeFrom)} تا {$this->fa($timeToStr)}", 'rough' => $rough];
     }
 
     private function fa(int|string $v): string
