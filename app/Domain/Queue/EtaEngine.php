@@ -204,7 +204,9 @@ final class EtaEngine
          * حضوری همیشه همین حالا شروع می‌شود.
          */
         if ($position === 0 && $minutesP50 < $imminent) {
-            return ['text' => 'نوبت بعدی توست', 'rough' => false];
+            // «next»: همین جمله رو به مشتری است؛ پنل آرایشگر از این پرچم
+            // «نفر بعدی» می‌سازد، نه اینکه به آرایشگر بگوید «نوبتِ توست».
+            return ['text' => 'نوبت بعدی توست', 'rough' => false, 'next' => true];
         }
 
         if ($minutesP50 < $imminent) {

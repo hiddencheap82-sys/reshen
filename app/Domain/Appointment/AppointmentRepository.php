@@ -254,4 +254,39 @@ final class AppointmentRepository
             'no_show' => (int) ($row['no_show'] ?? 0),
         ];
     }
+
+    /**
+     * کارهای امروز که تمام شده‌اند ولی پولشان ثبت نشده.
+     *
+     * آرایشگرِ بدون دسترسیِ تسویه که «تمام شد» می‌زند، کار را به
+     * پیشخوان می‌سپارد؛ این فهرست همان سپرده است. مرزش همان مرزِ
+     * «نیاز به رسیدگی»ِ داشبورد است (پایانِ امروز، بدون پرداخت) تا عددِ
+     * آنجا و ردیف‌های اینجا یکی باشند — کسی که از داشبورد می‌آید باید
+     * همان تعداد را ببیند.
+     *
+     * @return list<array{id:int,customer_name:?string,staff_name:?string,actual_end_at:string,total:int}>
+     */
+    public function awaitingPayment(int $salonId): array
+    {
+        $rows = DB::select(
+            "SELECT a.id, c.name AS customer_name, s.name AS staff_name, a.actual_end_at,
+                    COALESCE((SELECT SUM(i.price) FROM appointment_items i WHERE i.appointment_id = a.id), 0) AS total
+               FROM appointments a
+               LEFT JOIN payments p ON p.appointment_id = a.id
+               LEFT JOIN customers c ON c.id = a.customer_id
+               LEFT JOIN staff s ON s.id = a.staff_id
+              WHERE a.salon_id = ? AND a.status = 'completed'
+                AND DATE(a.actual_end_at) = CURDATE() AND p.id IS NULL
+              ORDER BY a.actual_end_at",
+            [$salonId]
+        );
+
+        return array_map(static fn (array $r) => [
+            'id' => (int) $r['id'],
+            'customer_name' => $r['customer_name'],
+            'staff_name' => $r['staff_name'],
+            'actual_end_at' => (string) $r['actual_end_at'],
+            'total' => (int) $r['total'],
+        ], $rows);
+    }
 }

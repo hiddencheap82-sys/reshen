@@ -42,6 +42,8 @@ for key, p in palettes.items():
         ('رنگ تأکید روی سطح روشن',    p['accent'],   LIGHT_SURFACE,  4.5),
         ('رنگ تأکید روی زمینهٔ روشن', p['accent'],   LIGHT_BG,       4.5),
         ('متن روی سطح نرمِ تأکید',    LIGHT_TEXT,    p['soft'],      4.5),
+        # دکمهٔ کم‌رنگ (‎.btn-tint‎): متنِ رنگِ سالن روی زمینهٔ نرمِ خودش
+        ('تأکید روی سطح نرمِ روشن',   p['accent'],   p['soft'],      4.5),
         ('تأکید تیره روی سطح تیره',   p['darkAccent'], DARK_SURFACE, 4.5),
         ('تأکید تیره روی زمینهٔ تیره',p['darkAccent'], DARK_BG,      4.5),
         ('متن روی سطح نرمِ تیره',     DARK_TEXT,     p['darkSoft'],  4.5),

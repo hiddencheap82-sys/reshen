@@ -49,19 +49,23 @@ final class Auth
         Session::regenerate();
         Session::put('user_id', $userId);
         self::$userCache = null;
+        self::$membershipCache = null;
         DB::update('users', ['last_login_at' => date('Y-m-d H:i:s')], 'id = :id', ['id' => $userId]);
     }
 
     /**
-     * حافظهٔ کاربر را دور می‌ریزد.
+     * حافظهٔ کاربر را دور می‌ریزد — خودش و عضویت‌هایش.
      *
      * بعد از عوض شدن نام یا رمز لازم است: بدون این، تا پایان همان
      * درخواست، صفحه هنوز مقدار قبلی را نشان می‌دهد و کاربر فکر می‌کند
-     * تغییرش ذخیره نشده.
+     * تغییرش ذخیره نشده. عضویت‌ها هم با همین پاک می‌شوند، چون نقشِ
+     * کاربر از آن‌ها می‌آید: حافظه‌ای که فقط نیمی از کاربر را فراموش
+     * کند، نقشِ کاربرِ قبلی را به بعدی می‌دهد.
      */
     public static function forgetUserCache(): void
     {
         self::$userCache = null;
+        self::$membershipCache = null;
     }
 
     public static function logout(): void

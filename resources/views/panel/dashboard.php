@@ -63,7 +63,7 @@ $growth = $prevWeekTotal > 0 ? (int) round(($weekTotal - $prevWeekTotal) / $prev
         $rows[] = ['wallet', 'text-bad', 'var(--bad-soft)',
             fa_num($attention['unpaid']) . ' نوبت تمام‌شده، تسویه‌نشده',
             'کار انجام شده ولی پولش ثبت نشده — گزارش فروش امروز کم‌تر از واقعیت است.',
-            url('panel')];
+            url('panel') . '#awaiting-payment'];
     }
     if ($attention['stale'] > 0) {
         $rows[] = ['clock', 'text-warn', 'var(--accent-soft)',

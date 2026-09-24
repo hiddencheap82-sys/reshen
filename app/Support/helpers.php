@@ -97,7 +97,13 @@ if (!function_exists('csrf_token')) {
 if (!function_exists('csrf_field')) {
     function csrf_field(): string
     {
-        return '<input type="hidden" name="_csrf" value="' . e(csrf_token()) . '">';
+        /*
+         * ویژگیِ ‎hidden‎ روی ورودیِ پنهان زائد به نظر می‌رسد، ولی نیست:
+         * ‎space-y-*‎ تیلویند فاصله را به هر فرزندی می‌دهد که ‎[hidden]‎
+         * ندارد. این ورودی اولین فرزندِ تقریباً هر فرمی است، پس بخشِ
+         * اولِ فرم یک فاصلهٔ اضافهٔ بی‌دلیل از بالا می‌گرفت.
+         */
+        return '<input type="hidden" hidden name="_csrf" value="' . e(csrf_token()) . '">';
     }
 }
 

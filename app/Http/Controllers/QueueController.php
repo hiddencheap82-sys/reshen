@@ -32,6 +32,9 @@ final class QueueController extends Controller
         return $this->page('layouts.panel', 'panel.queue.index', [
             'title' => 'صف زنده',
             'snapshot' => $snapshot,
+            // همان اثرِ انگشتی که poll برمی‌گرداند؛ صفحه فقط وقتی دوباره
+            // بارگذاری می‌شود که این عوض شده باشد.
+            'pollEtag' => $this->etagFor($snapshot),
             'myStaffId' => $myStaffId,
             'services' => $services,
             'staffList' => $staffList,
@@ -43,6 +46,11 @@ final class QueueController extends Controller
             'salonEarnings' => Access::allows(Access::VIEW_SALON_EARNINGS)
                 ? (new \App\Domain\Payment\PaymentRepository())->dailyTotal($salonId, date('Y-m-d'), null)
                 : null,
+            // فقط برای کسی که می‌تواند تسویه کند؛ برای بقیه فهرستی است که
+            // کاری با آن نمی‌توانند بکنند.
+            'awaitingPayment' => Access::allows(Access::TAKE_PAYMENT)
+                ? (new AppointmentRepository())->awaitingPayment($salonId)
+                : [],
         ]);
     }
 
@@ -59,7 +67,7 @@ final class QueueController extends Controller
         $snapshot = (new QueueService())->salonSnapshot($salonId);
 
         $body = json_encode($this->simplify($snapshot), JSON_UNESCAPED_UNICODE);
-        $etag = '"' . md5($body) . '"';
+        $etag = $this->etagFor($snapshot);
 
         if ($request->header('If-None-Match') === $etag) {
             return new Response('', 304, ['ETag' => $etag]);
@@ -74,10 +82,13 @@ final class QueueController extends Controller
         $serviceIds = array_filter(array_map('intval', (array) $request->input('service_ids', [])));
         $staffId = $request->input('staff_id') !== '' && $request->input('staff_id') !== null ? (int) $request->input('staff_id') : null;
 
+        $name = trim((string) $request->input('name', '')) ?: null;
+        $queue = new QueueService();
+
         try {
-            (new QueueService())->addWalkin(
+            $appointment = $queue->addWalkin(
                 $salonId,
-                trim((string) $request->input('name', '')) ?: null,
+                $name,
                 trim((string) $request->input('phone', '')) ?: null,
                 $staffId,
                 $serviceIds
@@ -86,7 +97,36 @@ final class QueueController extends Controller
             return $this->withError($e->getMessage(), '/panel');
         }
 
-        return $this->withSuccess('مشتری به صف اضافه شد.', '/panel');
+        return $this->withSuccess($this->walkinMessage($queue, $appointment, $name), '/panel');
+    }
+
+    /**
+     * پیامِ «اضافه شد» — با همان جوابی که مشتری جلوی پیشخوان می‌خواهد.
+     *
+     * اولین سؤالِ مشتریِ حضوری «چقدر طول می‌کشه؟» است. پیش‌تر پیام فقط
+     * «مشتری به صف اضافه شد» بود و پذیرش باید صف را پایین می‌رفت، ردیفِ
+     * تازه را پیدا می‌کرد و زمانش را می‌خواند. حالا جواب در همان پیام است.
+     */
+    private function walkinMessage(QueueService $queue, array $appointment, ?string $name): string
+    {
+        $who = $name !== null ? '«' . $name . '»' : 'مشتری';
+        $staff = DB::selectOne('SELECT name FROM staff WHERE id = ?', [(int) $appointment['staff_id']]);
+        $staffName = (string) ($staff['name'] ?? '');
+        $view = $queue->customerView((string) $appointment['public_token']);
+
+        if (($view['appointment']['status'] ?? '') === 'in_chair') {
+            return "{$who} روی صندلیِ {$staffName} نشست.";
+        }
+
+        if (!empty($view['display']['next'])) {
+            return "{$who} نفرِ بعدیِ {$staffName} است.";
+        }
+
+        $when = $view['display']['text'] ?? null;
+
+        return $when !== null
+            ? "{$who} به صف {$staffName} اضافه شد — نوبتش {$when}."
+            : "{$who} به صف {$staffName} اضافه شد.";
     }
 
     /**
@@ -141,6 +181,19 @@ final class QueueController extends Controller
             return $this->withError($e->getMessage(), '/panel');
         }
 
+        /*
+         * آرایشگری که دسترسیِ تسویه ندارد، به صفحهٔ تسویه فرستاده نمی‌شود.
+         *
+         * پیش‌تر همه به ‎/panel/pay‎ می‌رفتند، و برای نقشِ «آرایشگر» آن
+         * مسیر ۴۰۳ است: هر بار که آرایشگر کارِ مشتری را تمام می‌کرد، با
+         * صفحهٔ «دسترسی ندارید» روبه‌رو می‌شد — در حالی که کار درست ثبت
+         * شده بود. حالا به صف برمی‌گردد و تسویه در فهرستِ «منتظر تسویه»ِ
+         * پیشخوان می‌نشیند.
+         */
+        if (!Access::allows(Access::TAKE_PAYMENT)) {
+            return $this->withSuccess('تمام شد. تسویه را پیشخوان ثبت می‌کند.', '/panel');
+        }
+
         $total = array_sum(array_column($result['items'], 'price'));
 
         return $this->redirect('/panel/pay/' . $appointmentId . '?amount=' . $total);
@@ -166,6 +219,11 @@ final class QueueController extends Controller
         (new QueueService())->cancel(Auth::salonId(), (int) $request->param('id'), (string) $request->input('reason', ''));
 
         return $this->withSuccess('نوبت لغو شد.', '/panel');
+    }
+
+    private function etagFor(array $snapshot): string
+    {
+        return '"' . md5((string) json_encode($this->simplify($snapshot), JSON_UNESCAPED_UNICODE)) . '"';
     }
 
     private function simplify(array $snapshot): array
