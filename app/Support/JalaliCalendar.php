@@ -143,7 +143,10 @@ final class JalaliCalendar
         $today ??= new DateTimeImmutable('today');
         $diff = (int) $today->diff($date->setTime(0, 0))->format('%r%a');
 
+        // «دیروز» برای گزارش‌ها لازم شد: «دیروز چقدر فروختیم؟» سؤال هر شب
+        // است، و «چهارشنبه ۱ مهر» جوابش را یک لحظه دیرتر می‌دهد.
         return match ($diff) {
+            -1 => 'دیروز',
             0 => 'امروز',
             1 => 'فردا',
             2 => 'پس‌فردا',

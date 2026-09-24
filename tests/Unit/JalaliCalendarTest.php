@@ -141,6 +141,7 @@ final class JalaliCalendarTest extends TestCase
     {
         $today = new DateTimeImmutable('2026-09-20');
 
+        self::assertSame('دیروز', JalaliCalendar::relativeDate(new DateTimeImmutable('2026-09-19'), $today));
         self::assertSame('امروز', JalaliCalendar::relativeDate(new DateTimeImmutable('2026-09-20'), $today));
         self::assertSame('فردا', JalaliCalendar::relativeDate(new DateTimeImmutable('2026-09-21'), $today));
         self::assertSame('پس‌فردا', JalaliCalendar::relativeDate(new DateTimeImmutable('2026-09-22'), $today));

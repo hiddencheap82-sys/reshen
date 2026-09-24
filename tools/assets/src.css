@@ -552,6 +552,38 @@ html.dark[data-theme="ruby"]{
   .hairline-bad{box-shadow:inset 0 2px 0 0 var(--bad-strong)}
 
   /*
+   * نمودار ستونیِ روزانه.
+   *
+   * قواعدش از یک جا می‌آید: میله حداکثر ۲۴ پیکسل (هیچ‌وقت کلِ جایش را
+   * پر نمی‌کند — نسخهٔ قبلی با یک روز داده، یک مستطیلِ یکدست به پهنای
+   * کارت می‌شد)، سرِ میله ۴ پیکسل گرد و پایه‌اش صاف، خط‌های راهنما یک
+   * پیکسلِ کم‌رنگ. رنگ میله لهجهٔ سالن است؛ هر شش پالت در هر دو تم
+   * کنتراست ۳:۱ با کارت را پاس می‌کنند.
+   */
+  .chart-plot{position:relative;height:8rem;touch-action:pan-y}
+  .chart-grid{position:absolute;inset-inline:0;height:1px;background:var(--line);pointer-events:none}
+  .chart-bars{position:absolute;inset:0;display:flex;align-items:flex-end}
+  .chart-slot{
+    flex:1 1 0;min-width:0;height:100%;
+    display:flex;align-items:flex-end;justify-content:center;
+    border-radius:4px;
+  }
+  .chart-slot[aria-selected="true"]{background:var(--fill-secondary)}
+  .chart-bar{
+    width:min(24px, calc(100% - 2px));
+    background:var(--accent);
+    border-radius:4px 4px 0 0;
+  }
+  .chart-x{display:flex;margin-top:.375rem}
+  .chart-x > span{
+    flex:1 1 0;min-width:0;text-align:center;
+    font-size:11px;line-height:1;color:var(--text-dim);
+    font-variant-numeric:tabular-nums;white-space:nowrap;overflow:visible;
+  }
+  .chart-x > .is-today{color:var(--text);font-weight:800}
+
+
+  /*
    * گروهی که باید از آن انتخاب شود ولی نشده.
    *
    * وقتی دکمه بدون انتخاب زده می‌شود، این کلاس یک لحظه روی گروه
