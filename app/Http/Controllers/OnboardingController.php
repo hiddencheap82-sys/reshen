@@ -36,7 +36,7 @@ final class OnboardingController extends Controller
         $name = trim((string) $request->input('name', ''));
         $city = trim((string) $request->input('city', ''));
         $address = trim((string) $request->input('address', ''));
-        $seats = max(1, (int) $request->input('seats', 1));
+        $seats = max(1, $request->integer('seats', 1));
 
         if ($name === '') {
             return $this->withError('نام سالن را وارد کنید.', '/onboarding');

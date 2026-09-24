@@ -44,7 +44,7 @@ include __DIR__ . '/_nav.php';
       </div>
       <div>
         <label for="seats" class="block text-[12px] font-bold text-ink-600 mb-1.5">تعداد صندلی</label>
-        <input type="number" name="seats" id="seats" min="1" max="50" value="1"
+        <input type="text" name="seats" id="seats" value="۱" autocomplete="off"
                inputmode="numeric" class="field tabular-nums">
       </div>
     </div>

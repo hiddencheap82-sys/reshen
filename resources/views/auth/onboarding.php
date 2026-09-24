@@ -21,7 +21,7 @@
     </div>
     <div>
       <label class="block text-sm text-ink-600 mb-1.5" for="seats">تعداد صندلی</label>
-      <input id="seats" inputmode="numeric" type="number" name="seats" value="1" min="1" max="20"
+      <input id="seats" inputmode="numeric" type="text" autocomplete="off" name="seats" value="۱"
         class="field field-lg">
     </div>
   </div>

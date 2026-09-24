@@ -299,5 +299,56 @@ $newBookings = $hasSalon ? App\Domain\Booking\NewBookings::forCurrentUser() : 0;
 
 <?php include BASE_PATH . '/resources/views/components/install-prompt.php'; ?>
 
+<script>
+/*
+ * مبلغ، به زبانی که گفته می‌شود.
+ *
+ * مبلغ‌های تومانی بزرگ‌اند و یک صفرِ کم یا زیاد، اشتباهِ رایج و
+ * گران است: «۲۵۰۰۰۰۰» به‌جای «۲۵۰۰۰۰». زیر هر فیلدِ پولی (data-money)
+ * همان عدد به شکلِ گفتاری می‌آید — «یعنی ۲ میلیون و ۵۰۰ هزار تومان» —
+ * تا اشتباه پیش از ثبت دیده شود. ارقام فارسی و عربی هم پذیرفته‌اند؛
+ * سرور همان‌ها را با App\Support\Digits می‌خواند.
+ */
+(function () {
+  var FA = '۰۱۲۳۴۵۶۷۸۹';
+  function toLatin(s) {
+    return s.replace(/[۰-۹]/g, function (d) { return FA.indexOf(d); })
+            .replace(/[٠-٩]/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'.indexOf(d); });
+  }
+  function fa(n) { return String(n).replace(/\d/g, function (d) { return FA[d]; }); }
+  function spoken(n) {
+    var parts = [];
+    var m = Math.floor(n / 1e6), k = Math.floor((n % 1e6) / 1e3), r = n % 1e3;
+    if (m) parts.push(fa(m) + ' میلیون');
+    if (k) parts.push(fa(k) + ' هزار');
+    if (r) parts.push(fa(r));
+    return parts.join(' و ');
+  }
+
+  document.querySelectorAll('input[data-money]').forEach(function (input) {
+    var echo = document.createElement('p');
+    echo.className = 'text-[12px] text-ink-500 mt-1.5';
+    echo.setAttribute('aria-live', 'polite');
+    input.insertAdjacentElement('afterend', echo);
+
+    function render() {
+      var raw = toLatin(input.value).replace(/[٬,\s\u200c]/g, '');
+      if (raw === '') { echo.textContent = ''; return; }
+      if (!/^\d+$/.test(raw)) {
+        echo.textContent = 'فقط عدد بنویس';
+        echo.classList.add('text-bad');
+        return;
+      }
+      echo.classList.remove('text-bad');
+      var n = parseInt(raw, 10);
+      echo.textContent = n === 0 ? '' : 'یعنی ' + spoken(n) + ' تومان';
+    }
+
+    input.addEventListener('input', render);
+    render();
+  });
+})();
+</script>
+
 </body>
 </html>

@@ -40,8 +40,8 @@ final class ServiceController extends Controller
         $repo->create(Auth::salonId(), [
             'name' => $name,
             'description' => self::description($request),
-            'duration_minutes' => max(5, (int) $request->input('duration_minutes', 30)),
-            'price' => Money::fromToman(max(0, (int) $request->input('price_toman', 0)))->rials,
+            'duration_minutes' => max(5, $request->integer('duration_minutes', 30)),
+            'price' => Money::fromToman(max(0, $request->integer('price_toman')))->rials,
         ]);
 
         return $this->withSuccess('خدمت اضافه شد.', '/panel/services');
@@ -72,8 +72,8 @@ final class ServiceController extends Controller
         $repo->update(Auth::salonId(), $id, [
             'name' => trim((string) $request->input('name', '')),
             'description' => self::description($request),
-            'duration_minutes' => max(5, (int) $request->input('duration_minutes', 30)),
-            'price' => Money::fromToman(max(0, (int) $request->input('price_toman', 0)))->rials,
+            'duration_minutes' => max(5, $request->integer('duration_minutes', 30)),
+            'price' => Money::fromToman(max(0, $request->integer('price_toman')))->rials,
         ]);
 
         return $this->withSuccess('تغییرات ذخیره شد.', '/panel/services/' . $id . '/edit');
@@ -83,11 +83,10 @@ final class ServiceController extends Controller
     {
         $serviceId = (int) $request->param('id');
         $staffId = (int) $request->input('staff_id');
-        $durationRaw = $request->input('duration_minutes');
-        $priceRaw = $request->input('price_toman');
-
-        $duration = $durationRaw !== '' && $durationRaw !== null ? (int) $durationRaw : null;
-        $price = $priceRaw !== '' && $priceRaw !== null ? Money::fromToman((int) $priceRaw)->rials : null;
+        // خالی یعنی «همان مقدارِ پیش‌فرضِ خدمت»، نه صفر — پس null می‌ماند.
+        $duration = \App\Support\Digits::toInt($request->input('duration_minutes'));
+        $priceToman = \App\Support\Digits::toInt($request->input('price_toman'));
+        $price = $priceToman !== null ? Money::fromToman($priceToman)->rials : null;
 
         (new ServiceRepository())->setOverride(Auth::salonId(), $staffId, $serviceId, $duration, $price);
 

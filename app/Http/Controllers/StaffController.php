@@ -35,7 +35,7 @@ final class StaffController extends Controller
         $salonId = Auth::salonId();
         $name = trim((string) $request->input('name', ''));
         $phoneRaw = trim((string) $request->input('phone', ''));
-        $commission = $request->input('commission_percent');
+        $commission = $request->decimal('commission_percent');
 
         if ($name === '') {
             return $this->withError('نام آرایشگر را وارد کنید.', '/panel/staff/create');
@@ -64,7 +64,7 @@ final class StaffController extends Controller
             'user_id' => $userId,
             'name' => $name,
             'phone' => $phoneRaw !== '' ? IranMobile::parse($phoneRaw)->e164 : null,
-            'commission_percent' => $commission !== '' && $commission !== null ? (float) $commission : null,
+            'commission_percent' => $commission,
             'color' => (string) $request->input('color', '#2563eb'),
         ]);
 
@@ -88,7 +88,7 @@ final class StaffController extends Controller
         $repo = new StaffRepository();
         $repo->update(Auth::salonId(), $id, [
             'name' => trim((string) $request->input('name', '')),
-            'commission_percent' => $request->input('commission_percent') !== '' ? (float) $request->input('commission_percent') : null,
+            'commission_percent' => $request->decimal('commission_percent'),
             'color' => (string) $request->input('color', '#2563eb'),
         ]);
 

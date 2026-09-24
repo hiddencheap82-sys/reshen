@@ -22,7 +22,7 @@
   <div class="space-y-4">
     <div>
       <label class="block text-sm text-ink-600 mb-1.5" for="commission_percent">درصد پیش‌فرض تسویه</label>
-      <input id="commission_percent" inputmode="numeric" type="number" step="0.1" name="commission_percent" value="<?= e((string)($staff['commission_percent'] ?? '')) ?>" placeholder="۵۰"
+      <input id="commission_percent" inputmode="decimal" type="text" autocomplete="off" name="commission_percent" value="<?= e(($staff['commission_percent'] ?? '') === '' || $staff['commission_percent'] === null ? '' : fa_num((float) $staff['commission_percent'])) ?>" placeholder="۵۰"
         class="field field-lg">
     </div>
     <div>

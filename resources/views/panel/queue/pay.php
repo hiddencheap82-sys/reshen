@@ -23,12 +23,12 @@ use App\Support\Money;
     <?= csrf_field() ?>
     <div>
       <label class="block text-sm text-ink-600 mb-1.5" for="amount_toman">مبلغ کل (تومان)</label>
-      <input id="amount_toman" inputmode="numeric" type="number" name="amount_toman" value="<?= (int) Money::fromRials($amount)->toToman() ?>"
+      <input id="amount_toman" inputmode="numeric" type="text" autocomplete="off" data-money name="amount_toman" value="<?= e(fa_num((int) Money::fromRials($amount)->toToman())) ?>"
         class="field field-lg font-bold">
     </div>
     <div>
       <label class="block text-sm text-ink-600 mb-1.5" for="tip_toman">انعام (اختیاری)</label>
-      <input id="tip_toman" inputmode="numeric" type="number" name="tip_toman" value="0" class="field field-lg">
+      <input id="tip_toman" inputmode="numeric" type="text" autocomplete="off" data-money name="tip_toman" value="" placeholder="۰" class="field field-lg">
     </div>
     <div>
       <label class="block text-sm text-ink-600 mb-2">روش پرداخت</label>

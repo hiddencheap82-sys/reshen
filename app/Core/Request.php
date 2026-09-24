@@ -63,6 +63,25 @@ final class Request
         return $_POST[$key] ?? $_GET[$key] ?? $default;
     }
 
+    /**
+     * عدد صحیح از فرم — با ارقام فارسی و عربی و جداکنندهٔ هزارگان.
+     *
+     * هر فیلد عددی از این راه خوانده می‌شود، نه با ‎(int) $request->input()‎.
+     * دلیلش در App\Support\Digits است: در PHP ‎(int) "۲۰۰۰۰۰"‎ صفر است،
+     * و آرایشگری که با صفحه‌کلید فارسی مبلغ می‌زد، هر پرداخت را صفر ثبت
+     * می‌کرد.
+     */
+    public function integer(string $key, int $default = 0): int
+    {
+        return \App\Support\Digits::toInt($this->input($key)) ?? $default;
+    }
+
+    /** مثل integer، با ممیز. null یعنی فیلد خالی یا نامعتبر بوده. */
+    public function decimal(string $key): ?float
+    {
+        return \App\Support\Digits::toFloat($this->input($key));
+    }
+
     public function all(): array
     {
         return array_merge($_GET, $_POST);

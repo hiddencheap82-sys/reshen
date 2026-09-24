@@ -36,12 +36,12 @@ foreach ($overrides as $o) { $overrideMap[(int)$o['staff_id']] = $o; }
   <div class="grid grid-cols-2 gap-3">
     <div>
       <label class="block text-sm text-ink-600 mb-1.5" for="duration_minutes">مدت (دقیقه)</label>
-      <input id="duration_minutes" inputmode="numeric" type="number" name="duration_minutes" value="<?= e((string)($service['duration_minutes'] ?? 30)) ?>"
+      <input id="duration_minutes" inputmode="numeric" type="text" autocomplete="off" name="duration_minutes" value="<?= e(fa_num((int) ($service['duration_minutes'] ?? 30))) ?>"
         class="field field-lg">
     </div>
     <div>
       <label class="block text-sm text-ink-600 mb-1.5" for="price_toman">قیمت (تومان)</label>
-      <input id="price_toman" inputmode="numeric" type="number" name="price_toman" value="<?= e((string)($service ? App\Support\Money::fromRials((int)$service['price'])->toToman() : 0)) ?>"
+      <input id="price_toman" inputmode="numeric" type="text" autocomplete="off" data-money name="price_toman" value="<?= e(fa_num((int) ($service ? App\Support\Money::fromRials((int)$service['price'])->toToman() : 0))) ?>"
         class="field field-lg">
     </div>
   </div>
@@ -58,14 +58,14 @@ foreach ($overrides as $o) { $overrideMap[(int)$o['staff_id']] = $o; }
       <?= csrf_field() ?>
       <input type="hidden" name="staff_id" value="<?= (int)$st['id'] ?>">
       <span class="text-sm text-ink-700 w-24 shrink-0 truncate"><?= e($st['name']) ?></span>
-      <input inputmode="numeric" type="number" name="duration_minutes" placeholder="دقیقه"
+      <input inputmode="numeric" type="text" autocomplete="off" name="duration_minutes" placeholder="دقیقه"
         aria-label="مدت این خدمت برای <?= e($st['name']) ?> (دقیقه)"
-        value="<?= e($ov ? (string)$ov['duration_minutes'] : '') ?>"
-        class="w-20 rounded-lg border border-ink-200 px-2 py-1.5 text-sm">
-      <input inputmode="numeric" type="number" name="price_toman" placeholder="تومان"
+        value="<?= e($ov ? fa_num((int) $ov['duration_minutes']) : '') ?>"
+        class="field w-20 text-center tabular-nums">
+      <input inputmode="numeric" type="text" autocomplete="off" name="price_toman" placeholder="تومان"
         aria-label="قیمت این خدمت برای <?= e($st['name']) ?> (تومان)"
-        value="<?= e($ov && $ov['price'] !== null ? (string) App\Support\Money::fromRials((int)$ov['price'])->toToman() : '') ?>"
-        class="w-28 rounded-lg border border-ink-200 px-2 py-1.5 text-sm">
+        value="<?= e($ov && $ov['price'] !== null ? fa_num((int) App\Support\Money::fromRials((int)$ov['price'])->toToman()) : '') ?>"
+        class="field w-28 text-center tabular-nums">
       <button type="submit" class="text-xs bg-ink-100 hover:bg-ink-200 rounded-lg px-3 py-1.5">ذخیره</button>
     </form>
   <?php endforeach; ?>

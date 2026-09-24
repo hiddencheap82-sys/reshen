@@ -127,7 +127,7 @@ final class PlatformController extends Controller
         }
 
         $planCode = (string) $request->input('plan_code', '');
-        $seats = max(1, (int) $request->input('seats', 1));
+        $seats = max(1, $request->integer('seats', 1));
         $plans = new PlanRepository();
 
         if ($plans->find($planCode) === null) {
@@ -575,7 +575,7 @@ final class PlatformController extends Controller
         $city = trim((string) $request->input('city', ''));
         $address = trim((string) $request->input('address', ''));
         $planCode = (string) $request->input('plan_code', 'trial');
-        $seats = max(1, (int) $request->input('seats', 1));
+        $seats = max(1, $request->integer('seats', 1));
         $ownerPhoneRaw = trim((string) $request->input('owner_phone', ''));
         $ownerName = trim((string) $request->input('owner_name', ''));
         $ownerPassword = (string) $request->input('owner_password', '');

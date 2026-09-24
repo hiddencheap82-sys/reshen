@@ -140,8 +140,8 @@ $trialEnds = $salon['trial_ends_at'];
 
       <div>
         <label for="plan-seats" class="block text-[13px] font-semibold text-ink-800 mb-1.5">تعداد صندلی</label>
-        <input type="number" inputmode="numeric" id="plan-seats" name="seats" min="1" max="99"
-               value="<?= e((string) $salon['seats']) ?>"
+        <input type="text" inputmode="numeric" autocomplete="off" id="plan-seats" name="seats"
+               value="<?= e(fa_num((int) $salon['seats'])) ?>"
                class="field tabular-nums">
       </div>
 

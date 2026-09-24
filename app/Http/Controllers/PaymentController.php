@@ -49,8 +49,8 @@ final class PaymentController extends Controller
         $salonId = Auth::salonId();
         $appointmentId = (int) $request->param('id');
         $method = (string) $request->input('method', 'cash');
-        $amount = Money::fromToman((int) $request->input('amount_toman', 0))->rials;
-        $tip = Money::fromToman((int) $request->input('tip_toman', 0))->rials;
+        $amount = Money::fromToman($request->integer('amount_toman'))->rials;
+        $tip = Money::fromToman($request->integer('tip_toman'))->rials;
 
         (new PaymentRepository())->record($salonId, $appointmentId, $method, $amount, $tip, Auth::id());
 

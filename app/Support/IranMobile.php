@@ -74,10 +74,6 @@ final class IranMobile
 
     private static function normalizeDigits(string $value): string
     {
-        $persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-        $arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-        $latin = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-
-        return strtr($value, array_combine(array_merge($persian, $arabic), array_merge($latin, $latin)));
+        return Digits::toLatin($value);
     }
 }
