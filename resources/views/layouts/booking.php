@@ -32,7 +32,7 @@ $step = $step ?? null;
   $pwaAppTitle = $salon['name'] ?? 'رشن';
   include BASE_PATH . '/resources/views/components/pwa-head.php';
 ?>
-<meta name="theme-color" content="#1C1917" id="theme-color">
+<meta name="theme-color" content="#102431" id="theme-color">
 <meta name="color-scheme" content="light dark">
 <?php include BASE_PATH . '/resources/views/components/theme-boot.php'; ?>
 </head>

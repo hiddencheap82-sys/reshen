@@ -283,7 +283,7 @@ $etaText = static fn (array $row): string => !empty($row['display']['next'])
 
       <header class="px-4 py-3 flex items-center gap-2.5 border-b" style="border-color:var(--line)">
         <span class="w-8 h-8 rounded-lg grid place-items-center text-[12px] font-extrabold text-white on-tint shrink-0"
-              style="background:<?= e($group['staff']['color'] ?: '#57534E') ?>" aria-hidden="true">
+              style="background:<?= e($group['staff']['color'] ?: '#4A565D') ?>" aria-hidden="true">
           <?= e(mb_substr($group['staff']['name'], 0, 1)) ?>
         </span>
         <span class="font-extrabold text-[14px] text-ink-900 flex-1"><?= e($group['staff']['name']) ?></span>

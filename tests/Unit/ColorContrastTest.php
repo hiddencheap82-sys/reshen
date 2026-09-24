@@ -40,13 +40,8 @@ final class ColorContrastTest extends TestCase
      * ارزشی ندارد.
      */
     private const TEXT_COLORS = [
-        'text-ink-300' => '#D6D3D1',
-        'text-ink-400' => '#6B6560',
-        'text-ink-500' => '#57534E',
-        'text-ink-600' => '#44403C',
-        'text-ink-700' => '#3A3633',
-        'text-ink-800' => '#292524',
-        'text-ink-900' => '#1C1917',
+        // ‎text-ink-*‎ اینجا نیست: از خودِ tailwind.config.js خوانده می‌شود
+        // (inkRamp)، تا این تست رنگی را نسنجد که منتشر نمی‌شود.
         'text-emerald-500' => '#10B981',
         'text-emerald-600' => '#059669',
         'text-emerald-700' => '#047857',
@@ -76,6 +71,44 @@ final class ColorContrastTest extends TestCase
         'bg-red-600' => '#DC2626',
         'bg-red-700' => '#B91C1C',
     ];
+
+    /**
+     * نردبانِ ink، همان‌طور که در tailwind.config.js نوشته شده.
+     *
+     * پیش‌تر مقادیرش اینجا هم کپی شده بود. یک بار پالت عوض شد و این
+     * تست رنگ‌های قبلی را می‌سنجید — «قبول» دربارهٔ رنگی که در مرورگر
+     * نبود (ت-۱۹). حالا منبع یکی است.
+     *
+     * @return array<string,string> 'text-ink-400' => '#5D6870'
+     */
+    private static function inkRamp(): array
+    {
+        $js = (string) file_get_contents(BASE_PATH . '/tools/assets/tailwind.config.js');
+        preg_match('/\bink:\s*\{([^}]*)\}/', $js, $block);
+        preg_match_all("/(\d+):'(#[0-9A-Fa-f]{6})'/", $block[1] ?? '', $pairs, PREG_SET_ORDER);
+
+        $ramp = [];
+        foreach ($pairs as [, $step, $hex]) {
+            $ramp['text-ink-' . $step] = strtoupper($hex);
+        }
+
+        return $ramp;
+    }
+
+    /** @return array<string,string> */
+    private static function textColors(): array
+    {
+        return self::inkRamp() + self::TEXT_COLORS;
+    }
+
+    public function testInkRampIsReadFromTheTailwindConfig(): void
+    {
+        $ramp = self::inkRamp();
+
+        foreach ([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as $step) {
+            $this->assertArrayHasKey('text-ink-' . $step, $ramp, "پلهٔ {$step} در tailwind.config.js پیدا نشد.");
+        }
+    }
 
     private static function luminance(string $hex): float
     {
@@ -127,12 +160,13 @@ final class ColorContrastTest extends TestCase
     /** هیچ متنی روی سطح روشن زیر AA نباشد. */
     public function testEveryTextColourUsedInViewsPassesAaOnLight(): void
     {
-        $used = self::classesUsedInViews(array_keys(self::TEXT_COLORS));
+        $colors = self::textColors();
+        $used = self::classesUsedInViews(array_keys($colors));
         $this->assertNotEmpty($used, 'هیچ کلاس رنگی پیدا نشد — الگوی جست‌وجو خراب است.');
 
         $bad = [];
         foreach ($used as $class => $file) {
-            $ratio = self::ratio(self::TEXT_COLORS[$class], self::LIGHT_SURFACE);
+            $ratio = self::ratio($colors[$class], self::LIGHT_SURFACE);
             if ($ratio < 4.5) {
                 $bad[] = "{$class} = {$ratio} (در {$file})";
             }

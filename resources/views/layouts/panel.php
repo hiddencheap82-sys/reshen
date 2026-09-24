@@ -102,7 +102,7 @@ $newBookings = $hasSalon ? App\Domain\Booking\NewBookings::forCurrentUser() : 0;
 <title><?= e($title ?? 'رشن') ?></title>
 <link rel="stylesheet" href="<?= asset('css/app.css') ?>">
 <?php include BASE_PATH . '/resources/views/components/pwa-head.php'; ?>
-<meta name="theme-color" content="#1C1917">
+<meta name="theme-color" content="#102431">
 <style>
   .nav-active{ background:var(--accent-soft); color:var(--accent); font-weight:700; }
 </style>

@@ -39,15 +39,15 @@ function reshen_doctor_stop($title, $body)
     echo '<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8">'
        . '<meta name="viewport" content="width=device-width, initial-scale=1">'
        . '<title>' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '</title><style>'
-       . "body{margin:0;background:#FAFAF9;color:#1C1917;"
+       . "body{margin:0;background:#F9FAFB;color:#111B21;"
        . "font:15px/1.9 Tahoma,'Segoe UI',sans-serif;"
        . 'display:grid;place-items:center;min-height:100vh;padding:20px}'
-       . '.card{background:#fff;border:1px solid #E7E5E4;border-radius:16px;'
+       . '.card{background:#fff;border:1px solid #E3E6E8;border-radius:16px;'
        . 'padding:28px;max-width:560px;width:100%}'
-       . 'h1{font-size:18px;margin:0 0 14px}p{margin:0 0 12px;color:#44403C}'
+       . 'h1{font-size:18px;margin:0 0 14px}p{margin:0 0 12px;color:#37434B}'
        . 'code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;'
-       . 'background:#F5F5F4;border-radius:6px;padding:2px 6px;direction:ltr;'
-       . 'display:inline-block}ol{margin:0;padding-inline-start:20px;color:#44403C}'
+       . 'background:#F3F5F6;border-radius:6px;padding:2px 6px;direction:ltr;'
+       . 'display:inline-block}ol{margin:0;padding-inline-start:20px;color:#37434B}'
        . 'li{margin-bottom:8px}.now{background:#FEF2F2;border:1px solid #FECACA;'
        . 'color:#991B1B;border-radius:10px;padding:10px 14px;margin:0 0 16px;font-size:14px}'
        . '</style></head><body><div class="card"><h1>'

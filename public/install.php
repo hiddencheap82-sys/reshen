@@ -43,17 +43,17 @@ if (version_compare(PHP_VERSION, RESHEN_MIN_PHP, '<')) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>نسخهٔ PHP قدیمی است</title>
 <style>
-  body{margin:0;background:#FAFAF9;color:#1C1917;
+  body{margin:0;background:#F9FAFB;color:#111B21;
        font:15px/1.8 Tahoma,'Segoe UI',sans-serif;
        display:grid;place-items:center;min-height:100vh;padding:20px}
-  .card{background:#fff;border:1px solid #E7E5E4;border-radius:16px;
+  .card{background:#fff;border:1px solid #E3E6E8;border-radius:16px;
         padding:28px;max-width:520px;width:100%}
   h1{font-size:18px;margin:0 0 12px}
-  p{margin:0 0 12px;color:#44403C}
+  p{margin:0 0 12px;color:#37434B}
   code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;
-       background:#F5F5F4;border-radius:6px;padding:2px 6px;direction:ltr;
+       background:#F3F5F6;border-radius:6px;padding:2px 6px;direction:ltr;
        display:inline-block}
-  ol{margin:0;padding-inline-start:20px;color:#44403C}
+  ol{margin:0;padding-inline-start:20px;color:#37434B}
   li{margin-bottom:8px}
   .now{background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;
        border-radius:10px;padding:10px 14px;margin:0 0 16px;font-size:14px}

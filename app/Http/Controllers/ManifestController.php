@@ -39,10 +39,10 @@ final class ManifestController extends Controller
 
         $isSalon = $salon !== null;
 
-        // رنگ نوار بالای اپ. برای صفحهٔ سالن، سرصفحهٔ تیره؛ برای پنل،
-        // همان زغالی. هر دو با چیزی که واقعاً رندر می‌شود یکی است،
-        // وگرنه موقع باز شدن یک نوار بی‌ربط بالای صفحه می‌ماند.
-        $themeColor = '#1C1917';
+        // رنگ نوار بالای اپ: نفتیِ سرصفحه (--hero)، برای صفحهٔ سالن و
+        // پنل هر دو. باید با چیزی که واقعاً رندر می‌شود یکی باشد، وگرنه
+        // موقع باز شدن یک نوار بی‌ربط بالای صفحه می‌ماند.
+        $themeColor = '#102431';
 
         $manifest = [
             // id ثابت می‌ماند تا مرورگر نصبِ قبلی را همان اپ بشناسد،
@@ -57,7 +57,7 @@ final class ManifestController extends Controller
             'scope' => url(''),
             'display' => 'standalone',
             'orientation' => 'portrait',
-            'background_color' => '#FAFAF9',
+            'background_color' => '#F9FAFB',
             'theme_color' => $themeColor,
             'dir' => 'rtl',
             'lang' => 'fa-IR',

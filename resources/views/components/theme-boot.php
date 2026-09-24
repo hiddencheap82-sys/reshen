@@ -18,7 +18,8 @@
     document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
     // نوار بالای مرورگر موبایل هم باید با صفحه یک‌رنگ باشد
     var m = document.getElementById('theme-color');
-    if (m) { m.setAttribute('content', dark ? '#071019' : '#1C1917'); }
+    // همان --hero: نفتی در روشن، نفتیِ عمیق در تیره
+    if (m) { m.setAttribute('content', dark ? '#0A151E' : '#102431'); }
   };
 
   var saved = null;
