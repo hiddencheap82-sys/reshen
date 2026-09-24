@@ -24,6 +24,21 @@ $live = in_array($appointment['status'], ['confirmed','queued','in_chair'], true
     <div class="text-xs text-ink-400 mb-1">زمان تقریبی نوبت شما</div>
     <div class="text-2xl font-extrabold text-accent"><?= e($display['text']) ?></div>
     <?php if ($display['rough']): ?><div class="text-[12px] text-warn mt-1">تخمین تقریبی</div><?php endif; ?>
+  <?php elseif ($appointment['status'] === 'confirmed' && $appointment['scheduled_at']): ?>
+    <?php
+    /*
+     * نوبتِ روزهای بعد.
+     *
+     * در صفِ امروز نیست، پس تخمینی هم ندارد — و درست است که نداشته
+     * باشد: تخمینِ صف برای امروز معنی دارد، نه برای سه‌شنبهٔ بعد. سرتیترش
+     * خودِ روز و ساعتِ رزرو است، نه کلمهٔ «تأییدشده».
+     */
+    $at = new DateTimeImmutable((string) $appointment['scheduled_at']);
+    ?>
+    <div class="text-xs text-ink-400 mb-1">نوبت شما</div>
+    <div class="text-2xl font-extrabold text-accent">
+      <?= e(App\Support\JalaliCalendar::relativeDate($at)) ?>، ساعت <?= e(fa_time($at->format('H:i'))) ?>
+    </div>
   <?php else: ?>
     <div class="text-lg font-bold text-ink-600"><?= e($statusLabels[$appointment['status']] ?? $appointment['status']) ?></div>
   <?php endif; ?>
@@ -39,7 +54,31 @@ $live = in_array($appointment['status'], ['confirmed','queued','in_chair'], true
 </div>
 
 <?php if ($appointment['scheduled_at']): ?>
-<div class="text-xs text-ink-400 text-center mb-5">زمان رزروشده: <?= jdate($appointment['scheduled_at'], 'D j M، H:i') ?></div>
+<div class="text-xs text-ink-400 text-center mb-3">زمان رزروشده: <?= jdate($appointment['scheduled_at'], 'D j M، H:i') ?></div>
+<?php endif; ?>
+
+<?php if ($live && $appointment['kind'] === 'booked' && $appointment['status'] === 'confirmed'): ?>
+  <?php
+  /*
+   * قاعدهٔ سر وقت آمدن — به خودِ مشتری.
+   *
+   * صف یک قاعده دارد (QueueOrderingService): رزروی تا ده دقیقه بعد از
+   * ساعتش بر حضوری‌ها مقدم است، و بعد از آن به ترتیب رسیدن. تا حالا
+   * این قاعده فقط در کد بود؛ مشتری‌ای که ربع ساعت دیر می‌رسید و پشت
+   * حضوری‌ها می‌نشست، نمی‌فهمید چرا — و فکر می‌کرد سالن به نوبتش
+   * احترام نگذاشته. گفتنش از پیش، هم انگیزهٔ سر وقت آمدن است، هم
+   * جلوی دلخوری را می‌گیرد.
+   */
+  $graceMinutes = (int) App\Core\Config::get('reshen.queue.priority_window_minutes', 10);
+  ?>
+  <div class="flex items-start gap-2.5 rounded-xl px-3.5 py-3 mb-5 text-[12px] leading-relaxed text-ink-600"
+       style="background:var(--fill-secondary)">
+    <?= icon('clock', 'w-4 h-4 shrink-0 mt-0.5 text-ink-400') ?>
+    <span>
+      سر وقت بیا. اگر بیش از <?= e(fa_num($graceMinutes)) ?> دقیقه دیر برسی، نوبتت به ترتیبِ
+      رسیدن حساب می‌شود و ممکن است منتظر بمانی.
+    </span>
+  </div>
 <?php endif; ?>
 
 <?php if ($live): ?>

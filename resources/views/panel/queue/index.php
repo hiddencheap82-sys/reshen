@@ -204,6 +204,34 @@ $sum = $todaySummary ?? ['total'=>0,'completed'=>0,'waiting'=>0,'in_chair'=>0,'n
                 </span>
                 <?php if ($row['kind'] === 'booked'): ?>
                   <span class="text-[12px] font-bold bg-ink-100 text-ink-600 rounded px-1.5 py-0.5 whitespace-nowrap">رزرو</span>
+                  <?php
+                  /*
+                   * «دیر کرده» — مشتریِ رزروی که از پنجرهٔ اولویتش گذشته و
+                   * هنوز نیامده.
+                   *
+                   * بدون این، آرایشگر نمی‌داند منتظر بماند یا نفر بعدی را
+                   * بنشاند. با این، یا زنگ می‌زند یا «غیبت» می‌زند — و هر
+                   * دو، تخمینِ بقیهٔ صف را به واقعیت برمی‌گردانند. مرزش
+                   * همان پنجره‌ای است که QueueOrderingService اولویت را با
+                   * آن می‌سنجد، تا چیپ و ترتیبِ صف یک حرف بزنند.
+                   */
+                  $late = null;
+                  if (!$inChair && ($row['status'] ?? '') === 'confirmed' && !empty($row['scheduled_at'])) {
+                      $window = (int) App\Core\Config::get('reshen.queue.priority_window_minutes', 10);
+                      $overdue = (int) floor((time() - strtotime((string) $row['scheduled_at'])) / 60);
+                      if ($overdue > $window) {
+                          $late = $overdue;
+                      }
+                  }
+                  ?>
+                  <?php if ($late !== null): ?>
+                    <span class="text-[12px] font-bold rounded px-1.5 py-0.5 whitespace-nowrap text-bad"
+                          style="background:var(--bad-soft)">
+                      <?= $late < 60
+                          ? e(fa_num($late)) . ' دقیقه دیر'
+                          : e(fa_num(intdiv($late, 60))) . ' ساعت دیر' ?>
+                    </span>
+                  <?php endif; ?>
                 <?php endif; ?>
               </div>
               <p class="text-[12px] text-ink-500 mt-0.5 truncate">
