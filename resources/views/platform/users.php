@@ -47,8 +47,8 @@ include __DIR__ . '/_nav.php';
         خالی بگذارید تا این کاربر فقط با کد پیامکی وارد شود. اگر رمز بگذارید، خودتان باید به او بگویید.
       </p>
     </div>
-    <label class="tap flex items-center gap-2 text-[13px] text-ink-600">
-      <input type="checkbox" name="is_platform_admin" value="1" class="w-4 h-4 accent-current">
+    <label class="tap flex items-center gap-2 min-h-11 text-[13px] text-ink-600">
+      <input type="checkbox" name="is_platform_admin" value="1" class="w-5 h-5 accent-current">
       مدیر پلتفرم باشد — به همهٔ سالن‌ها دسترسی دارد
     </label>
     <button type="submit" class="btn-accent metal w-full h-11 text-[13px]">ساخت کاربر</button>

@@ -65,8 +65,9 @@
               PNG یا JPG، تا ۳ مگابایت. به‌طور خودکار کوچک می‌شود.
             </p>
             <?php if ($logoUrl !== null): ?>
-              <label class="inline-flex items-center gap-1.5 text-[12px] text-ink-500 mt-1.5 cursor-pointer" for="name">
-                <input type="checkbox" name="remove_logo" value="1" class="w-4 h-4 accent-current">
+              <!-- بدون ‎for‎: پیش‌تر ‎for="name"‎ داشت و زدنِ متن، فیلدِ نامِ سالن را فعال می‌کرد. -->
+              <label class="inline-flex items-center gap-2 text-[12px] text-ink-500 min-h-11 cursor-pointer">
+                <input type="checkbox" name="remove_logo" value="1" class="w-5 h-5 accent-current">
                 حذف لوگوی فعلی
               </label>
             <?php endif; ?>
@@ -199,10 +200,22 @@
           -->
           <div class="flex items-center justify-between gap-2 mb-2">
             <span class="text-[13px] font-bold text-ink-800"><?= e($dayName) ?></span>
-            <label class="flex items-center gap-1.5 text-[12px] text-ink-600 cursor-pointer
-                          py-1 px-1.5 -me-1.5 rounded-lg" for="off_staff_id">
+            <?php
+            /*
+             * برچسب، خودِ کلید است — ۴۴ پیکسل.
+             *
+             * پیش‌تر هر هفت برچسب ‎for="off_staff_id"‎ داشتند: یعنی به
+             * فهرستِ آرایشگرِ فرمِ مرخصی (پایین‌تر) وصل بودند، نه به
+             * چک‌باکسِ خودشان. زدنِ کلمهٔ «تعطیل» روز را نمی‌بست؛ فقط
+             * مربعِ ۱۶ پیکسلی کار می‌کرد. حالا برچسب چک‌باکس را در بر
+             * می‌گیرد و ‎for‎ ندارد، و روز همان لحظه کم‌رنگ می‌شود.
+             */
+            ?>
+            <label class="flex items-center gap-2 text-[12px] font-semibold text-ink-600 cursor-pointer
+                          min-h-11 px-2.5 -me-2.5 rounded-lg">
               <input type="checkbox" name="closed_<?= $i ?>" <?= $closed ? 'checked' : '' ?>
-                     class="w-4 h-4 accent-current">
+                     onchange="this.closest('fieldset').classList.toggle('opacity-55', this.checked)"
+                     class="w-5 h-5 accent-current">
               تعطیل
             </label>
           </div>

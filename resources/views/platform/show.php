@@ -160,8 +160,8 @@ $trialEnds = $salon['trial_ends_at'];
             'value' => $trialEnds !== null ? substr((string) $trialEnds, 0, 10) : null,
             'years' => [-1, 3],
         ]) ?>
-        <label class="tap flex items-center gap-2 mt-2 text-[12px] text-ink-500">
-          <input type="checkbox" name="no_trial_end" value="1" class="w-4 h-4 accent-current"
+        <label class="tap flex items-center gap-2 mt-1 min-h-11 text-[12px] text-ink-500">
+          <input type="checkbox" name="no_trial_end" value="1" class="w-5 h-5 accent-current"
                  <?= $trialEnds === null ? 'checked' : '' ?>>
           بدون مهلت
         </label>

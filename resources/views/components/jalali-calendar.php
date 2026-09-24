@@ -58,8 +58,17 @@ $atMin = $minMonth !== null
     </a>
   </div>
 
-  <div class="p-2">
-    <div class="grid grid-cols-7 gap-1 mb-1" aria-hidden="true">
+  <?php
+  /*
+   * فاصله‌ها روی گوشیِ باریک نصف می‌شوند.
+   *
+   * هفت ستون در ۳۲۰ پیکسل، با ‎p-2‎ و ‎gap-1‎، خانه‌ای ۳۳ پیکسلی می‌داد
+   * و روی ۳۶۰ پیکسل ۳۹ — کمتر از حداقلِ لمس، کنارِ هم، در صفحه‌ای که
+   * مشتری با آن روزِ نوبتش را انتخاب می‌کند. با فاصلهٔ نصف: ۳۷ و ۴۳.
+   */
+  ?>
+  <div class="p-1 sm:p-2">
+    <div class="grid grid-cols-7 gap-0.5 sm:gap-1 mb-1" aria-hidden="true">
       <?php foreach (JalaliCalendar::WEEKDAY_INITIALS as $i => $initial): ?>
         <div class="h-7 grid place-items-center text-[12px] font-bold
                     <?= $i >= 5 ? 'text-accent' : 'text-ink-400' ?>">
@@ -68,7 +77,7 @@ $atMin = $minMonth !== null
       <?php endforeach; ?>
     </div>
 
-    <div class="grid grid-cols-7 gap-1">
+    <div class="grid grid-cols-7 gap-0.5 sm:gap-1">
       <?php foreach ($cal['weeks'] as $week): ?>
         <?php foreach ($week as $cell): ?>
 

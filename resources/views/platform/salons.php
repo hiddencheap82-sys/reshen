@@ -20,7 +20,11 @@ include __DIR__ . '/_nav.php';
   </a>
 </div>
 
-<form method="get" action="<?= e(url('platform/salons')) ?>" class="flex gap-2 mb-4">
+<!--
+  شبکه، نه flex: ‎.field‎ پهنای ۱۰۰٪ دارد و در ردیفِ flex، فهرستِ «وضعیت»
+  همهٔ ردیف را می‌گرفت و جعبهٔ جستجو روی گوشی ۲۶ پیکسل می‌ماند.
+-->
+<form method="get" action="<?= e(url('platform/salons')) ?>" class="grid grid-cols-[minmax(0,1fr)_auto_auto] gap-2 mb-4">
   <label for="salon-q" class="sr-only">جستجوی سالن</label>
   <input type="search" id="salon-q" name="q" value="<?= e($q) ?>"
          placeholder="نام، نشانی یا شهر"

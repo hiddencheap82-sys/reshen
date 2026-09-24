@@ -38,8 +38,8 @@ $etaText = static fn (array $row): string => !empty($row['display']['next'])
   یا نبودِ تاریخ، این صفحه را از واقعیت جدا می‌کند.
 -->
 <div class="glass rounded-2xl p-4 mb-4 rise hairline-accent">
-  <div class="flex items-baseline justify-between mb-3">
-    <div>
+  <div class="flex items-baseline justify-between gap-3 mb-3">
+    <div class="min-w-0">
       <div class="text-[15px] font-extrabold text-ink-900">
         <?= e(JalaliCalendar::humanDate($today, true)) ?>
       </div>
@@ -50,7 +50,7 @@ $etaText = static fn (array $row): string => !empty($row['display']['next'])
     <?php if ($salonEarnings !== null): ?>
       <div class="text-left">
         <div class="text-[12px] text-ink-400">فروش امروز</div>
-        <div class="text-xl font-extrabold text-accent tabular-nums">
+        <div class="text-xl font-extrabold text-accent tabular-nums whitespace-nowrap">
           <?= e(toman((int) ($salonEarnings['total'] ?? 0))) ?>
         </div>
       </div>
@@ -402,9 +402,10 @@ $etaText = static fn (array $row): string => !empty($row['display']['next'])
                   وسط کار و بدون خواندن باید پیدایش کند، پس هرجا بیاید
                   یک رنگ دارد.
                 -->
-                <button class="btn-done w-full h-11 text-[13px]">
+                <!-- زیر ۳۶۰ پیکسل «و تسویه» جا نمی‌شود و دکمه دوخطی می‌شد. -->
+                <button class="btn-done w-full h-11 px-3 text-[13px] whitespace-nowrap">
                   <?= icon('check', 'w-4 h-4') ?>
-                  تمام شد و تسویه
+                  <span>تمام شد<span class="hidden min-[360px]:inline"> و تسویه</span></span>
                 </button>
               </form>
             <?php endif; ?>

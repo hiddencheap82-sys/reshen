@@ -38,7 +38,7 @@ $filters = [
   <?php foreach ($filters as $key => $label): ?>
     <?php $on = $status === $key; ?>
     <a href="<?= e(url('platform/support' . ($key === '' ? '' : '?status=' . $key))) ?>"
-       class="tap shrink-0 h-9 px-3.5 inline-flex items-center gap-1.5 rounded-xl text-[12px] font-semibold
+       class="tap shrink-0 h-11 px-3.5 inline-flex items-center gap-1.5 rounded-xl text-[12px] font-semibold
               <?= $on ? 'day-chip-on' : 'glass text-ink-700' ?>">
       <?= e($label) ?>
       <?php if ($key !== '' && ($counts[$key] ?? 0) > 0): ?>

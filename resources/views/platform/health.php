@@ -48,10 +48,10 @@ $style = [
 
 <div class="flex items-center gap-2 mb-4">
   <a href="<?= e(url('platform/health')) ?>"
-     class="tap h-9 px-3.5 inline-flex items-center rounded-xl text-[12px] font-semibold
+     class="tap h-11 px-3.5 inline-flex items-center rounded-xl text-[12px] font-semibold
             <?= $onlyBroken ? 'day-chip-on' : 'glass text-ink-700' ?>">فقط ایراددارها</a>
   <a href="<?= e(url('platform/health?all=1')) ?>"
-     class="tap h-9 px-3.5 inline-flex items-center rounded-xl text-[12px] font-semibold
+     class="tap h-11 px-3.5 inline-flex items-center rounded-xl text-[12px] font-semibold
             <?= $onlyBroken ? 'glass text-ink-700' : 'day-chip-on' ?>">همهٔ سالن‌ها</a>
 </div>
 
