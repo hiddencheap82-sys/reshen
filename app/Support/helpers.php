@@ -178,6 +178,32 @@ if (!function_exists('toman')) {
     }
 }
 
+if (!function_exists('phone_display')) {
+    /**
+     * شماره برای *نمایش*، به شکلی که ایرانی‌ها می‌خوانند: ‎۰۹۱۲ ۳۴۵ ۶۷۸۹‎.
+     *
+     * شماره‌ها به شکل بین‌المللی (‎+98912…‎) ذخیره می‌شوند که برای
+     * پیامک و «تماس» درست است، ولی روی صفحه غریبه است — هیچ‌کس شمارهٔ
+     * خودش را با ‎+98‎ نمی‌شناسد. چند صفحه IranMobile::local() را صدا
+     * می‌زدند و بقیه شکلِ خام را چاپ می‌کردند؛ این تابع یک‌دستشان می‌کند.
+     *
+     * شمارهٔ سالن ممکن است ثابت باشد (‎021…‎) و IranMobile آن را
+     * نمی‌پذیرد؛ آن‌وقت همان‌طور که هست، فقط با ارقام فارسی، برمی‌گردد.
+     * پیوندِ tel: همچنان شکل بین‌المللی را می‌گیرد، نه این را.
+     */
+    function phone_display(?string $phone): string
+    {
+        $phone = trim((string) $phone);
+        if ($phone === '') {
+            return '';
+        }
+
+        $mobile = App\Support\IranMobile::tryParse($phone);
+
+        return fa_num($mobile !== null ? $mobile->local() : $phone);
+    }
+}
+
 if (!function_exists('fa_num')) {
     /**
      * عدد فارسی.

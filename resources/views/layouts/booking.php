@@ -93,7 +93,7 @@ $step = $step ?? null;
                       bg-white/10 hover:bg-white/15 text-white transition-colors tap
                       focus-visible:outline-2 focus-visible:outline-accent">
               <?= icon('phone', 'w-3.5 h-3.5') ?>
-              <span class="ltr tabular-nums"><?= e(fa_num($salon['phone'])) ?></span>
+              <span class="ltr tabular-nums"><?= e(phone_display($salon['phone'])) ?></span>
             </a>
           <?php endif; ?>
 

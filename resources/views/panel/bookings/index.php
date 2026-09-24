@@ -88,7 +88,7 @@ $totalRows = array_sum(array_map(static fn ($d) => count($d['rows']), $days));
         </span>
         <span class="flex-1 min-w-0">
           <span class="block text-[13px] font-bold text-ink-900 truncate">
-            <?= e($b['customer_name'] ?? $b['customer_phone'] ?? 'مشتری') ?>
+            <?= e(($b['customer_name'] ?? '') !== '' ? $b['customer_name'] : (phone_display($b['customer_phone'] ?? '') ?: 'مشتری')) ?>
           </span>
           <span class="block text-[12px] text-ink-500 tabular-nums">
             <?= e(JalaliCalendar::humanDate($at)) ?> · <?= e(fa_time($at->format('H:i'))) ?>

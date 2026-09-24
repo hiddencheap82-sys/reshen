@@ -216,7 +216,7 @@ $trialEnds = $salon['trial_ends_at'];
           <li class="flex items-center justify-between text-[13px]">
             <span class="min-w-0 truncate">
               <?= e($o['name'] ?? '—') ?>
-              <span dir="ltr" class="text-ink-400 code"><?= e(fa_num($o['phone'])) ?></span>
+              <span dir="ltr" class="text-ink-400 code"><?= e(phone_display($o['phone'])) ?></span>
             </span>
             <span class="text-[12px] text-ink-400 shrink-0"><?= e($roleNames[$o['role']] ?? $o['role']) ?></span>
           </li>

@@ -41,7 +41,7 @@
     <span class="flex-1 min-w-0">
       <span class="block font-bold text-[14px] text-ink-800 truncate"><?= e($c['name'] ?: 'بدون نام') ?></span>
       <span class="block text-[12px] text-ink-400 code" dir="ltr">
-        <?= $c['phone'] ? e(fa_num(\App\Support\IranMobile::parse($c['phone'])->local())) : '—' ?>
+        <?= $c['phone'] ? e(phone_display($c['phone'])) : '—' ?>
       </span>
     </span>
     <span class="text-end shrink-0">

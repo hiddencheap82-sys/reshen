@@ -25,7 +25,7 @@
           عوض کردنش یعنی ساختن یک آدم تازه، نه ویرایش یک فیلد.
         -->
         <div class="text-[12px] text-ink-400 code" dir="ltr">
-          <?= e(fa_num(App\Support\IranMobile::parse((string) $user['phone'])->local())) ?>
+          <?= e(phone_display((string) $user['phone'])) ?>
         </div>
       </div>
       <?php if ((int) $user['is_platform_admin'] === 1): ?>

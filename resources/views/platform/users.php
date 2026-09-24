@@ -79,7 +79,7 @@ include __DIR__ . '/_nav.php';
           <?php if ($u['password_hash'] !== null): ?>
             <span class="shrink-0 text-ink-400" title="رمز دارد"><?= icon('key', 'w-3.5 h-3.5') ?></span>
           <?php endif; ?>
-          <span class="ms-auto text-[12px] text-ink-400 code shrink-0" dir="ltr"><?= e(fa_num($u['phone'])) ?></span>
+          <span class="ms-auto text-[12px] text-ink-400 code shrink-0" dir="ltr"><?= e(phone_display($u['phone'])) ?></span>
         </div>
 
         <p class="text-[12px] text-ink-400 leading-relaxed mb-2">

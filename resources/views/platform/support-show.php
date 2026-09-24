@@ -33,7 +33,7 @@ $badge = [
       <a href="<?= e(url('platform/' . $ticket['salon_id'])) ?>"
          class="text-accent font-semibold"><?= e($ticket['salon_name']) ?></a>
       <?php if (($ticket['opener_phone'] ?? '') !== ''): ?>
-        · <span dir="ltr" class="tabular-nums"><?= e($ticket['opener_phone']) ?></span>
+        · <span dir="ltr" class="tabular-nums"><?= e(phone_display($ticket['opener_phone'])) ?></span>
       <?php endif; ?>
     </p>
   </div>
